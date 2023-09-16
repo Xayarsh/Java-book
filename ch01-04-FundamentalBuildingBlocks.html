@@ -148,15 +148,15 @@
                     <main>
                         <h2 id="fundamentals"><a class="header" href="#fundamentals">Fundamental Building Blocks of Programs</a></h2>
                         <p>
-                            <span class="start"><big>T</big>here are two basic aspects</span> of programming: data
-                            and instructions. To work with data, you need to understand <span class="newword">variables</span>
-                            and <span class="newword">types</span>; to work with
-                            instructions, you need to understand <span class="newword">control structures</span>
-                            and <span class="newword">subroutines</span>. You'll spend a
+                            <span class="start">There are two basic aspects</span> of programming: data
+                            and instructions. To work with data, you need to understand <code>variables</code>
+                            and <code>types</code>; to work with
+                            instructions, you need to understand <code>control structures</code>
+                            and <code>subroutines</code>. You'll spend a
                             large part of the course becoming familiar with these concepts.</p>
 
 
-                        <p>A <span class="newword">variable</span> is just a memory location (or
+                        <p>A <code>variable</code> is just a memory location (or
                             several consecutive locations treated as a unit) that has been given a name so that it can
                             be easily referred to and used in a program. The programmer only has to worry
                             about the name; it is the compiler's responsibility to keep track of the memory
@@ -165,7 +165,7 @@
                             to know where in memory that box is located.</p>
 
 
-                        <p>In Java and in many other programming languages, a variable has a <span class="newword">type</span>
+                        <p>In Java and in many other programming languages, a variable has a <code>type</code>
                             that indicates what sort of data it can hold. One type of
                             variable might hold integers&mdash;whole numbers such as 3, -7, and 0&mdash;while
                             another holds floating point numbers&mdash;numbers with decimal points such as
@@ -185,7 +185,7 @@
                             "interest":</p>
 
 
-                        <pre><code class="language-java">$ interest = principal * 0.07;</code></pre>
+                        <pre><code class="java"> interest = principal * 0.07;</code></pre>
 
 
                         <p>There are also "input commands" for getting data from the user or from files
@@ -199,17 +199,17 @@
                             subroutines.</p>
 
 
-                        <hr class="break">
+                        <h3 id="contst"><a class="header" href="#contst">Control Structures</h3>
 
 
                         <p>A program is a sequence of instructions. In the ordinary "flow of control,"
                             the computer executes the instructions in the sequence in which they occur in the program,
                             one after the other. However, this is obviously very limited: the computer
-                            would soon run out of instructions to execute. <span class="newword">Control structures</span>
+                            would soon run out of instructions to execute. <code>Control structures</code>
                             are special instructions that can change the flow of control.
-                            There are two basic types of control structure: <span class="newword">loops</span>,
+                            There are two basic types of control structure: <code>loops</code>,
                             which allow a sequence of instructions to be repeated
-                            over and over, and <span class="newword">branches</span>, which allow the
+                            over and over, and <code>branches</code>, which allow the
                             computer to decide between two or more different courses of action by testing
                             conditions that occur as the program is running.</p>
 
@@ -222,11 +222,10 @@
                             statement":</p>
 
 
-                        <pre><code class="language-java"> if (principal &gt; 10000)
+                        <pre><code class="java"> if (principal &gt; 10000)
     interest = principal * 0.05;
  else
-    interest = principal * 0.04;
- </code></pre>
+    interest = principal * 0.04;</code></pre>
 
 
                         <p>(Don't worry about the details for now. Just remember that the computer can
@@ -244,12 +243,12 @@
                             program to express such repetition.</p>
 
 
-                        <hr class="break">
+                        <h3 id="subr"><a class="header" href="#subr">Subroutines</h3>
 
 
                         <p>Large programs are so complex that it would be almost impossible to write
                             them if there were not some way to break them up into manageable "chunks."
-                            Subroutines provide one way to do this. A <span class="newword">subroutine</span>
+                            Subroutines provide one way to do this. A <code>subroutine</code>
                             consists of the instructions for performing some
                             task, grouped together as a unit and given a name. That name can then be used
                             as a substitute for the whole set of instructions. For example, suppose that
@@ -260,7 +259,7 @@
                             single command:</p>
 
 
-                        <pre>drawHouse();</pre>
+                        <pre><code class="language-java">drawHouse();</code></pre>
 
 
                         <p>This will have the same effect as repeating all the house-drawing
@@ -278,7 +277,7 @@
                             on "inside" the subroutine.</p>
 
 
-                        <hr class="break">
+                        <h3></h3>
 
 
                         <p>Variables, types, loops, branches, and subroutines are the basis of what
