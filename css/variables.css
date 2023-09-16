@@ -50,6 +50,8 @@
     --searchresults-border-color: #888;
     --searchresults-li-bg: #252932;
     --search-mark-bg: #e3b171;
+
+    --hljs-params-color:  #e91e63
 }
 
 .coal {
@@ -90,6 +92,8 @@
     --searchresults-border-color: #98a3ad;
     --searchresults-li-bg: #2b2b2f;
     --search-mark-bg: #355c7d;
+
+    --hljs-params-color:  #e91e63
 }
 
 .light {
@@ -105,11 +109,11 @@
     --scrollbar: #8F8F8F;
 
     --icons: #747474;
-    --icons-hover: #000000;
+    --icons-hover: #a93830;
 
-    --links: #289f20;
+    --links: #009688;
 
-    --inline-code-color: #301900;
+    --inline-code-color: #fff7ed;
 
     --theme-popup-bg: #fafafa;
     --theme-popup-border: #cccccc;
@@ -130,6 +134,8 @@
     --searchresults-border-color: #888;
     --searchresults-li-bg: #e4f2fe;
     --search-mark-bg: #a2cff5;
+
+    --hljs-params-color:  #e91e63
 }
 
 .navy {
@@ -170,33 +176,35 @@
     --searchresults-border-color: #5c5c68;
     --searchresults-li-bg: #242430;
     --search-mark-bg: #a2cff5;
+
+    --hljs-params-color:  #e91e63
 }
 
 .rust {
-    --bg: hsl(60, 9%, 87%);
-    --fg: #262625;
+    --bg: hsl(0deg 0% 7.87%);
+    --fg: #9E9E9E;
 
-    --sidebar-bg: #3b2e2a;
-    --sidebar-fg: #c8c9db;
+    --sidebar-bg: #19191a;
+    --sidebar-fg: #58595e;
     --sidebar-non-existant: #505254;
-    --sidebar-active: #e69f67;
+    --sidebar-active: #9b3129;
     --sidebar-spacer: #45373a;
 
     --scrollbar: var(--sidebar-fg);
 
-    --icons: #737480;
+    --icons: #9b3129;
     --icons-hover: #262625;
 
-    --links: #2b79a2;
+    --links: #ffeb3bab;
 
-    --inline-code-color: #6e6b5e;
+    --inline-code-color: #999587;
 
-    --theme-popup-bg: #e1e1db;
-    --theme-popup-border: #b38f6b;
-    --theme-hover: #99908a;
+    --theme-popup-bg: #141313;
+    --theme-popup-border: #121212;
+    --theme-hover: #1c1d1e;
 
-    --quote-bg: hsl(60, 5%, 75%);
-    --quote-border: hsl(60, 5%, 70%);
+    --quote-bg: #262626;
+    --quote-border: #5c323236;
 
     --table-border-color: hsl(60, 9%, 82%);
     --table-header-bg: #b3a497;
@@ -210,6 +218,8 @@
     --searchresults-border-color: #888;
     --searchresults-li-bg: #dec2a2;
     --search-mark-bg: #e69f67;
+
+    --hljs-params-color:  #e91e63
 }
 
 @media (prefers-color-scheme: dark) {

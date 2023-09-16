@@ -34,33 +34,33 @@
 .hljs-literal,
 .hljs-type,
 .hljs-params {
-  color: #b21e00;
+  color: var(--hljs-params-color);
 }
 
 /* Green */
 .hljs-string,
 .hljs-symbol,
 .hljs-bullet {
-  color: #008200;
+  color: #cddc39;
 }
 
 /* Blue */
 .hljs-title,
 .hljs-section {
-  color: #0030f2;
+  color: #c9291d;
 }
 
 /* Purple */
 .hljs-keyword,
 .hljs-selector-tag {
-  color: #9d00ec;
+  color: #5d8cbd;
 }
 
 .hljs {
   display: block;
   overflow-x: auto;
-  background: #f6f7f6;
-  color: #000;
+  background: #262626;
+  color: #cfcccc;
 }
 
 .hljs-emphasis {

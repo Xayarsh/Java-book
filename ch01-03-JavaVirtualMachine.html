@@ -146,196 +146,158 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h2 id="hello-cargo"><a class="header" href="#hello-cargo">Hello, Cargo!</a></h2>
-<p>Cargo is Rust’s build system and package manager. Most Rustaceans use this tool
-to manage their Rust projects because Cargo handles a lot of tasks for you,
-such as building your code, downloading the libraries your code depends on, and
-building those libraries. (We call the libraries that your code needs
-<em>dependencies</em>.)</p>
-<p>The simplest Rust programs, like the one we’ve written so far, don’t have any
-dependencies. If we had built the “Hello, world!” project with Cargo, it would
-only use the part of Cargo that handles building your code. As you write more
-complex Rust programs, you’ll add dependencies, and if you start a project
-using Cargo, adding dependencies will be much easier to do.</p>
-<p>Because the vast majority of Rust projects use Cargo, the rest of this book
-assumes that you’re using Cargo too. Cargo comes installed with Rust if you
-used the official installers discussed in the
-<a href="ch01-01-FetchExecuteCycle.html#installation">“Installation”</a><!-- ignore --> section. If you installed Rust
-through some other means, check whether Cargo is installed by entering the
-following in your terminal:</p>
-<pre><code class="language-console">$ cargo --version
-</code></pre>
-<p>If you see a version number, you have it! If you see an error, such as <code>command not found</code>, look at the documentation for your method of installation to
-determine how to install Cargo separately.</p>
-<h3 id="creating-a-project-with-cargo"><a class="header" href="#creating-a-project-with-cargo">Creating a Project with Cargo</a></h3>
-<p>Let’s create a new project using Cargo and look at how it differs from our
-original “Hello, world!” project. Navigate back to your <em>projects</em> directory
-(or wherever you decided to store your code). Then, on any operating system,
-run the following:</p>
-<pre><code class="language-console">$ cargo new hello_cargo
-$ cd hello_cargo
-</code></pre>
-<p>The first command creates a new directory and project called <em>hello_cargo</em>.
-We’ve named our project <em>hello_cargo</em>, and Cargo creates its files in a
-directory of the same name.</p>
-<p>Go into the <em>hello_cargo</em> directory and list the files. You’ll see that Cargo
-has generated two files and one directory for us: a <em>Cargo.toml</em> file and a
-<em>src</em> directory with a <em>main.rs</em> file inside.</p>
-<p>It has also initialized a new Git repository along with a <em>.gitignore</em> file.
-Git files won’t be generated if you run <code>cargo new</code> within an existing Git
-repository; you can override this behavior by using <code>cargo new --vcs=git</code>.</p>
-<blockquote>
-<p>Note: Git is a common version control system. You can change <code>cargo new</code> to
-use a different version control system or no version control system by using
-the <code>--vcs</code> flag. Run <code>cargo new --help</code> to see the available options.</p>
-</blockquote>
-<p>Open <em>Cargo.toml</em> in your text editor of choice. It should look similar to the
-code in Listing 1-2.</p>
-<p><span class="filename">Filename: Cargo.toml</span></p>
-<pre><code class="language-toml">[package]
-name = &quot;hello_cargo&quot;
-version = &quot;0.1.0&quot;
-edition = &quot;2021&quot;
+                        <h2 id="jvm"><a class="header" href="#jvm">The Java Virtual Machine</a></h2>
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+                        <p>
+                            Machine language consistsof very simple instructions that can be executed directly by the CPU of a computer. Almost all
+                            programs, though, are written in <code>high-level programming languages</code>
+                            such as Java, Python, or C++. A program written in a
+                            high-level language cannot be run directly on any computer. First, it has to be
+                            translated into machine language. This translation can be done by a program
+                            called a <code>compiler</code>. A compiler takes a
+                            high-level-language program and translates it into an executable
+                            machine-language program. Once the translation is done, the machine-language
+                            program can be run any number of times, but of course it can only be run on one
+                            type of computer, since each type of computer has its own individual machine
+                            language.  (In fact, Java also depends on the particular operating system
+                            under which it is running, since it must work with the operating system to perform certain tasks such as
+                            accessing the computer's hardware. But let's ignore that complication here.)
+                            If the program is to run on another type of computer it has to be
+                            re-translated, using a different compiler, into the appropriate machine
+                            language.</p>
 
-[dependencies]
-</code></pre>
-<p><span class="caption">Listing 1-2: Contents of <em>Cargo.toml</em> generated by <code>cargo new</code></span></p>
-<p>This file is in the <a href="https://toml.io"><em>TOML</em></a><!-- ignore --> (<em>Tom’s Obvious, Minimal
-Language</em>) format, which is Cargo’s configuration format.</p>
-<p>The first line, <code>[package]</code>, is a section heading that indicates that the
-following statements are configuring a package. As we add more information to
-this file, we’ll add other sections.</p>
-<p>The next three lines set the configuration information Cargo needs to compile
-your program: the name, the version, and the edition of Rust to use. We’ll talk
-about the <code>edition</code> key in <a href="appendix-05-editions.html">Appendix E</a><!-- ignore -->.</p>
-<p>The last line, <code>[dependencies]</code>, is the start of a section for you to list any
-of your project’s dependencies. In Rust, packages of code are referred to as
-<em>crates</em>. We won’t need any other crates for this project, but we will in the
-first project in Chapter 2, so we’ll use this dependencies section then.</p>
-<p>Now open <em>src/main.rs</em> and take a look:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
-    println!(&quot;Hello, world!&quot;);
-}</code></pre></pre>
-<p>Cargo has generated a “Hello, world!” program for you, just like the one we
-wrote in Listing 1-1! So far, the differences between our project and the
-project Cargo generated are that Cargo placed the code in the <em>src</em> directory
-and we have a <em>Cargo.toml</em> configuration file in the top directory.</p>
-<p>Cargo expects your source files to live inside the <em>src</em> directory. The
-top-level project directory is just for README files, license information,
-configuration files, and anything else not related to your code. Using Cargo
-helps you organize your projects. There’s a place for everything, and
-everything is in its place.</p>
-<p>If you started a project that doesn’t use Cargo, as we did with the “Hello,
-world!” project, you can convert it to a project that does use Cargo. Move the
-project code into the <em>src</em> directory and create an appropriate <em>Cargo.toml</em>
-file.</p>
-<h3 id="building-and-running-a-cargo-project"><a class="header" href="#building-and-running-a-cargo-project">Building and Running a Cargo Project</a></h3>
-<p>Now let’s look at what’s different when we build and run the “Hello, world!”
-program with Cargo! From your <em>hello_cargo</em> directory, build your project by
-entering the following command:</p>
-<pre><code class="language-console">$ cargo build
-   Compiling hello_cargo v0.1.0 (file:///projects/hello_cargo)
-    Finished dev [unoptimized + debuginfo] target(s) in 2.85 secs
-</code></pre>
-<p>This command creates an executable file in <em>target/debug/hello_cargo</em> (or
-<em>target\debug\hello_cargo.exe</em> on Windows) rather than in your current
-directory. Because the default build is a debug build, Cargo puts the binary in
-a directory named <em>debug</em>. You can run the executable with this command:</p>
-<pre><code class="language-console">$ ./target/debug/hello_cargo # or .\target\debug\hello_cargo.exe on Windows
-Hello, world!
-</code></pre>
-<p>If all goes well, <code>Hello, world!</code> should print to the terminal. Running <code>cargo build</code> for the first time also causes Cargo to create a new file at the top
-level: <em>Cargo.lock</em>. This file keeps track of the exact versions of
-dependencies in your project. This project doesn’t have dependencies, so the
-file is a bit sparse. You won’t ever need to change this file manually; Cargo
-manages its contents for you.</p>
-<p>We just built a project with <code>cargo build</code> and ran it with
-<code>./target/debug/hello_cargo</code>, but we can also use <code>cargo run</code> to compile the
-code and then run the resultant executable all in one command:</p>
-<pre><code class="language-console">$ cargo run
-    Finished dev [unoptimized + debuginfo] target(s) in 0.0 secs
-     Running `target/debug/hello_cargo`
-Hello, world!
-</code></pre>
-<p>Using <code>cargo run</code> is more convenient than having to remember to run <code>cargo build</code> and then use the whole path to the binary, so most developers use <code>cargo run</code>.</p>
-<p>Notice that this time we didn’t see output indicating that Cargo was compiling
-<code>hello_cargo</code>. Cargo figured out that the files hadn’t changed, so it didn’t
-rebuild but just ran the binary. If you had modified your source code, Cargo
-would have rebuilt the project before running it, and you would have seen this
-output:</p>
-<pre><code class="language-console">$ cargo run
-   Compiling hello_cargo v0.1.0 (file:///projects/hello_cargo)
-    Finished dev [unoptimized + debuginfo] target(s) in 0.33 secs
-     Running `target/debug/hello_cargo`
-Hello, world!
-</code></pre>
-<p>Cargo also provides a command called <code>cargo check</code>. This command quickly checks
-your code to make sure it compiles but doesn’t produce an executable:</p>
-<pre><code class="language-console">$ cargo check
-   Checking hello_cargo v0.1.0 (file:///projects/hello_cargo)
-    Finished dev [unoptimized + debuginfo] target(s) in 0.32 secs
-</code></pre>
-<p>Why would you not want an executable? Often, <code>cargo check</code> is much faster than
-<code>cargo build</code> because it skips the step of producing an executable. If you’re
-continually checking your work while writing the code, using <code>cargo check</code> will
-speed up the process of letting you know if your project is still compiling! As
-such, many Rustaceans run <code>cargo check</code> periodically as they write their
-program to make sure it compiles. Then they run <code>cargo build</code> when they’re
-ready to use the executable.</p>
-<p>Let’s recap what we’ve learned so far about Cargo:</p>
-<ul>
-<li>We can create a project using <code>cargo new</code>.</li>
-<li>We can build a project using <code>cargo build</code>.</li>
-<li>We can build and run a project in one step using <code>cargo run</code>.</li>
-<li>We can build a project without producing a binary to check for errors using
-<code>cargo check</code>.</li>
-<li>Instead of saving the result of the build in the same directory as our code,
-Cargo stores it in the <em>target/debug</em> directory.</li>
-</ul>
-<p>An additional advantage of using Cargo is that the commands are the same no
-matter which operating system you’re working on. So, at this point, we’ll no
-longer provide specific instructions for Linux and macOS versus Windows.</p>
-<h3 id="building-for-release"><a class="header" href="#building-for-release">Building for Release</a></h3>
-<p>When your project is finally ready for release, you can use <code>cargo build --release</code> to compile it with optimizations. This command will create an
-executable in <em>target/release</em> instead of <em>target/debug</em>. The optimizations
-make your Rust code run faster, but turning them on lengthens the time it takes
-for your program to compile. This is why there are two different profiles: one
-for development, when you want to rebuild quickly and often, and another for
-building the final program you’ll give to a user that won’t be rebuilt
-repeatedly and that will run as fast as possible. If you’re benchmarking your
-code’s running time, be sure to run <code>cargo build --release</code> and benchmark with
-the executable in <em>target/release</em>.</p>
-<h3 id="cargo-as-convention"><a class="header" href="#cargo-as-convention">Cargo as Convention</a></h3>
-<p>With simple projects, Cargo doesn’t provide a lot of value over just using
-<code>rustc</code>, but it will prove its worth as your programs become more intricate.
-Once programs grow to multiple files or need a dependency, it’s much easier to
-let Cargo coordinate the build.</p>
-<p>Even though the <code>hello_cargo</code> project is simple, it now uses much of the real
-tooling you’ll use in the rest of your Rust career. In fact, to work on any
-existing projects, you can use the following commands to check out the code
-using Git, change to that project’s directory, and build:</p>
-<pre><code class="language-console">$ git clone example.org/someproject
-$ cd someproject
-$ cargo build
-</code></pre>
-<p>For more information about Cargo, check out <a href="https://doc.rust-lang.org/cargo/">its documentation</a>.</p>
-<h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
-<p>You’re already off to a great start on your Rust journey! In this chapter,
-you’ve learned how to:</p>
-<ul>
-<li>Install the latest stable version of Rust using <code>rustup</code></li>
-<li>Update to a newer Rust version</li>
-<li>Open locally installed documentation</li>
-<li>Write and run a “Hello, world!” program using <code>rustc</code> directly</li>
-<li>Create and run a new project using the conventions of Cargo</li>
-</ul>
-<p>This is a great time to build a more substantial program to get used to reading
-and writing Rust code. So, in Chapter 2, we’ll build a guessing game program.
-If you would rather start by learning how common programming concepts work in
-Rust, see Chapter 3 and then return to Chapter 2.</p>
+
+                        <p>There is an alternative to compiling a high-level language program. Instead
+                            of using a compiler, which translates the program all at once, you can use an
+                            <code>interpreter</code>, which translates it
+                            instruction-by-instruction, as necessary. An interpreter is a program that acts
+                            much like a CPU, with a kind of fetch-and-execute cycle. In order to execute a
+                            program, the interpreter runs in a loop in which it repeatedly reads one
+                            instruction from the program, decides what is necessary to carry out that
+                            instruction, and then performs the appropriate machine-language commands to do
+                            so.</p>
+
+
+                        <p>(A compiler is like a human translator who translates an entire book from
+                            one language to another, producing a new book in the second language.
+                            An interpreter is more like a human interpreter who translates a speech at
+                            the United Nations from one language to another at the same time that
+                            the speech is being given.)</p>
+
+
+                        <p>One use of interpreters is to execute high-level language programs. For
+                            example, the programming language Lisp is usually executed by an interpreter
+                            rather than a compiler. However, interpreters have another purpose: They can
+                            let you use a machine-language program meant for one type of computer on a
+                            completely different type of computer. For example, one of the original home
+                            computers was the Commodore&nbsp;64 or "C64".  While you might not find an actual
+                            C64, you can find programs that run on other computers&mdash;or even in
+                            a web browser&mdash;that "emulate" one.  Such an emulator can run C64 programs by
+                            acting as an interpreter for the C64 machine language.</p>
+
+
+                        <hr class="break">
+
+
+                        <p>The designers of Java chose to use a combination of compiling and
+                            interpreting. Programs written in Java are compiled into machine language,
+                            but it is a machine language for a computer that doesn't really exist. This
+                            so-called "virtual" computer is known as the <code>Java Virtual Machine</code>,
+                            or JVM.
+                            The machine language for the Java Virtual Machine is called
+                                <code>Java bytecode</code>.  There is no reason why Java
+                            bytecode couldn't be used as the machine language of a real computer, rather
+                            than a virtual computer.  But in fact the use of a virtual machine makes possible
+                            one of the main selling points of Java: the fact that it can actually be
+                            used on <b>any</b> computer. All that the computer needs is an interpreter for
+                            Java bytecode. Such an interpreter simulates the JVM in the
+                            same way that a C64 emulator simulates a Commodore&nbsp;64 computer.  (The term JVM is also used
+                            for the Java bytecode interpreter program that does the simulation, so we say that
+                            a computer needs a JVM in order to run Java programs.  Technically, it would
+                            be more correct to say that the interpreter <i>implements</i> the JVM than
+                            to say that it <i>is</i> a JVM.)</p>
+
+
+                        <p>Of course, a different Java bytecode interpreter is needed for each type of
+                            computer, but once a computer has a Java bytecode interpreter, it can run any
+                            Java bytecode program, and the same program can be run on any
+                            computer that has such an interpreter. This is one of the essential features of
+                            Java: the same compiled program can be run on many different types of
+                            computers.</p>
+
+
+                        <p align="center">
+                            <img src="./images/overview-fig2.png" width="530" height="208" alt="" class="bordered"></p>
+
+
+                        <p>Why, you might wonder, use the intermediate Java bytecode at all? Why not
+                            just distribute the original Java program and let each person compile it into
+                            the machine language of whatever computer they want to run it on? There are
+                            several reasons. First of all, a compiler has to understand Java, a complex
+                            high-level language. The compiler is itself a complex program. A Java bytecode
+                            interpreter, on the other hand, is a relatively small, simple program. This makes
+                            it easy to write a bytecode interpreter for a new type of computer; once that
+                            is done, that computer can run any compiled Java program. It would be much
+                            harder to write a Java compiler for the same computer.</p>
+
+
+                        <p>Furthermore, Java was created with the idea that some programs would be downloaded over a network.
+                            This leads to obvious security concerns: you don't want to download and run a
+                            program that will damage your computer or your files. The bytecode interpreter
+                            acts as a buffer between you and the program you download. You are really
+                            running the interpreter, which runs the downloaded program indirectly. The
+                            interpreter can protect you from potentially dangerous actions on the part of
+                            that program.</p>
+
+
+                        <p>When Java was still a new language, it was criticized for being slow:
+                            Since Java bytecode was executed by an interpreter, it seemed that Java
+                            bytecode programs could never run as quickly as programs compiled into
+                            native machine language (that is, the actual
+                            machine language of the computer on which the program is running).
+                            However, this problem has been largely overcome by the use of <code>just-in-time
+                                compilers</code> for executing Java bytecode.  A just-in-time compiler
+                            translates Java bytecode into native machine language.  It does
+                            this while it is executing the program.  Just as for a normal interpreter,
+                            the input to a just-in-time compiler is a Java bytecode program, and its task
+                            is to execute that program.  But as it is executing the program, it also
+                            translates parts of it into the native machine language.  The translated parts of the
+                            program can then be executed much more quickly than they could be interpreted.
+                            Since a given part of a program is often executed many times as the program
+                            runs, a just-in-time compiler can significantly speed up the overall
+                            execution time.
+                        </p>
+
+
+                        <p>I should note that there is no necessary connection between Java and Java
+                            bytecode. A program written in Java could certainly be compiled into the
+                            machine language of a real computer. And programs written in other languages
+                            can be compiled into Java bytecode. However, the combination of Java
+                            and Java bytecode is platform-independent, secure, and network-compatible
+                            while allowing you to program in a modern high-level object-oriented
+                            language.</p>
+
+
+                        <p>There are even some other programming
+                            languages that compile into Java bytecode.  The
+                            compiled bytecode programs can then be executed by a standard JVM.  New languages
+                            that have been developed specifically for programming the JVM include Scala,
+                            Groovy, Clojure, and Processing.  Jython and JRuby are versions of older languages,
+                            Python and Ruby, that target the JVM.  These languages make it possible to
+                            enjoy many of the advantages of the JVM while avoiding some of the technicalities
+                            of the Java language.  In fact, the use of other languages with the JVM has
+                            become important enough that several new features have been added to the
+                            JVM specifically to add better support for some of those languages.  And this
+                            improvement to the JVM has in turn made possible some new features in Java.</p>
+
+
+                        <hr class="break">
+
+
+                        <p>I should also note that the really hard part of platform-independence is
+                            providing a "Graphical User Interface"&mdash;with windows, buttons, etc.&mdash;that
+                            will work on all the platforms that support Java. You'll see more about this
+                            problem in <a href="ch01-06-ModernUserInterface.html">Section&nbsp;1.6</a>.</p>
 
                     </main>
 

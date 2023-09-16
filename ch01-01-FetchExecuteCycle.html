@@ -1,5 +1,6 @@
 <!DOCTYPE HTML>
-<html lang="en" class="sidebar-visible no-js light">
+<html lang="en" class="sidebar-visible no-js light" xmlns="http://www.w3.org/1999/html"
+      xmlns="http://www.w3.org/1999/html">
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
@@ -146,104 +147,24 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h2 id="installation"><a class="header" href="#installation">Installation</a></h2>
-<p>The first step is to install Rust. We’ll download Rust through <code>rustup</code>, a
-command line tool for managing Rust versions and associated tools. You’ll need
-an internet connection for the download.</p>
-<blockquote>
-<p>Note: If you prefer not to use <code>rustup</code> for some reason, please see the
-<a href="https://forge.rust-lang.org/infra/other-installation-methods.html">Other Rust Installation Methods page</a> for more options.</p>
-</blockquote>
-<p>The following steps install the latest stable version of the Rust compiler.
-Rust’s stability guarantees ensure that all the examples in the book that
-compile will continue to compile with newer Rust versions. The output might
-differ slightly between versions because Rust often improves error messages and
-warnings. In other words, any newer, stable version of Rust you install using
-these steps should work as expected with the content of this book.</p>
-<blockquote>
-<h3 id="command-line-notation"><a class="header" href="#command-line-notation">Command Line Notation</a></h3>
-<p>In this chapter and throughout the book, we’ll show some commands used in the
-terminal. Lines that you should enter in a terminal all start with <code>$</code>. You
-don’t need to type the <code>$</code> character; it’s the command line prompt shown to
-indicate the start of each command. Lines that don’t start with <code>$</code> typically
-show the output of the previous command. Additionally, PowerShell-specific
-examples will use <code>&gt;</code> rather than <code>$</code>.</p>
-</blockquote>
-<h3 id="installing-rustup-on-linux-or-macos"><a class="header" href="#installing-rustup-on-linux-or-macos">Installing <code>rustup</code> on Linux or macOS</a></h3>
-<p>If you’re using Linux or macOS, open a terminal and enter the following command:</p>
-<pre><code class="language-console">$ curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh
-</code></pre>
-<p>The command downloads a script and starts the installation of the <code>rustup</code>
-tool, which installs the latest stable version of Rust. You might be prompted
-for your password. If the install is successful, the following line will appear:</p>
-<pre><code class="language-text">Rust is installed now. Great!
-</code></pre>
-<p>You will also need a <em>linker</em>, which is a program that Rust uses to join its
-compiled outputs into one file. It is likely you already have one. If you get
-linker errors, you should install a C compiler, which will typically include a
-linker. A C compiler is also useful because some common Rust packages depend on
-C code and will need a C compiler.</p>
-<p>On macOS, you can get a C compiler by running:</p>
-<pre><code class="language-console">$ xcode-select --install
-</code></pre>
-<p>Linux users should generally install GCC or Clang, according to their
-distribution’s documentation. For example, if you use Ubuntu, you can install
-the <code>build-essential</code> package.</p>
-<h3 id="installing-rustup-on-windows"><a class="header" href="#installing-rustup-on-windows">Installing <code>rustup</code> on Windows</a></h3>
-<p>On Windows, go to <a href="https://www.rust-lang.org/tools/install">https://www.rust-lang.org/tools/install</a> and follow
-the instructions for installing Rust. At some point in the installation, you’ll
-receive a message explaining that you’ll also need the MSVC build tools for
-Visual Studio 2013 or later.</p>
-<p>To acquire the build tools, you’ll need to install <a href="https://visualstudio.microsoft.com/downloads/">Visual Studio
-2022</a>. When asked which workloads to install, include:</p>
-<ul>
-<li>“Desktop Development with C++”</li>
-<li>The Windows 10 or 11 SDK</li>
-<li>The English language pack component, along with any other language pack of
-your choosing</li>
-</ul>
-<p>The rest of this book uses commands that work in both <em>cmd.exe</em> and PowerShell.
-If there are specific differences, we’ll explain which to use.</p>
-<h3 id="troubleshooting"><a class="header" href="#troubleshooting">Troubleshooting</a></h3>
-<p>To check whether you have Rust installed correctly, open a shell and enter this
-line:</p>
-<pre><code class="language-console">$ rustc --version
-</code></pre>
-<p>You should see the version number, commit hash, and commit date for the latest
-stable version that has been released, in the following format:</p>
-<pre><code class="language-text">rustc x.y.z (abcabcabc yyyy-mm-dd)
-</code></pre>
-<p>If you see this information, you have installed Rust successfully! If you don’t
-see this information, check that Rust is in your <code>%PATH%</code> system variable as
-follows.</p>
-<p>In Windows CMD, use:</p>
-<pre><code class="language-console">&gt; echo %PATH%
-</code></pre>
-<p>In PowerShell, use:</p>
-<pre><code class="language-powershell">&gt; echo $env:Path
-</code></pre>
-<p>In Linux and macOS, use:</p>
-<pre><code class="language-console">$ echo $PATH
-</code></pre>
-<p>If that’s all correct and Rust still isn’t working, there are a number of
-places you can get help. Find out how to get in touch with other Rustaceans (a
-silly nickname we call ourselves) on <a href="https://www.rust-lang.org/community">the community page</a>.</p>
-<h3 id="updating-and-uninstalling"><a class="header" href="#updating-and-uninstalling">Updating and Uninstalling</a></h3>
-<p>Once Rust is installed via <code>rustup</code>, updating to a newly released version is
-easy. From your shell, run the following update script:</p>
-<pre><code class="language-console">$ rustup update
-</code></pre>
-<p>To uninstall Rust and <code>rustup</code>, run the following uninstall script from your
-shell:</p>
-<pre><code class="language-console">$ rustup self uninstall
-</code></pre>
-<h3 id="local-documentation"><a class="header" href="#local-documentation">Local Documentation</a></h3>
-<p>The installation of Rust also includes a local copy of the documentation so
-that you can read it offline. Run <code>rustup doc</code> to open the local documentation
-in your browser.</p>
-<p>Any time a type or function is provided by the standard library and you’re not
-sure what it does or how to use it, use the application programming interface
-(API) documentation to find out!</p>
+                        <h3 id="program"><a class="header" href="#program">Program</a></h3>
+                        <p>A <code>Program</code> is simply a list of unambiguous instructions meant to be followed mechanically by a computer. A computer is built to carry out instructions that are written in a very simple type of language called <code>machine language</code>. Each type of computer has its own machine language, and the computer can directly execute a program only if the program is expressed in that language. (It can execute programs written in other languages if they are first translated into machine language.)</p>
+
+                        <blockquote><p>At the heart of the computer is CPU, that does the actual computing. In a modern desktop computer, the CPU is a single chip on the order of one square inch in size. The job of the CPU is to execute programs.</p></blockquote>
+                        <p>When the CPU executes a program, that program is stored in the computer's main memory (RAM). In addition to the program, memory (RAM) can also hold data that is being used or processed by the program. Main memory consists of a sequence of locations. These locations are numbered, and the sequence number of a location is called its <code>address</code>. An address provides a way of picking out one particular piece of information from among the millions stored in memory. When the CPU needs to access the program instruction or data in a particular location, it sends the address of that information as a signal to the memory; the memory responds by sending back the value contained in the specified location. The CPU can also store information in memory by specifying the information to be stored and the address of the location where it is to be stored.</p>
+
+                        <h3 id="fetch_execute"><a class="header" href="#fetch_execute">Fetch and Execute Cycle</a></h3>
+                        <p>On the level of machine language, the operation of the CPU is fairly straightforward (although it is very complicated in detail). The CPU executes a program that is stored as a sequence of machine language instructions in main memory. It does this by repeatedly reading, or fetching, an instruction from memory and then carrying out, or executing, that instruction. This process—fetch an instruction, execute it, fetch another instruction, execute it, and so on forever—is called the fetch-and-execute cycle. With one exception, which will be covered in the next section, this is all that the CPU ever does. </p>
+                        <blockquote><p>A typical processing chip these days contains several CPU "cores," which allows it to execute several instructions simultaneously. And access to main memory is speeded up by memory "caches," which can be more quickly accessed than main memory and which are meant to hold data and instructions that the CPU is likely to need soon. However, these complications don't change the basic operation.</p></blockquote>
+
+                        <h3 id="alu"><a class="header" href="#alu">ALU and registers</a></h3>
+                        <p>A CPU contains an Arithmetic Logic Unit, or <code>ALU</code>, which is the part of the processor that carries out operations such as addition and subtraction. It also holds a small number of <code>registers</code>, which are small memory units capable of holding a single number. A typical CPU might have 16 or 32 "general purpose" registers, which hold data values that are immediately accessible for processing, and many machine language instructions refer to these registers. For example, there might be an instruction that takes two numbers from two specified registers, adds those numbers (using the ALU), and stores the result back into a register. And there might be instructions for copying a data value from main memory into a register, or from a register into main memory.</p>
+                        <h3 id="counter"><a class="header" href="#counter">Program Counters</a></h3>
+                        <p>The CPU also includes special purpose registers. The most important of these is the <code>program counter</code>, or PC. The CPU uses the PC to keep track of where it is in the program it is executing. The PC simply stores the memory address of the next instruction that the CPU should execute. At the beginning of each fetch-and-execute cycle, the CPU checks the PC to see which instruction it should fetch. During the course of the fetch-and-execute cycle, the number in the PC is updated to indicate the instruction that is to be executed in the next cycle. Usually, but not always, this is just the instruction that sequentially follows the current instruction in the program. Some machine language instructions modify the value that is stored in the PC. This makes it possible for the computer to "jump" from one point in the program to another point, which is essential for implementing the program features known as loops and branches that are discussed in <a href="ch01-04-FundamentalBuildingBlocks.html">Fundamentals</a></a></p>
+                        <p>A computer executes machine language programs mechanically—that is without understanding them or thinking about them—simply because of the way it is physically put together. This is not an easy concept. A computer is a machine built of millions of tiny switches called <code>transistors</code>, which have the property that they can be wired together in such a way that an output from one switch can turn another switch on or off. As a computer computes, these switches turn each other on or off in a pattern determined both by the way they are wired together and by the program that the computer is executing.</p>
+
+                        <h3 id="bit"><a class="header" href="#bit">Bit and Byte</a></h3>
+                        <p>Machine language instructions are expressed as binary numbers. A binary number is made up of just two possible digits, zero and one. Each zero or one is called a bit. So, a machine language instruction is just a sequence of zeros and ones. Each particular sequence encodes some particular instruction. The data that the computer manipulates is also encoded as binary numbers. In modern computers, each memory location holds a byte, which is a sequence of eight bits. A machine language instruction or a piece of data generally consists of several bytes, stored in consecutive memory locations. For example, when a CPU reads an instruction from memory, it might actually read four or eight bytes from four or eight memory locations; the memory address of the instruction is the address of the first of those bytes.</p>
 
                     </main>
 
