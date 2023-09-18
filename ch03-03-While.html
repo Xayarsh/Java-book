@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Functions - Introduction to Programming Using Java</title>
+        <title>The while and do..while Statements - Introduction to Programming Using Java</title>
 
 
         <!-- Custom HTML head -->
@@ -31,6 +31,8 @@
         <!-- Custom theme stylesheets -->
         <link rel="stylesheet" href="ferris.css">
         <link rel="stylesheet" href="theme/2018-edition.css">
+
+        <link rel="stylesheet" href="code-class.css">
 
     </head>
     <body>
@@ -146,294 +148,445 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h2 id="functions"><a class="header" href="#functions">Functions</a></h2>
-<p>Functions are prevalent in Rust code. You’ve already seen one of the most
-important functions in the language: the <code>main</code> function, which is the entry
-point of many programs. You’ve also seen the <code>fn</code> keyword, which allows you to
-declare new functions.</p>
-<p>Rust code uses <em>snake case</em> as the conventional style for function and variable
-names, in which all letters are lowercase and underscores separate words.
-Here’s a program that contains an example function definition:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
-    println!(&quot;Hello, world!&quot;);
+                        <h2 id="whiledowhile"><a class="header" href="#whiledowhile">The while and do..while Statements</a></h2>
+                        <p>
+                            Statements in Java can be either simple statements
+                            or compound statements. Simple statements, such as assignment statements and
+                            subroutine call statements, are the basic building blocks of a program.
+                            Compound statements, such as <span class="code">while</span> loops and <span class="code">if</span> statements,
+                            are used to organize simple statements into complex structures, which are
+                            called control structures because they control the order in which the
+                            statements are executed. The next five sections explore the details of
+                            control structures that are available in Java, starting with the <span class="code">while</span>
+                            statement and the <span class="code">do..while</span> statement in this section. At the same
+                            time, we'll look at examples of programming with each control structure and
+                            apply the techniques for designing algorithms that were introduced in the
+                            <a href="ch03-02-AlgorithmDevelopment.html">previous&nbsp;section</a>.</p>
 
-    another_function();
-}
 
-fn another_function() {
-    println!(&quot;Another function.&quot;);
-}</code></pre></pre>
-<p>We define a function in Rust by entering <code>fn</code> followed by a function name and a
-set of parentheses. The curly brackets tell the compiler where the function
-body begins and ends.</p>
-<p>We can call any function we’ve defined by entering its name followed by a set
-of parentheses. Because <code>another_function</code> is defined in the program, it can be
-called from inside the <code>main</code> function. Note that we defined <code>another_function</code>
-<em>after</em> the <code>main</code> function in the source code; we could have defined it before
-as well. Rust doesn’t care where you define your functions, only that they’re
-defined somewhere in a scope that can be seen by the caller.</p>
-<p>Let’s start a new binary project named <em>functions</em> to explore functions
-further. Place the <code>another_function</code> example in <em>src/main.rs</em> and run it. You
-should see the following output:</p>
-<pre><code class="language-console">$ cargo run
-   Compiling functions v0.1.0 (file:///projects/functions)
-    Finished dev [unoptimized + debuginfo] target(s) in 0.28s
-     Running `target/debug/functions`
-Hello, world!
-Another function.
+
+                        <h3 id="ThewhileStatement"><a class="header" href="#ThewhileStatement">The while Statement</a></h3>
+
+
+                        <p>The <span class="code">while</span> statement was already introduced in <a href="ch03-01-BlocksLoopsBranches.html">Section&nbsp;3.1</a>.
+                            A <span class="code">while</span> loop has the form</p>
+
+
+                        <pre><code class="java">while ( <span class="bnf">boolean-expression</span> )
+   <span class="bnf">statement</span>
 </code></pre>
-<p>The lines execute in the order in which they appear in the <code>main</code> function.
-First the “Hello, world!” message prints, and then <code>another_function</code> is called
-and its message is printed.</p>
-<h3 id="parameters"><a class="header" href="#parameters">Parameters</a></h3>
-<p>We can define functions to have <em>parameters</em>, which are special variables that
-are part of a function’s signature. When a function has parameters, you can
-provide it with concrete values for those parameters. Technically, the concrete
-values are called <em>arguments</em>, but in casual conversation, people tend to use
-the words <em>parameter</em> and <em>argument</em> interchangeably for either the variables
-in a function’s definition or the concrete values passed in when you call a
-function.</p>
-<p>In this version of <code>another_function</code> we add a parameter:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
-    another_function(5);
-}
 
-fn another_function(x: i32) {
-    println!(&quot;The value of x is: {x}&quot;);
-}</code></pre></pre>
-<p>Try running this program; you should get the following output:</p>
-<pre><code class="language-console">$ cargo run
-   Compiling functions v0.1.0 (file:///projects/functions)
-    Finished dev [unoptimized + debuginfo] target(s) in 1.21s
-     Running `target/debug/functions`
-The value of x is: 5
-</code></pre>
-<p>The declaration of <code>another_function</code> has one parameter named <code>x</code>. The type of
-<code>x</code> is specified as <code>i32</code>. When we pass <code>5</code> in to <code>another_function</code>, the
-<code>println!</code> macro puts <code>5</code> where the pair of curly brackets containing <code>x</code> was
-in the format string.</p>
-<p>In function signatures, you <em>must</em> declare the type of each parameter. This is
-a deliberate decision in Rust’s design: requiring type annotations in function
-definitions means the compiler almost never needs you to use them elsewhere in
-the code to figure out what type you mean. The compiler is also able to give
-more helpful error messages if it knows what types the function expects.</p>
-<p>When defining multiple parameters, separate the parameter declarations with
-commas, like this:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
-    print_labeled_measurement(5, 'h');
-}
 
-fn print_labeled_measurement(value: i32, unit_label: char) {
-    println!(&quot;The measurement is: {value}{unit_label}&quot;);
-}</code></pre></pre>
-<p>This example creates a function named <code>print_labeled_measurement</code> with two
-parameters. The first parameter is named <code>value</code> and is an <code>i32</code>. The second is
-named <code>unit_label</code> and is type <code>char</code>. The function then prints text containing
-both the <code>value</code> and the <code>unit_label</code>.</p>
-<p>Let’s try running this code. Replace the program currently in your <em>functions</em>
-project’s <em>src/main.rs</em> file with the preceding example and run it using <code>cargo run</code>:</p>
-<pre><code class="language-console">$ cargo run
-   Compiling functions v0.1.0 (file:///projects/functions)
-    Finished dev [unoptimized + debuginfo] target(s) in 0.31s
-     Running `target/debug/functions`
-The measurement is: 5h
-</code></pre>
-<p>Because we called the function with <code>5</code> as the value for <code>value</code> and <code>'h'</code> as
-the value for <code>unit_label</code>, the program output contains those values.</p>
-<h3 id="statements-and-expressions"><a class="header" href="#statements-and-expressions">Statements and Expressions</a></h3>
-<p>Function bodies are made up of a series of statements optionally ending in an
-expression. So far, the functions we’ve covered haven’t included an ending
-expression, but you have seen an expression as part of a statement. Because
-Rust is an expression-based language, this is an important distinction to
-understand. Other languages don’t have the same distinctions, so let’s look at
-what statements and expressions are and how their differences affect the bodies
-of functions.</p>
-<ul>
-<li><strong>Statements</strong> are instructions that perform some action and do not return
-a value.</li>
-<li><strong>Expressions</strong> evaluate to a resultant value. Let’s look at some examples.</li>
-</ul>
-<p>We’ve actually already used statements and expressions. Creating a variable and
-assigning a value to it with the <code>let</code> keyword is a statement. In Listing 3-1,
-<code>let y = 6;</code> is a statement.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
-    let y = 6;
-}</code></pre></pre>
-<p><span class="caption">Listing 3-1: A <code>main</code> function declaration containing one statement</span></p>
-<p>Function definitions are also statements; the entire preceding example is a
-statement in itself.</p>
-<p>Statements do not return values. Therefore, you can’t assign a <code>let</code> statement
-to another variable, as the following code tries to do; you’ll get an error:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore does_not_compile">fn main() {
-    let x = (let y = 6);
+                        <p>The <span class="bnf">statement</span> can, of course, be a block
+                            statement consisting of several statements grouped together between a pair of
+                            braces. This statement is called the <span class="newword">body of the loop</span>.
+                            The body of the loop is repeated as long as the <span class="bnf">boolean-expression</span> is true. This boolean expression is
+                            called the <span class="newword">continuation condition</span>, or more simply
+                            the <span class="newword">test</span>, of the loop. There are a few points that
+                            might need some clarification. What happens if the condition is false in the
+                            first place, before the body of the loop is executed even once? In that case,
+                            the body of the loop is never executed at all. The body of a while loop can be
+                            executed any number of times, including zero. What happens if the condition is
+                            true, but it becomes false somewhere in the <b>middle</b> of the loop
+                            body? Does the loop end as soon as this happens? It doesn't, because the
+                            computer continues executing the body of the loop until it gets to the end.
+                            Only then does it jump back to the beginning of the loop and test the
+                            condition, and only then can the loop end.</p>
+
+
+                        <p>Let's look at a typical problem that can be solved using a <span class="code">while</span>
+                            loop: finding the average of a set of positive integers entered by the user.
+                            The average is the sum of the integers, divided by the number of integers. The
+                            program will ask the user to enter one integer at a time. It will keep count of
+                            the number of integers entered, and it will keep a running total of all the
+                            numbers it has read so far. Here is a pseudocode algorithm for the program:</p>
+
+
+                        <pre><code class="java">Let sum = 0     // The sum of the integers entered by the user.
+Let count = 0   // The number of integers entered by the user.
+while there are more integers to process:
+    Read an integer
+    Add it to the sum
+    Count it
+Divide sum by count to get the average
+Print out the average</code></pre>
+
+
+                        <p>But how can we test whether there are more integers to process? A typical
+                            solution is to tell the user to type in zero after all the data have been
+                            entered. This will work because we are assuming that all the data are positive
+                            numbers, so zero is not a legal data value. The zero is not itself part of the
+                            data to be averaged. It's just there to mark the end of the real data. A data
+                            value used in this way is sometimes called a <span class="newword">sentinel value</span>.
+                            So now the test in the while loop becomes "while the input
+                            integer is not zero". But there is another problem! The first time the test is
+                            evaluated, before the body of the loop has ever been executed, no integer has
+                            yet been read. There is no "input integer" yet, so testing whether the input
+                            integer is zero doesn't make sense. So, we have to do something
+                            <b>before</b> the while loop to make sure that the test makes sense.
+                            Setting things up so that the test in a <span class="code">while</span> loop makes sense the
+                            first time it is executed is called <span class="newword">priming the loop</span>.
+                            In this case, we can simply read the first integer before the
+                            beginning of the loop. Here is a revised algorithm:</p>
+
+
+                        <pre><code class="java">Let sum = 0
+Let count = 0
+Read an integer
+while the integer is not zero:
+    Add the integer to the sum
+    Count it
+    Read an integer
+Divide sum by count to get the average
+Print out the average</code></pre>
+
+
+                        <p>Notice that I've rearranged the body of the loop. Since an integer is read
+                            before the loop, the loop has to begin by processing that integer. At the end
+                            of the loop, the computer reads a new integer. The computer then jumps back to
+                            the beginning of the loop and tests the integer that it has just read. Note
+                            that when the computer finally reads the sentinel value, the loop ends before
+                            the sentinel value is processed. It is not added to the sum, and it is not
+                            counted. This is the way it's supposed to work. The sentinel is not part of the
+                            data. The original algorithm, even if it could have been made to work without
+                            priming, was incorrect since it would have summed and counted all the integers,
+                            including the sentinel. (Since the sentinel is zero, the sum would still be
+                            correct, but the count would be off by one. Such so-called <span class="newword">off-by-one errors</span>
+                            are very common. Counting turns out to be
+                            harder than it looks!)</p>
+
+
+                        <p>We can easily turn the algorithm into a complete program. Note that the
+                            program cannot use the statement "<span class="code">average&nbsp;=&nbsp;sum/count</span>;" to compute the
+                            average. Since <span class="code">sum</span> and <span class="code">count</span> are both variables of type
+                            <span class="ptype">int</span>, the value of <span class="code">sum/count</span> is an integer. The average should
+                            be a real number. We've seen this problem before: we have to convert one of the
+                            <span class="ptype">int</span> values to a <span class="ptype">double</span> to force the computer to compute the
+                            quotient as a real number. This can be done by type-casting one of the
+                            variables to type <span class="ptype">double</span>. The type cast "(double)sum" converts the
+                            value of <span class="code">sum</span> to a real number, so in the program the average is
+                            computed as "<span class="code">average&nbsp;= ((double)sum)&nbsp;/&nbsp;count</span>;". Another solution in
+                            this case would have been to declare <span class="code">sum</span> to be a variable of type
+                            <span class="ptype">double</span> in the first place.</p>
+
+
+                        <p>One other issue is addressed by the program: If the user enters zero as the
+                            first input value, there are no data to process. We can test for this case by
+                            checking whether <span class="code">count</span> is still equal to zero after the <span class="code">while</span>
+                            loop. This might seem like a minor point, but a careful programmer should cover
+                            all the bases.</p>
+
+
+
+                        <p>Here is the full source code for the program (with comments added, of course!):</p>
+
+
+                        <pre><code class="java">import textio.TextIO;
+
+/**
+ * This program reads a sequence of positive integers input
+ * by the user, and it will print out the average of those
+ * integers.  The user is prompted to enter one integer at a
+ * time.  The user must enter a 0 to mark the end of the
+ * data.  (The zero is not counted as part of the data to
+ * be averaged.)  The program does not check whether the
+ * user's input is positive, so it will actually add up
+ * both positive and negative input values.
+ */
+public class ComputeAverage {
+
+   public static void main(String[] args) {
+
+      int inputNumber;   // One of the integers input by the user.
+      int sum;           // The sum of the positive integers.
+      int count;         // The number of positive integers.
+      double average;    // The average of the positive integers.
+
+      /* Initialize the summation and counting variables. */
+
+      sum = 0;
+      count = 0;
+
+      /* Read and process the user's input. */
+
+      System.out.print("Enter your first positive integer: ");
+      inputNumber = TextIO.getlnInt();
+
+      while (inputNumber != 0) {
+         sum += inputNumber;   // Add inputNumber to running sum.
+         count++;              // Count the input by adding 1 to count.
+         System.out.print("Enter your next positive integer, or 0 to end: ");
+         inputNumber = TextIO.getlnInt();
+      }
+
+      /* Display the result. */
+
+      if (count == 0) {
+         System.out.println("You didn't enter any data!");
+      }
+      else {
+         average = ((double)sum) / count;
+         System.out.println();
+         System.out.println("You entered " + count + " positive integers.");
+         System.out.printf("Their average is %1.3f.\n", average);
+      }
+
+   } // end main()
+
+} // end class ComputeAverage</code></pre>
+
+
+
+
+                        <h3 id="do..whileStatement"><a class="header" href="#do..whileStatement">The do..while Statement</a></h3>
+
+
+                        <p>Sometimes it is more convenient to test the continuation condition at the
+                            end of a loop, instead of at the beginning, as is done in the <span class="code">while</span>
+                            loop. The <span class="code">do..while</span> statement is very similar to the <span class="code">while</span>
+                            statement, except that the word "while," along with the condition that it
+                            tests, has been moved to the end. The word "do" is added to mark the beginning
+                            of the loop. A <span class="code">do..while</span> statement has the form</p>
+
+
+                        <pre><code class="java">do
+    <span class="bnf">statement</span>
+while ( <span class="bnf">boolean-expression</span> );</code></pre>
+
+
+                        <p>or, since, as usual, the <span class="bnf">statement</span> can be a
+                            block,</p>
+
+
+                        <pre><code class="java">do {
+    <span class="bnf">statements</span>
+} while ( <span class="bnf">boolean-expression</span> );</code></pre>
+
+
+                        <p>Note the semicolon, ';', at the very  end. This semicolon is part of the
+                            statement, just as the semicolon at the end of an assignment statement or
+                            declaration is part of the statement. Omitting it is a syntax error. (More
+                            generally, <b>every</b> statement in Java ends either with a
+                            semicolon or a right brace, '}'.)</p>
+
+
+                        <p>To execute a <span class="code">do</span> loop, the computer first executes the body of the
+                            loop&mdash;that is, the statement or statements inside the loop&mdash;and then it
+                            evaluates the boolean expression. If the value of the expression is
+                            <span class="code">true</span>, the computer returns to the beginning of the <span class="code">do</span> loop and repeats
+                            the process; if the value is <span class="code">false</span>, it ends the loop and continues
+                            with the next part of the program. Since the condition is not tested until the
+                            end of the loop, the body of a <span class="code">do</span> loop is always executed at least once.</p>
+
+
+                        <p>For example, consider the following pseudocode for a game-playing program.
+                            The <span class="code">do</span> loop makes sense here instead of a <span class="code">while</span> loop because
+                            with the <span class="code">do</span> loop, you know there will be at least one game. Also, the
+                            test that is used at the end of the loop wouldn't even make sense at the
+                            beginning:</p>
+
+
+                        <pre><code class="java">do {
+   Play a Game
+   Ask user if he wants to play another game
+   Read the user's response
+} while ( the user's response is yes );</code></pre>
+
+
+                        <p>Let's convert this into proper Java code. Since I don't want to talk about
+                            game playing at the moment, let's say that we have a class named
+                            <span class="code">Checkers</span>, and that the <span class="code">Checkers</span> class contains a static
+                            member subroutine named <span class="code">playGame()</span> that plays one game of checkers
+                            against the user. Then, the pseudocode "Play a game" can be expressed as the
+                            subroutine call statement "<span class="code">Checkers.playGame();</span>". We need a variable
+                            to store the user's response. The <span class="classname">TextIO</span> class makes it convenient to
+                            use a <span class="ptype">boolean</span> variable to store the answer to a yes/no question. The
+                            input function <span class="code">TextIO.getlnBoolean()</span> allows the user to enter the
+                            value as "yes" or "no" (among other acceptable responses).
+                            "Yes" is considered to be <span class="code">true</span>, and "no" is
+                            considered to be <span class="code">false</span>. So, the algorithm can be coded as</p>
+
+
+                        <pre><code class="java">boolean wantsToContinue;  // True if user wants to play again.
+do {
+   Checkers.playGame();
+   System.out.print("Do you want to play again? ");
+   wantsToContinue = TextIO.getlnBoolean();
+} while (wantsToContinue == true);</code></pre>
+
+
+                        <p>When the value of the <span class="ptype">boolean</span> variable is set to <span class="code">false</span>, it
+                            is a signal that the loop should end. When a <span class="ptype">boolean</span> variable is used
+                            in this way&mdash;as a signal that is set in one part of the program and tested in
+                            another part&mdash;it is sometimes called a <span class="newword">flag</span> or
+                            <span class="newword">flag variable</span> (in the sense of a signal flag).</p>
+
+
+                        <p>By the way, a more-than-usually-pedantic programmer would sneer at the test
+                            "<span class="code">while (wantsToContinue == true)</span>". This test is exactly equivalent to
+                            "<span class="code">while (wantsToContinue)</span>". Testing whether "<span class="code">wantsToContinue&nbsp;==&nbsp;true</span>"
+                            is true amounts to the same thing as testing whether
+                            "<span class="code">wantsToContinue</span>" is true. A little less offensive is an expression of
+                            the form "<span class="code">flag&nbsp;==&nbsp;false</span>", where <span class="code">flag</span> is a boolean variable.
+                            The value of "<span class="code">flag&nbsp;==&nbsp;false</span>" is exactly the same as the value of
+                            "<span class="code">!flag</span>", where <span class="code">!</span> is the boolean negation operator. So you can
+                            write "<span class="code">while&nbsp;(!flag)</span>" instead of "<span class="code">while (flag&nbsp;==&nbsp;false)</span>", and
+                            you can write "<span class="code">if&nbsp;(!flag)</span>" instead of "<span class="code">if&nbsp;(flag&nbsp;==&nbsp;false)</span>".</p>
+
+
+                        <p>Although a <span class="code">do..while</span> statement is sometimes more convenient than a
+                            <span class="code">while</span> statement, having two kinds of loops does not make the language
+                            more powerful. Any problem that can be solved using <span class="code">do..while</span> loops
+                            can also be solved using only <span class="code">while</span> statements, and vice versa. In
+                            fact, if <span class="bnf">doSomething</span> represents any block of
+                            program code, then</p>
+
+
+                        <pre><code class="java">do {
+    <span class="bnf">doSomething</span>
+} while ( <span class="bnf">boolean-expression</span> );</code></pre>
+
+
+                        <p>has exactly the same effect as</p>
+
+
+                        <pre><code class="java">
+<span class="bnf">doSomething</span>
+while ( <span class="bnf">boolean-expression</span> ) {
+    <span class="bnf">doSomething</span>
 }</code></pre>
-<p>When you run this program, the error you’ll get looks like this:</p>
-<pre><code class="language-console">$ cargo run
-   Compiling functions v0.1.0 (file:///projects/functions)
-error: expected expression, found `let` statement
- --&gt; src/main.rs:2:14
-  |
-2 |     let x = (let y = 6);
-  |              ^^^
 
-error: expected expression, found statement (`let`)
- --&gt; src/main.rs:2:14
-  |
-2 |     let x = (let y = 6);
-  |              ^^^^^^^^^
-  |
-  = note: variable declaration using `let` is a statement
 
-error[E0658]: `let` expressions in this position are unstable
- --&gt; src/main.rs:2:14
-  |
-2 |     let x = (let y = 6);
-  |              ^^^^^^^^^
-  |
-  = note: see issue #53667 &lt;https://github.com/rust-lang/rust/issues/53667&gt; for more information
+                        <p>Similarly,</p>
 
-warning: unnecessary parentheses around assigned value
- --&gt; src/main.rs:2:13
-  |
-2 |     let x = (let y = 6);
-  |             ^         ^
-  |
-  = note: `#[warn(unused_parens)]` on by default
-help: remove these parentheses
-  |
-2 -     let x = (let y = 6);
-2 +     let x = let y = 6;
-  |
 
-For more information about this error, try `rustc --explain E0658`.
-warning: `functions` (bin &quot;functions&quot;) generated 1 warning
-error: could not compile `functions` due to 3 previous errors; 1 warning emitted
-</code></pre>
-<p>The <code>let y = 6</code> statement does not return a value, so there isn’t anything for
-<code>x</code> to bind to. This is different from what happens in other languages, such as
-C and Ruby, where the assignment returns the value of the assignment. In those
-languages, you can write <code>x = y = 6</code> and have both <code>x</code> and <code>y</code> have the value
-<code>6</code>; that is not the case in Rust.</p>
-<p>Expressions evaluate to a value and make up most of the rest of the code that
-you’ll write in Rust. Consider a math operation, such as <code>5 + 6</code>, which is an
-expression that evaluates to the value <code>11</code>. Expressions can be part of
-statements: in Listing 3-1, the <code>6</code> in the statement <code>let y = 6;</code> is an
-expression that evaluates to the value <code>6</code>. Calling a function is an
-expression. Calling a macro is an expression. A new scope block created with
-curly brackets is an expression, for example:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
-    let y = {
-        let x = 3;
-        x + 1
-    };
+                        <pre><code class="java">while ( <span class="bnf">boolean-expression</span> ) {
+    <span class="bnf">doSomething</span>
+} </code></pre>
 
-    println!(&quot;The value of y is: {y}&quot;);
-}</code></pre></pre>
-<p>This expression:</p>
-<pre><code class="language-rust ignore">{
-    let x = 3;
-    x + 1
+
+                        <p>can be replaced by</p>
+
+
+                        <pre><code class="java">if ( <span class="bnf">boolean-expression</span> ) {
+   do {
+       <span class="bnf">doSomething</span>
+   } while ( <span class="bnf">boolean-expression</span> );
 }</code></pre>
-<p>is a block that, in this case, evaluates to <code>4</code>. That value gets bound to <code>y</code>
-as part of the <code>let</code> statement. Note that the <code>x + 1</code> line doesn’t have a
-semicolon at the end, which is unlike most of the lines you’ve seen so far.
-Expressions do not include ending semicolons. If you add a semicolon to the end
-of an expression, you turn it into a statement, and it will then not return a
-value. Keep this in mind as you explore function return values and expressions
-next.</p>
-<h3 id="functions-with-return-values"><a class="header" href="#functions-with-return-values">Functions with Return Values</a></h3>
-<p>Functions can return values to the code that calls them. We don’t name return
-values, but we must declare their type after an arrow (<code>-&gt;</code>). In Rust, the
-return value of the function is synonymous with the value of the final
-expression in the block of the body of a function. You can return early from a
-function by using the <code>return</code> keyword and specifying a value, but most
-functions return the last expression implicitly. Here’s an example of a
-function that returns a value:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn five() -&gt; i32 {
-    5
+
+
+                        <p>without changing the meaning of the program in any way.</p>
+
+
+
+
+
+                        <h3 id="breakcontinue"><a class="header" href="#breakcontinue">break and continue</a></h3>
+
+
+                        <p>The syntax of the <span class="code">while</span> and <span class="code">do..while</span> loops allows you to
+                            test the continuation condition at either the beginning of a loop or at the
+                            end. Sometimes, it is more natural to have the test in the middle of the loop,
+                            or to have several tests at different places in the same loop. Java provides a
+                            general method for breaking out of the middle of any loop. It's called the
+                            <span class="code">break</span> statement, which takes the form</p>
+
+
+                        <pre><code class="java">break;</code></pre>
+
+
+                        <p>When the computer executes a <span class="code">break</span> statement in a loop, it will
+                            immediately jump out of the loop. It then continues on to whatever follows the
+                            loop in the program. Consider for example:</p>
+
+
+                        <pre><code class="java">while (true) {  // looks like it will run forever!
+   System.out.print("Enter a positive number: ");
+   N = TextIO.getlnInt();
+   if (N &gt; 0)   // the input value is OK, so jump out of loop
+      break;
+   System.out.println("Your answer must be &gt; 0.");
 }
+// continue here after break</code></pre>
 
-fn main() {
-    let x = five();
 
-    println!(&quot;The value of x is: {x}&quot;);
-}</code></pre></pre>
-<p>There are no function calls, macros, or even <code>let</code> statements in the <code>five</code>
-function—just the number <code>5</code> by itself. That’s a perfectly valid function in
-Rust. Note that the function’s return type is specified too, as <code>-&gt; i32</code>. Try
-running this code; the output should look like this:</p>
-<pre><code class="language-console">$ cargo run
-   Compiling functions v0.1.0 (file:///projects/functions)
-    Finished dev [unoptimized + debuginfo] target(s) in 0.30s
-     Running `target/debug/functions`
-The value of x is: 5
-</code></pre>
-<p>The <code>5</code> in <code>five</code> is the function’s return value, which is why the return type
-is <code>i32</code>. Let’s examine this in more detail. There are two important bits:
-first, the line <code>let x = five();</code> shows that we’re using the return value of a
-function to initialize a variable. Because the function <code>five</code> returns a <code>5</code>,
-that line is the same as the following:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>let x = 5;
-<span class="boring">}</span></code></pre></pre>
-<p>Second, the <code>five</code> function has no parameters and defines the type of the
-return value, but the body of the function is a lonely <code>5</code> with no semicolon
-because it’s an expression whose value we want to return.</p>
-<p>Let’s look at another example:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
-    let x = plus_one(5);
+                        <p>If the number entered by the user is greater than zero, the <span class="code">break</span>
+                            statement will be executed and the computer will jump out of the loop.
+                            Otherwise, the computer will print out "Your answer must be &gt; 0." and will
+                            jump back to the start of the loop to read another input value.</p>
 
-    println!(&quot;The value of x is: {x}&quot;);
-}
 
-fn plus_one(x: i32) -&gt; i32 {
-    x + 1
-}</code></pre></pre>
-<p>Running this code will print <code>The value of x is: 6</code>. But if we place a
-semicolon at the end of the line containing <code>x + 1</code>, changing it from an
-expression to a statement, we’ll get an error:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore does_not_compile">fn main() {
-    let x = plus_one(5);
+                        <p>The first line of this loop, "<span class="code">while&nbsp;(true)</span>" might look a bit
+                            strange, but it's perfectly legitimate. The condition in a <span class="code">while</span> loop
+                            can be any boolean-valued expression. The computer evaluates this expression
+                            and checks whether the value is <span class="code">true</span> or <span class="code">false</span>. The boolean
+                            literal "<span class="code">true</span>" is just a boolean expression that always evaluates to
+                            true. So "<span class="code">while&nbsp;(true)</span>" can be used to write an infinite loop, or one
+                            that will be terminated by a <span class="code">break</span> statement.</p>
 
-    println!(&quot;The value of x is: {x}&quot;);
-}
 
-fn plus_one(x: i32) -&gt; i32 {
-    x + 1;
+                        <p>A <span class="code">break</span> statement terminates the loop that immediately encloses the
+                            <span class="code">break</span> statement. It is possible to have <span class="newword">nested</span> loops,
+                            where one loop statement is contained inside
+                            another. If you use a <span class="code">break</span> statement inside a nested loop, it will
+                            only break out of that loop, not out of the loop that contains the nested loop.
+                            There is something called a <span class="newword">labeled break</span> statement that allows you to
+                            specify which loop you want to break. This is not very common, so I will go over it quickly.
+                            Labels work like this:  You can put a <span class="newword">label</span> in
+                            front of any loop.  A label consists of a simple identifier followed
+                            by a colon.  For example, a <span class="code">while</span> with a label might
+                            look like "<span class="code">mainloop:&nbsp;while...</span>".  Inside
+                            this loop you can use the labeled break statement "<span class="code">break&nbsp;mainloop;</span>"
+                            to break out of the labeled loop.  For example, here is a code segment that checks
+                            whether two strings, <span class="code">s1</span> and <span class="code">s2</span>, have a character in common.
+                            If a common character is found, the value of the flag variable <span class="code">nothingInCommon</span>
+                            is set to <span class="code">false</span>, and a labeled break is used to end the processing
+                            at that point:</p>
+
+
+                        <pre><code class="java">boolean nothingInCommon;
+nothingInCommon = true;  // Assume s1 and s2 have no chars in common.
+int i,j;  // Variables for iterating through the chars in s1 and s2.
+
+i = 0;
+bigloop: while (i &lt; s1.length()) {
+   j = 0;
+   while (j &lt; s2.length()) {
+      if (s1.charAt(i) == s2.charAt(j)) { // s1 and s2 have a common char...
+          nothingInCommon = false;  // so nothingInCommon is actually false.
+          break bigloop;  // break out of BOTH loops
+      }
+      j++;  // Go on to the next char in s2.
+   }
+   i++;  //Go on to the next char in s1.
 }</code></pre>
-<p>Compiling this code produces an error, as follows:</p>
-<pre><code class="language-console">$ cargo run
-   Compiling functions v0.1.0 (file:///projects/functions)
-error[E0308]: mismatched types
- --&gt; src/main.rs:7:24
-  |
-7 | fn plus_one(x: i32) -&gt; i32 {
-  |    --------            ^^^ expected `i32`, found `()`
-  |    |
-  |    implicitly returns `()` as its body has no tail or `return` expression
-8 |     x + 1;
-  |          - help: remove this semicolon
 
-For more information about this error, try `rustc --explain E0308`.
-error: could not compile `functions` due to previous error
-</code></pre>
-<p>The main error message, <code>mismatched types</code>, reveals the core issue with this
-code. The definition of the function <code>plus_one</code> says that it will return an
-<code>i32</code>, but statements don’t evaluate to a value, which is expressed by <code>()</code>,
-the unit type. Therefore, nothing is returned, which contradicts the function
-definition and results in an error. In this output, Rust provides a message to
-possibly help rectify this issue: it suggests removing the semicolon, which
-would fix the error.</p>
+
+
+
+                        <p>The <span class="code">continue</span> statement is related to <span class="code">break</span>, but less
+                            commonly used. A <span class="code">continue</span> statement tells the computer to skip the
+                            rest of the current iteration of the loop. However, instead of jumping out of
+                            the loop altogether, it jumps back to the beginning of the loop and continues
+                            with the next iteration (including evaluating the loop's continuation condition to
+                            see whether any further iterations are required).  As with <span class="code">break</span>,
+                            when a <span class="code">continue</span> is in a nested loop, it will continue the loop
+                            that directly contains it; a "labeled continue" can be used to continue
+                            the containing loop instead.</p>
+
+
+                        <p>
+                            <span class="code">break</span> and <span class="code">continue</span> can be used in <span class="code">while</span> loops and
+                            <span class="code">do..while</span> loops. They can also be used in <span class="code">for</span> loops, which
+                            are covered in the <a href="ch03-04-For.html">next&nbsp;section</a>.
+                            In <a href="ch03-06-Switch.html">Section&nbsp;3.6</a>, we'll see that <span class="code">break</span> can also be used to
+                            break out of a <span class="code">switch</span> statement.   A <span class="code">break</span> can occur
+                            inside an <span class="code">if</span> statement, but only if the <span class="code">if</span> statement
+                            is nested inside a loop or inside a <span class="code">switch</span> statement.
+                            In that case, it does <b>not</b> mean
+                            to break out of the <span class="code">if</span>.  Instead, it breaks out of the loop or
+                            <span class="code">switch</span> statement that contains the <span class="code">if</span> statement.
+                            The same consideration applies to <span class="code">continue</span> statements inside <span class="code">ifs</span>.</p>
 
                     </main>
 

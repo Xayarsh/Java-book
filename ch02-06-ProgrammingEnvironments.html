@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html lang="en" class="sidebar-visible no-js light">
+<html lang="en" class="sidebar-visible no-js light" xmlns="http://www.w3.org/1999/html">
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
@@ -31,6 +31,8 @@
         <!-- Custom theme stylesheets -->
         <link rel="stylesheet" href="ferris.css">
         <link rel="stylesheet" href="theme/2018-edition.css">
+
+        <link rel="stylesheet" href="code-class.css">
 
     </head>
     <body>
@@ -146,1071 +148,990 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="programming-a-guessing-game"><a class="header" href="#programming-a-guessing-game">Programming a Guessing Game</a></h1>
-<p>Let’s jump into Rust by working through a hands-on project together! This
-chapter introduces you to a few common Rust concepts by showing you how to use
-them in a real program. You’ll learn about <code>let</code>, <code>match</code>, methods, associated
-functions, external crates, and more! In the following chapters, we’ll explore
-these ideas in more detail. In this chapter, you’ll just practice the
-fundamentals.</p>
-<p>We’ll implement a classic beginner programming problem: a guessing game. Here’s
-how it works: the program will generate a random integer between 1 and 100. It
-will then prompt the player to enter a guess. After a guess is entered, the
-program will indicate whether the guess is too low or too high. If the guess is
-correct, the game will print a congratulatory message and exit.</p>
-<h2 id="setting-up-a-new-project"><a class="header" href="#setting-up-a-new-project">Setting Up a New Project</a></h2>
-<p>To set up a new project, go to the <em>projects</em> directory that you created in
-Chapter 1 and make a new project using Cargo, like so:</p>
-<pre><code class="language-console">$ cargo new guessing_game
-$ cd guessing_game
+                        <h1 id="progenv"><a class="header" href="#progenv">Programming Environments</a></h1>
+                        <p>
+                            Although the Java language is highly
+                            standardized, the procedures for creating, compiling, and editing Java programs
+                            vary widely from one programming environment to another.  There are two
+                            basic approaches: a <span class="newword">command line environment</span>,
+                            where the user types commands and the computer responds,
+                            and an <span class="newword">integrated development environment</span> (IDE),
+                            where the user uses the keyboard and mouse to interact with a graphical user
+                            interface.  While there is essentially just one command line environment for Java
+                            programming, there are several common IDEs, including Eclipse, IntelliJ&nbsp;IDEA,
+                            and BlueJ. I cannot give complete or definitive information on Java programming environments
+                            in this section, but I will try to give enough information to let you compile
+                            and run the examples from this textbook using the command line, Eclipse, or BlueJ.
+                            (Readers are strongly encouraged to read,
+                            compile, and run the examples.  Source code for sample programs and solutions to
+                            end-of-chapter exercises can be downloaded from the
+                            book's web page,
+                            <a href="https://math.hws.edu/javanotes">https://math.hws.edu/javanotes</a>.)</p>
+
+
+                        <p>One thing to keep in mind is that you do not have to pay any money
+                            to do Java programming (aside from buying a computer, of course).  Everything
+                            that you need can be downloaded for free on the Internet.</p>
+
+                        <blockquote>
+                        <p>This textbook is meant for use with Java 17 or later, although the large majority of it
+                            it is valid for versions as old as Java&nbsp;8. In this section, I will try to give
+                            you enough information to make it possible to install Java and use it with this textbook.
+                            Since Java&nbsp;8, new versions of
+                            Java are released much more frequently than in the past, about twice a year,
+                            but only some of the releases are "long-term support" (LTS) releases that will continue
+                            to receive bug fixes and security updates over an extended period of time.
+                            Java&nbsp;8, Java&nbsp;11, and Java&nbsp;17 are long-term support releases.
+                            I&nbsp;recommend that you use Java&nbsp;17, or Java&nbsp;11 if you already have
+                            that installed, and avoid non-long-term-support releases unless you have
+                            specific need for some feature that they offer.</p></blockquote>
+
+
+                        <h3 id="jdk"><a class="header" href="#jdk">Getting a JDK</a></h3>
+
+
+                        <p>The basic development system for Java programming is usually referred
+                            to as a <span class="newword">JDK</span> (Java Development Kit). Note that Java comes in
+                            two versions: a Development Kit version (the JDK) and a Runtime Environment version
+                            (the JRE).  A&nbsp;Runtime Environment can be used to run Java programs,
+                            but it does not allow you to compile your own Java programs.
+                            A&nbsp;Development Kit includes the Runtime Environment but also
+                            lets you compile programs.  (It has become
+                            harder find a separate JRE download, but you will still see the term used &mdash;
+                            sometimes to refer, in fact, to a JDK.)
+                            A&nbsp;JDK will include the command line environment that you need to work with Java
+                            on the command line.  If you decide to use an IDE, you might still need to download
+                            a JDK first; note, however, that both the Eclipse IDE and BlueJ now include a JDK,
+                            so you do not need to download a separate JDK to use them.</p>
+
+
+                        <p>Java was developed by Sun Microsystems, Inc., which was acquired by the Oracle corporation.
+                            It is possible to download a JDK directly from Oracle's web site, but starting with Java&nbsp;11,
+                            the Oracle JDK is meant mostly for commercial use.  For personal and educational use,
+                            it is probably preferable to use OpenJDK, which has the same functionality as the version
+                            available from Oracle and is distributed under a fully free, open-source license.
+                            Although OpenJDK can be downloaded from <a href="https://jdk.java.net/">https://jdk.java.net/</a>,
+                            which is also owned by Oracle, I recommend downloading from Adoptium at this address:</p>
+
+
+                        <p align="center">
+                            <a href="https://adoptium.net/">https://adoptium.net/</a>
+                        </p>
+
+
+                        <p>This site is run by the Eclipse Foundation, and it distributes a version of the OpenJDk under
+                            the name "Eclipse Temurin."  You will want to download Temurin&nbsp;17 or later.  The JDK
+                            comes in different versions, depending on the operating system and type of CPU for your computer, but the
+                            Adoptium web page should detect your operating system and CPU, so that you just need to click the
+                            "Latest release" download button to get the appropriate version.  (If you need to select the
+                            version yourself, note that the CPU type is referred to as "Architecture."  You are most likely
+                            to be using the "x64" architecture, which works for Intel and AMD CPUs, but the newer M1
+                            Macs use "aarch64," which refers to ARM CPUs.)</p>
+
+
+                        <p>The Adoptium site provides installers for MacOS and Windows that make it easier to set up Java on those platforms.
+                            (The installer for MacOS is a .pkg file, and the installer for Windows is a .msi file.)
+                            If you use the Linux operating system, you can probably install an OpenJDK using the usual software
+                            manager for your distribution; if not, you can download a version from Adoptium, but it will
+                            just be a compressed archive rather than an installer.</p>
+
+
+                        <p>If you download a JDK installer for Windows or MacOS from Adoptium, you can just double-click the
+                            installer file to start the installation, if it does not start automatically.   If you use the default
+                            installation, the installer will set up your computer so that you can use the <span class="code">javac</span>
+                            and <span class="code">java</span> commands on the command line.</p>
+
+
+
+                        <p>The GUI programs in this book use a programming library known as <span class="newword">JavaFX</span>,
+                            which must be downloaded separately from the OpenJDK.  You will need to download JavaFX even
+                            if you use Eclipse for all of your Java work.  (BlueJ comes with JavaFX.)
+                            Information about downloading and using JavaFX is given at the end of this section.</p>
+
+
+
+                        <p>(An OpenJDK can also be downloaded as a compressed archive, which you can decompress and
+                            place anywhere on your computer.  However, to use the <span class="code">javac</span> and <span class="code">java</span>
+                            commands, you will either need to put the bin directory from the OpenJDK directory on your
+                            PATH environment variable, or use full path names for the <span class="code">javac</span> and <span class="code">java</span>
+                            commands.  The Adoptium installers for Windows and for MacOS will take care of this
+                            detail for you.)</p>
+
+
+                        <h3 id="commandenv"><a class="header" href="#commandenv">Command Line Environment</a></h3>
+
+
+                        <p>Many modern computer users find the command line environment to be
+                            pretty alien and unintuitive.  It is certainly very different from the
+                            graphical user interfaces that most people are used to.  However, it
+                            takes only a little practice to learn the basics of the command line
+                            environment and to become productive using it.  It is useful to know
+                            how to use the command line, and it is particularly important for
+                            computer science students, but you can skip this subsection if you plan to
+                            do all of your work with Java in an IDE.</p>
+
+
+                        <p>To use a command line programming environment, you will have to open a window
+                            where you can type commands.  In Windows, you can open such a command window
+                            by running a program named <span class="newword">cmd</span>.
+                            In MacOS, you want to run the
+                            <span class="newword">Terminal</span> program, which can be found in
+                            the Utilities folder inside the Applications folder.  In Linux, there
+                            are several possibilities, including a very old program called <span class="newword">xterm</span>;
+                            but try looking for "Terminal" in your Applications menu.</p>
+
+
+                        <p>No matter what type of computer you are using, when you open a command window,
+                            it will display a prompt of some sort.  Type in a command at the prompt and
+                            press return.  The computer will carry out the command, displaying any
+                            output in the command window, and will then redisplay the prompt so that you can
+                            type another command.   One of the central concepts in the command line
+                            environment is the <span class="newword">current directory</span> or <span class="newword">working directory</span>,
+                            which contains files that can be used by the commands that you type.  (The
+                            words "directory" and "folder" mean the same thing.)   Often, the
+                            name of the current directory is part of the command prompt.  You
+                            can get a list of the files in the current directory by typing in the
+                            command <span class="newword">dir</span> (on Windows) or
+                            <span class="newword">ls</span> (on Linux and MacOS).  When the window
+                            first opens, the current directory is your <span class="newword">home directory</span>,
+                            where your personal files are stored.  You can change the current directory using
+                            the <span class="newword">cd</span> command with the name of the
+                            directory that you want to use.  For example, if the current directory is your home directory,
+                            then you can change into your
+                            Desktop directory by typing the command <span class="code">cd&nbsp;Desktop</span> (and then
+                            pressing return).</p>
+
+
+                        <p>You might want to create a directory (that is, a folder) to hold your Java work.  For example, you might
+                            create a directory named <span class="code">javawork</span> in your home directory.  You can do this using
+                            your computer's GUI; another way is to use the command line:
+                            Open a command window.  If you want to put your work directory in a different folder
+                            from your home directory, <i>cd</i> into the directory where you want to put it.
+                            Then enter the command <span class="code">mkdir&nbsp;javawork</span> to make the directory.
+                            When you want to work on programming, open a command window and use
+                            the <i>cd</i> command to change into your Java work directory.
+                            Of course, you can have more than one working directory for your Java work;
+                            you can organize your files any way you like.</p>
+
+
+                        
+
+
+                        <p>The most basic commands for using Java on the command line are
+                            <span class="newword">javac</span> and <span class="newword">java</span>.  The
+                            <span class="code">javac</span> command is used to compile Java source code, and <span class="code">java</span>
+                            is used to run Java programs.  These commands, and other commands for working
+                            with Java, can be found in a directory named <i>bin</i> inside the
+                            directory that holds the JDK.  If you set things up correctly on your computer, it should recognize these
+                            commands when you type them on the command line.  Try typing the commands
+                            <span class="code">java&nbsp;-version</span> and <span class="code">javac&nbsp;-version</span>. The output
+                            from these commands should tell you which version of Java is being used.  If you get a message
+                            such as "Command not found," then Java is not correctly configured.</p>
+
+
+                        <p>Java should already be configured correctly on Linux, if you have installed Java
+                            from the Linux software repositories. The same is true on MacOS and Windows, if you have
+                            used an installer from Adoptium.</p>
+
+
+
+                        
+
+
+                        <p>To test the <span class="code">javac</span> command, place a copy of <span class="sourceref"><a href="./source/chapter2/HelloWorld.java">HelloWorld.java</a></span>
+                            into your working directory.  (If you downloaded the Web site of this book,
+                            you can find it in the directory named <span class="code">chapter2</span> inside the
+                            directory named <span class="code">source</span>; you can use
+                            your computer's GUI to copy-and-paste this file into your working directory,
+                            or you could <span class="code">cd</span> into the <span class="code">chapter2</span> folder and work there.
+                            Alternatively, you can navigate to <span class="sourceref"><a href="./source/chapter2/HelloWorld.java">HelloWorld.java</a></span> on the book's
+                            <a href="./source/index.html">Web&nbsp;site</a>
+                            and use the  "Save&nbsp;As" command in your Web browser to save a copy of the file into your working directory.)
+                            Type the command (while working in the directory that contains the file <span class="code">HelloWorld.java</span>):</p>
+
+
+                        <pre><code class="console">$ javac  HelloWorld.java</code></pre>
+
+
+                        <p>This will compile <span class="code">HelloWorld.java</span> and will create a bytecode file
+                            named <span class="code">HelloWorld.class</span> in the same directory.  Note that if the command
+                            succeeds, you will not get any response from the computer; it will just redisplay
+                            the command prompt to tell you it's ready for another command.  You will then
+                            be able to run the program using the <span class="code">java</span> command:</p>
+
+
+                        <pre><code class="console">$ java  HelloWorld</code></pre>
+
+
+                        <p>The computer should respond by outputting the message "Hello World!".  Note that although
+                            the compiled program is stored in a file named <span class="code">HelloWorld.class</span>, the <span class="code">java</span>
+                            command uses the name of the class, <span class="classname">HelloWorld</span>, not the name of the
+                            file.  To run the program, you only need .class file, not the .java file.</p>
+
+
+                        <p>Many of the sample programs for this book use <span class="classname">TextIO</span>
+                            to read input from the user (see <a href="ch02-04-TextInputAndOutput.html">Subsection&nbsp;2.4.3</a>).  Since <span class="classname">TextIO</span>
+                            is not a standard part of Java, you must make it available to any program that uses it.
+                            This means that your working directory should contain a folder named <span class="code">textio</span>,
+                            and inside that folder should be the file <span class="sourceref"><a href="./source/chapter2/textio/TextIO.java">TextIO.java</a></span>.
+                            You can copy <span class="code">TextIO.java</span> from this book's source directory, or your can download it from the web site,
+                            but you should be sure to place it inside a folder named <span class="code">textio</span>
+                            in the same directory as the program that uses <span class="classname">TextIO</span>.
+                        </p>
+
+
+                        <p>Once you have <span class="code">TextIO.java</span> you can run a sample program such as
+                            <span class="sourceref"><a href="./source/chapter2/Interest2.java">Interest2.java</a></span> to test user input.  First, compile the program
+                            with the command</p>
+
+
+                        <pre><code class="console">$ javac  Interest2.java</code></pre>
+
+
+                        <p>If successful, this will create the compiled file named <span class="code">Interest2.class</span>.  But you will
+                            also notice that it creates the file <span class="code">TextIO.class</span> inside the <span class="code">textio</span> folder,
+                            if that file does not already exist.  More generally, the <span class="code">javac</span> command will compile
+                            not just the file that you specify but also any additional Java files that are needed.
+                            Once you have <span class="code">Interest2.class</span>, you can run it using the command</p>
+
+
+                        <pre><code class="console">$ java  Interest2</code></pre>
+
+
+                        <p>You will be asked to enter some
+                            information, and you will respond by typing your answers into the command window,
+                            pressing return at the end of each line.  When the program ends, you will see the
+                            command prompt, and you can enter another command. (Note, by the way, that "<span class="code">java&nbsp;TextIO</span>"
+                            would not make sense, since <span class="code">TextIO</span> does not have a <span class="code">main()</span> routine,
+                            and so it is not possible to execute it as a program.)</p>
+
+
+                        <p>You can follow a similar procedure to run all of the examples in this book that do not use JavaFX.
+                            For running JavaFX programs, see <a href="ch02-06-ProgrammingEnvironments.html">Subsection&nbsp;2.6.8</a> below.</p>
+
+
+                        
+
+
+                        <p>To create your own programs, you will need a <span class="newword">text editor</span>.
+                            A text editor is a computer program that allows you to create and save documents
+                            that contain plain text.  It is important that the documents be saved as plain text,
+                            that is without any special encoding or formatting information.  Word processor
+                            documents are not appropriate, unless you can get your word processor to save
+                            as plain text.  A good text editor can make programming a lot more pleasant.
+                            Linux comes with several text editors.  On Windows, you can use notepad in a pinch,
+                            but you will probably want something better.  For MacOS, you might download
+                            the <a href="https://www.barebones.com/products/bbedit/">BBEdit</a> application, which
+                            can be used for free.
+                            One possibility that will work on any platform is to use <span class="newword">jedit</span>,
+                            a programmer's text editor that is itself written in Java and that can be downloaded
+                            for free from <a href="http://www.jedit.org/">www.jedit.org</a>.
+                            Another popular cross-platform programming editor is Atom, available from
+                            <a href="https://atom.io/">atom.io</a>.</p>
+
+
+                        <p>To work on your programs, you can open a command line window and <span class="code">cd</span>
+                            into the working directory where you will store your source code files.  Start up
+                            your text editor program, such as by double-clicking its icon or selecting it from
+                            a Start menu.  Type your code into the editor window, or open an existing source code
+                            file that you want to modify.  Save the file into your working directory.  Remember that the name of a Java
+                            source code file must end in ".java", and the rest of the file name must match the name of the
+                            class that is defined in the file.  Once the file is saved in your working directory,
+                            go to the command window and use the <span class="code">javac</span> command to compile it,
+                            as discussed above.  If there are syntax errors in the code, they will be listed
+                            in the command window.  Each error message contains the line number in the file
+                            where the computer found the error.  Go back to the editor and try to fix one or more
+                            errors, <b>save your changes</b>, and then try the <span class="code">javac</span> command again.
+                            (It's usually a good idea to just work on the first few errors; sometimes fixing
+                            those will make other errors go away.)
+                            Remember that when the <span class="code">javac</span> command finally succeeds, you will get
+                            no message at all, or possibly just some "warnings"; warnings do not stop a program
+                            from running.  Then you can use the <span class="code">java</span> command to run your
+                            program, as described above.  Once you've compiled the program, you can run it as
+                            many times as you like without recompiling it.</p>
+
+
+                        <p>That's really all there is to it: Keep both editor and command-line window open.
+                            Edit, save, and compile until you have eliminated all the syntax errors.  (Always
+                            remember to save the file before compiling it&mdash;the compiler only sees the saved
+                            file, not the version in the editor window.)  When you run the program, you might
+                            find that it has semantic errors that cause it to run incorrectly.  In that case,
+                            you have to go back to the edit/save/compile loop to try to find and fix the problem.</p>
+
+
+                        <h3 id="eclipse"><a class="header" href="#eclipse">Eclipse IDE</a></h3>
+
+
+                        <p>In an Integrated Development Environment, everything you need to create, compile, and
+                            run programs is integrated into a single package, with a graphical user interface
+                            that will be familiar to most computer users.  There are a number of different IDEs for Java program
+                            development, ranging from fairly simple wrappers around the JDK to highly complex
+                            applications with a multitude of features.  For a beginning programmer, there is a danger
+                            in using an IDE, since the difficulty of learning to use the IDE, on top of the
+                            difficulty of learning to program, can be daunting.  However, for my own programming,
+                            I generally use the <span class="newword">Eclipse</span> IDE, and I introduce my students to it
+                            after they have had some experience with the command line.  I will discuss Eclipse in
+                            some detail and a much simpler alternative, BlueJ, more briefly.
+                            IDEs have features that are very useful even
+                            for a beginning programmer, although a beginner will want to ignore many of their
+                            advanced features.</p>
+
+
+
+                        <p>Unless you happen to be using Oracle's JDK for Java 8, 9, or 10, using Eclipse for JavaFX programs
+                            will require some extra configuration.  <a href="ch02-06-ProgrammingEnvironments.html">Subsection&nbsp;2.6.8</a> discusses using JavaFX in Eclipse.
+                            This subsection tells you how to use it for programs that use only standard Java classes.</p>
+
+
+
+                        <p>You can download an Eclipse IDE from <a href="https://www.eclipse.org">eclipse.org</a>.
+                            When I install Eclipse, I get the "Eclipse IDE for Java Developers" package (<b>not</b> the "installer")
+                            from this web page:</p>
+
+
+                        <p align="center">
+                            <a href="https://www.eclipse.org/downloads/packages/">https://www.eclipse.org/downloads/packages/</a>
+                        </p>
+
+
+                        <p>For Windows and Linux, the package download is a compressed archive file.  You can simply extract the contents
+                            of the archive and place the resulting directory wherever you want it on your computer.
+                            You will find the Eclipse application in that directory, and you can start Eclipse by double-clicking
+                            the application icon.  For MacOS, the download is a .dmg file that contains the Eclipse application.
+                            You can open the .dmg file and drag the application to any location that you prefer (probably the
+                            Applications folder).  Note that the MacOS and Linux packages are available in two versions, for
+                            x86_64 and AArch64.  This refers to the type of CPU that the computer uses.  Newer "M1" Macs can
+                            use the AArch64 version; the x86_64 version is for older Macs that use Intel CPUs.  For Linux, you are
+                            most likely to need the x86_64 version, which will work for Intel and AMD CPUs.</p>
+
+                        <blockquote>
+                        <p>Eclipse is a free program.  It is itself written in Java. Recent versions of Eclipse include
+                            an OpenJDK (although Eclipse calls it a JRE), so you can use it without downloading a separate JDK.
+                            The March 2022 version includes a Java&nbsp;17 SDK.</p></blockquote>
+
+
+                        <p>The first time you start Eclipse, you will be asked to specify a <span class="newword">workspace</span>,
+                            which is the directory where your work will be stored.  You can accept the default name, or
+                            provide one of your own.  You can use multiple workspaces and select the one that you want to
+                            use at startup.  When a new workspace is first opened, the Eclipse window will be filled by a large
+                            "Welcome" screen that includes links to extensive documentation and tutorials.  You should close this screen, by
+                            clicking the "X" next to the word "Welcome"; you can get back to it later by choosing "Welcome"
+                            from the "Help" menu.</p>
+
+
+                        <p>The Eclipse GUI consists of one large window that is divided into several sections.  Each section
+                            contains one or more <span class="newword">views</span>.  For example, a view can be a text editor, it can be a place where
+                            a program can do I/O, or it can contain a list of your projects.
+                            If there are several views in one section of the window,
+                            then there will be tabs at the top of the section to select the view that is displayed in that
+                            section.  This will happen, for example, if you have several editor views open at the same time.</p>
+
+
+                        <p>Each view displays a different type of information.  The whole set of views in the window is called
+                            a <span class="newword">perspective</span>.  Eclipse uses different perspectives, that is, different
+                            sets of views of different types of information, for different tasks.  For compiling and
+                            running programs, the only perspective that you will need is the "Java Perspective,"
+                            which is the default.  As you become more experienced, you might want to use
+                            the "Debug Perspective," which has features designed to help you find semantic errors in programs.
+                            There are small buttons in the Eclipse toolbar that can be used to switch between perspectives.</p>
+
+
+                        <p>The Java Perspective includes a large area in the center of the window
+                            that contains text editor views.  This is where you will create and edit your programs.
+                            To the left of this is the
+                            Package Explorer view, which will contain a list of your Java projects and source code
+                            files.  To the right are one or more other views that you might or might not find useful;
+                            I usually close them by clicking the small "X" next to the name of each one.
+                            Several other views that will certainly be useful appear under different tabs in a section of the window
+                            below the editing area.  If you accidently close one of the important views, such as the
+                            Package Explorer, you can get it back by selecting it from the "Show View" submenu
+                            of the "Window" menu.  You can also reset the whole window to its default contents by
+                            selecting "Reset Perspective" from the "Window" menu.</p>
+
+
+                        
+
+
+
+                        <p>To do any work in Eclipse, you need a <span class="newword">project</span>.  To start
+                            a Java project, go to the "New" submenu in the "File" menu, and select the "Java Project" command.
+                            In the window that pops up, you will need to fill in a "Project Name," which can be anything you like.
+                            There are two other sections of the window that you might need to pay attention to:</p>
+
+
+                        <p align="center">
+                            <img src="./images/eclipse-create-project.png" width="579" height="247" alt="" class="bordered"></p>
+
+
+                        <p>If the project
+                            will use JavaFX, you must already have configured the workspace
+                            for JavaFX, as described at the end of this section.  You should
+                            make sure that the JRE configuration that you
+                            have created for JavaFX is selected in the "JRE" section of the dialog box, as shown here.  For a project
+                            that does not require JavaFX, you can set the JRE to be an "execution environment," which
+                            should be set to JavaSE&nbsp;17 or later.  And for
+                            any program from this textbook, you need to uncheck the option labeled "Create module-info.java file"
+                            in the "Module" section.  This textbook does <b>not</b> use modular programs!  Note that the
+                            workspace will remember these two settings for the next time that you create a new project
+                            and that it is harmless to use a JRE with JavaFX support even for a project that does not
+                            use JavaFX.</p>
+
+
+                        <p>After entering a project name, and changing the options if necessary,
+                            click the "Finish" button.  The project should appear in the
+                            "Package Explorer" view on the left side of the Eclipse window.
+                            Click on the small triangle or plus sign next to the project name to see the
+                            contents of the project.  Assuming that you use the default settings, there should be
+                            a directory named "src," which is where your Java source code files will go.  The project also
+                            contains the "JRE System Library". This is the collection of standard built-in classes
+                            that come with Java; if you have configured the project for JavaFX, it will also include
+                            the JavaFX classes.</p>
+
+
+                        <p>To run any of the sample Java programs from this textbook, you need to copy the source code file into
+                            your Eclipse Java project.  Assuming that you have downloaded the source code file onto your
+                            computer, you can copy-and-paste it into the Eclipse window.  (Right-click the file icon
+                            (or control-click on MacOS); select "Copy"
+                            from the pop-up menu; then right-click the project's src folder in the Eclipse window, and select
+                            "Paste". Be sure to paste it into the src folder, not into the project itself; files outside
+                            the <span class="code">src</span> folder are <b>not</b> treated as Java source code files.) Alternatively, you can try dragging
+                            the file icon from a file browser window onto the src folder in the Eclipse window.</p>
+
+
+                        <p>To use the <span class="classname">TextIO</span>-based examples from this textbook, you must add the
+                            source code file <span class="sourceref"><a href="./source/chapter2/textio/TextIO.java">TextIO.java</a></span> to your project.  This file has to be in
+                            a "package" named <span class="code">textio</span>.  If you already have <span class="code">TextIO.java</span>
+                            in a folder named "textio," as described above, then you can simply copy-and-paste
+                            the <span class="code">textio</span> folder
+                            into the "src" folder of your project.
+                            Alternatively, you can create the <span class="code">textio</span>
+                            package using the "New/Package" command from the "File" menu.  This will make a
+                            folder named "textio" in your project, inside the src folder, and you can then copy-and-paste <span class="code">TextIO.java</span>
+                            into that folder. In any case, package <span class="classname">textio</span> should
+                            appear under "src" in your project, with <span class="code">TextIO.java</span> inside it.
+                            (You can drag files from one location to another in the Package Explorer view, if
+                            you accidently put a file in the wrong location.)</p>
+
+
+                        <p>Once a Java program is in the project, you can open it in an editor by double-clicking the
+                            file name in the "Package Explorer" view.  To run the program,
+                            right-click in the editor window, or on the file name in
+                            the Package Explorer view (or control-click in MacOS).  In the menu that pops
+                            up, go to the "Run As" submenu, and select "Java Application".  The program
+                            will be executed.  If the program writes to standard output, the output will
+                            appear in the "Console" view, in the section of the Eclipse window below the editor section.  If the program uses
+                            <span class="classname">TextIO</span> or <span class="classname">Scanner</span> for input, you will have to type the required input into
+                            the "Console" view&mdash;<b>click the "Console" view before you start typing</b> so that
+                            the characters that you type will be sent to the correct part of the window.
+                            (For an easier way to run a program, find and click the small "Run" button in Eclipse's tool bar.
+                            This will run either the program in the editor window, the program selected in the Package Explorer view,
+                            or the program that was run most recently, depending on context.)
+                            Note that when you run a program in Eclipse, it is compiled automatically.  There is
+                            no separate compilation step.
+                        </p>
+
+
+                        <p>You can have more than one program in the same Eclipse project, or you
+                            can create additional projects to organize your work better.  Remember to
+                            place a copy of <span class="sourceref"><a href="./source/chapter2/textio/TextIO.java">TextIO.java</a></span>, inside
+                            a folder named <span class="code">textio</span>, in any project that requires it.</p>
+
+
+                        
+
+
+                        <p>To create a new Java program in Eclipse, you must create a new Java class.
+                            To do that, right-click the Java project name in the "Project Explorer" view.
+                            Go to the "New" submenu of the popup menu, and select "Class".  (Alternatively,
+                            there is a small icon in the toolbar at the top of the Eclipse window that you can click to
+                            create a new Java class.)  In the
+                            window that opens, type in the name of the class that you want to create.
+                            The class name must be a legal Java identifier.
+                            Note that you want the name of the class, not the name of the
+                            source code file, so don't add ".java" at the end of the name.
+                            The window also includes an input box labeled "Package" where you can
+                            specify the name of a package to contain the class.
+                            Most examples in this book use the "default package," but you can create your
+                            own programs in any package.  To use the default package, the "Package"
+                            input box should be empty.  Finally, click the "Finish" button to create the class.  The class
+                            should appear inside the "src" folder, in a folder corresponding to its package.  The new file
+                            should automatically open in the editing area so that you can start typing your program.</p>
+
+
+                        <p>Eclipse has several features that aid you as you type your code.
+                            It will underline any syntax error with a jagged red line, and in some
+                            cases will place an error marker in the left border of the edit window.
+                            If you hover the mouse cursor over the error marker or over the error itself,
+                            a description of
+                            the error will appear.  Note that you do <b>not</b> have to get rid of every
+                            error immediately as you type; many errors will go away as you type
+                            in more of the program!  If an error marker displays a small "light
+                            bulb," Eclipse is offering to try to fix the error for you.  Click
+                            the light bulb&mdash;or simply hover your mouse over the actual error&mdash;to
+                            get a list of possible fixes, then click
+                            the fix that you want to apply.  For example, if you use an undeclared
+                            variable in your program, Eclipse will offer to declare it for you.
+                            You can actually use this error-correcting feature to get Eclipse
+                            to write certain types of code for you!
+                            Unfortunately, you'll find that you won't understand a lot of the
+                            proposed fixes until you learn more about the Java language, and
+                            it is <b>not</b> a good idea to apply a fix that you don't
+                            understand&mdash;often that will just make things worse in the
+                            end.</p>
+
+
+                        <p>Eclipse will also look for spelling errors in comments and will underline
+                            them with jagged red lines.  Hover your mouse over the error to get
+                            a list of possible correct spellings.</p>
+
+
+                        <p>Another essential Eclipse feature is <span class="newword">content assist</span>.
+                            Content assist can be invoked by typing Control-Space.  It will offer possible
+                            completions of whatever you are typing at the moment.  For example,
+                            if you type part of an identifier and hit Control-Space, you will get
+                            a list of identifiers that start with the characters that you have typed;
+                            use the up and down arrow keys to select one of the items in the list, and
+                            press Return or Enter.  (You can also click an item with the mouse to select it,
+                            or hit Escape to dismiss the list.)  If there is
+                            only one possible completion when you hit Control-Space, it will be
+                            inserted automatically.  By default, Content Assist will also pop up automatically,
+                            when you type a period or certain other characters.
+                            For example, if you type "<span class="code">TextIO.</span>", you will get a list of all the subroutines in the
+                            <span class="classname">TextIO</span> class.  Personally, I find this auto-activation annoying.
+                            You can disable it in the Eclipse Preferences.  (Look under Java / Editor /
+                            Content Assist, and turn off the "Enable auto activation" option.)  You can
+                            still call up Code Assist manually with Control-Space.</p>
+
+
+                        <p>Once you have an error-free program, you can run it as described above.
+                            If you find a problem when you run it, it's very
+                            easy to go back to the editor, make changes, and run it again.</p>
+
+
+                        
+
+
+                        <p>(As a side note, it is possible to use the JDK that is included with Eclipse
+                            on the command line.  That JDK is a directory inside the Eclipse installation,
+                            with a long, complex name.  The best way to find the name might be to open
+                            The "Installed JREs" section of the Eclipse preferences, as described above, select the built-in
+                            JRE in the list of "Installed JREs", and click "Edit."  The name of the JDK directory will be in the "JRE home"
+                            section of the dialog, and you can copy-and-paste it from there.  You need to add /bin&mdash; or \bin on Windows&mdash;to that
+                            directory name to get the name of the directory that contains the JDK command line
+                            programs such as <span class="code">javac</span>.  You can add the full name of that bin directory
+                            to your PATH environment variable, or you can use full path names for the
+                            javac and java commands.)</p>
+
+
+                        <h3 id="bluej"><a class="header" href="#bluej">BlueJ</a></h3>
+
+                        <p>As a simpler alternative to Eclipse, I will mention BlueJ, a small IDE that is designed specifically for people who
+                            are learning to program.  It is much less complex than Eclipse, but it
+                            does have some features that make it useful for education.
+                            BlueJ can be downloaded from <a href="https://bluej.org">bluej.org</a>.  There
+                            are installers available for Windows, for MacOS, and for Debian-based Linux (such as Ubuntu Linux and Linux Mint).
+                            The installers include an OpenJDK as well as JavaFX (which is required to run BlueJ), so you
+                            will not need to do any additional downloading or configuration.
+                            As of March, 2022, BlueJ supports Java&nbsp;11 but not later versions.</p>
+
+
+                        <p>In BlueJ, you can begin a project with the "New Project" command in the "Project" menu.
+                            A BlueJ project is simply a folder.  When you create a project, you will have to select
+                            a folder name that does not already exist.  The folder will be created and a window will
+                            be opened to show the contents of the folder.  Files are shown as icons in the BlueJ window.
+                            You can drag .java files from the file system
+                            onto that window to add files to the project; they will be copied into the project folder
+                            as well as shown in the window.  You can also copy files directly into
+                            the project folder, but BlueJ won't see them until the next time you open the project.
+                            When you restart BlueJ, it should show the project that you were working on most recently, but
+                            you can open any project with a command from the "Project" menu.</p>
+
+
+                        <p>There is a button in the project window for creating a new class.  An icon for the
+                            class is added to the window, and a .java source code file is created in the project
+                            folder.  The file is not automatically opened for editing.  To edit a file, double-click
+                            its icon in the project window.  An editor will be opened in a separate window.  (A newly
+                            created class will contain some default code that you probably don't want; you can erase it
+                            and add a <span class="code">main()</span> routine instead.)  The BlueJ editor does not show errors as
+                            you type.  Errors will be reported when you compile the program.  Also, it does not
+                            offer automatic fixes for errors.  It has a less capable version of Eclipse's Content
+                            Assist, which seems only to work for getting a list of available subroutines in a
+                            class or object; call up the list by hitting Control-Space after typing the period following
+                            the name of a class or object.</p>
+
+
+                        <p>An editor window contains a button for compiling the program in the window.  There is also
+                            a compile button in the project window, which compiles all the classes in the project.</p>
+
+
+                        <p>To run a program, it must already be compiled.  Right-click the icon of a compiled program.
+                            In the menu that pops up, you will see "<span class="code">void&nbsp;main(String[]&nbsp;args)</span>" or,
+                            for a JavaFX program, "Run JavaFX Application").
+                            Select that option from the menu to run the program.</p>
+
+
+                        <p>One of the neatest features of BlueJ is that you can actually use it to run any subroutine,
+                            not just <span class="code">main()</span>.  If a class contains other subroutines, you will see them in the
+                            list that you get by right-clicking its icon.  A pop-up dialog allows you to enter any parameters
+                            required by the routine, and if the routine is a function, you will get another dialog box
+                            after the routine has been executed to tell you its return value.  This allows easy testing of
+                            individual subroutines.  Furthermore, you can also use BlueJ to create new objects from a class.
+                            An icon for the object will be added at the bottom of the project window, and you can right-click
+                            that icon to get a list of subroutines in the object.  This will, of course, not be useful to
+                            you until we get to object-oriented programming in <a href="ch05-00-ObjectsClasses.html">Chapter&nbsp;5</a>.</p>
+
+
+
+                        
+                        <h3 id="probpackage"><a class="header" href="#probpackage">The Problem of Packages</a></h3>
+
+
+                        <p>Every class in Java is contained in something called a <span class="newword">package</span>.
+                            Classes that are not explicitly  put into a  package are in the "default" package.
+                            All of Java's standard classes are in named packages.  This includes even classes
+                            like <span class="classname">String</span> and <span class="classname">System</span>, which are
+                            in a package named <span class="classname">java.lang</span>.  Classes in <span class="classname">java.lang</span>
+                            are automatically imported into any Java file, but classes in other packages must
+                            be imported using an <span class="code">import</span> directive.  My <span class="classname">TextIO</span>
+                            class is in a package named <span class="classname">textio</span>, and it must be
+                            imported into a program that wants to use it.  I will discuss packages in
+                            greater detail in <a href="ch04-06-APIPackagesModulesJavadoc.html">Section&nbsp;4.6</a>.   For now, you
+                            just need to know some basic facts.</p>
+
+
+                        <p>Although most of my examples are in the default package,
+                            the use of the default package is in fact discouraged, according to official Java
+                            style guidelines. Nevertheless, I have
+                            chosen to use it, since it seems easier for beginning programmers to
+                            avoid packages as much as possible, at least at first.   If Eclipse
+                            tries to put a class into a package, you can delete the package name from the
+                            class-creation dialog to get it to use the default package instead.
+                            But if you do create a class in a package, the source code starts with a line that specifies
+                            which package the class is in.  For example, if the class is in a package
+                            named <span class="code">test.pkg</span>, then the first line of the source code will be
+                        </p>
+
+
+                        <pre><code class="java">package test.pkg;</code></pre>
+
+
+                        <p>For example, the source code for <span class="classname">TextIO</span> begins with
+                            "package textio;".  I put <span class="classname">TextIO</span> in a package because
+                            a class that is in a non-default package cannot use a class from the default package.
+                            That is, if <span class="classname">TextIO</span> were in the default package, then
+                            it could <b>only</b> be used by programs that are also in the default package.
+                            (In fact, in earlier versions of this textbook, <span class="classname">TextIO</span> was
+                            in the default package.  I moved it to package <span class="classname">textio</span>
+                            as of Version&nbsp;8 of the book.)</p>
+
+
+                        <p>When packages are used in a command-line environment, some complications
+                            arise.  For example, if a program is in a package named <span class="classname">test.pkg</span>, then
+                            the source code file must be in a subdirectory named "pkg" inside a
+                            directory named "test" that is in turn inside your main Java working directory.  Nevertheless, when you compile or
+                            execute the program, you should be working in the main directory, not in the subdirectory.
+                            When you compile the source code file, you have to include the name of the
+                            directory in the command:  For example, for a program in package <span class="classname">test.pkg</span>
+                            use "<span class="code">javac&nbsp;test/pkg/ClassName.java</span>"
+                            on Linux or MacOS, or "<span class="code">javac&nbsp;test\pkg\ClassName.java</span>" on
+                            Windows.  The command for executing the program is then
+                            "<span class="code">java&nbsp;test.pkg.ClassName</span>", with a period separating the package
+                            name from the class name.</p>
+
+
+                        <h3 id="jshell"><a class="header" href="#jshell">About jshell</a></h3>
+
+
+                        <p>I will mention one more command-line tool for working with Java: <i>jshell</i>.
+                            The <span class="code">jshell</span> command is a standard part of the JDK (after Java&nbsp;8).
+                            If you can use the <span class="code">javac</span>
+                            and <span class="code">java</span> commands on the command line, then you can also use <span class="code">jshell</span>.
+                            The purpose of <span class="code">jshell</span> is to let you type in and execute Java code
+                            without the bother of creating a .java file and writing a main program.  To start
+                            <span class="code">jshell</span>, just enter the command on a line by itself.  You will get a
+                            jshell prompt where you can enter either a Java statement or a Java expression.
+                            If you enter a statement, it will be executed.  If you enter an expression,
+                            its value will be printed.   You do not have to place a semicolon at the end
+                            of a line.  Here is a short example of a jshell session. The text typed by
+                            the user is shown in bold.</p>
+
+
+                        <pre><code class="console">
+$ <b>jshell</b>
+|  Welcome to JShell -- Version 17.0.2
+|  For an introduction type: /help intro
+
+jshell&gt; <b>System.out.println("Hello World")</b>
+Hello World
+
+jshell&gt; <b>int x = 42</b>
+x ==&gt; 42
+
+jshell&gt; <b>x * x</b>
+$3 ==&gt; 1764
+
+jshell&gt; <b>/exit</b>
+|  Goodbye
 </code></pre>
-<p>The first command, <code>cargo new</code>, takes the name of the project (<code>guessing_game</code>)
-as the first argument. The second command changes to the new project’s
-directory.</p>
-<p>Look at the generated <em>Cargo.toml</em> file:</p>
-<!-- manual-regeneration
-cd listings/ch02-guessing-game-tutorial
-rm -rf no-listing-01-cargo-new
-cargo new no-listing-01-cargo-new --name guessing_game
-cd no-listing-01-cargo-new
-cargo run > output.txt 2>&1
-cd ../../..
--->
-<p><span class="filename">Filename: Cargo.toml</span></p>
-<pre><code class="language-toml">[package]
-name = &quot;guessing_game&quot;
-version = &quot;0.1.0&quot;
-edition = &quot;2021&quot;
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[dependencies]
-</code></pre>
-<p>As you saw in Chapter 1, <code>cargo new</code> generates a “Hello, world!” program for
-you. Check out the <em>src/main.rs</em> file:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
-    println!(&quot;Hello, world!&quot;);
-}</code></pre></pre>
-<p>Now let’s compile this “Hello, world!” program and run it in the same step
-using the <code>cargo run</code> command:</p>
-<pre><code class="language-console">$ cargo run
-   Compiling guessing_game v0.1.0 (file:///projects/guessing_game)
-    Finished dev [unoptimized + debuginfo] target(s) in 1.50s
-     Running `target/debug/guessing_game`
-Hello, world!
-</code></pre>
-<p>The <code>run</code> command comes in handy when you need to rapidly iterate on a project,
-as we’ll do in this game, quickly testing each iteration before moving on to
-the next one.</p>
-<p>Reopen the <em>src/main.rs</em> file. You’ll be writing all the code in this file.</p>
-<h2 id="processing-a-guess"><a class="header" href="#processing-a-guess">Processing a Guess</a></h2>
-<p>The first part of the guessing game program will ask for user input, process
-that input, and check that the input is in the expected form. To start, we’ll
-allow the player to input a guess. Enter the code in Listing 2-1 into
-<em>src/main.rs</em>.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore">use std::io;
+                        <p>Using <span class="code">jshell</span> can be a great way to learn Java and to experiment with
+                            its features.  I won't give any more detailed information about it in this book, but
+                            you can learn more at</p>
 
-fn main() {
-    println!(&quot;Guess the number!&quot;);
 
-    println!(&quot;Please input your guess.&quot;);
+                        <p align="center">
+                            <a href="https://docs.oracle.com/en/java/javase/17/jshell/introduction-jshell.html">https://docs.oracle.com/en/java/javase/17/jshell/introduction-jshell.html</a>
+                        </p>
 
-    let mut guess = String::new();
 
-    io::stdin()
-        .read_line(&amp;mut guess)
-        .expect(&quot;Failed to read line&quot;);
+                        <p>or you can use the <span class="code">/help</span> command inside jshell to learn more about it.</p>
 
-    println!(&quot;You guessed: {guess}&quot;);
-}</code></pre>
-<p><span class="caption">Listing 2-1: Code that gets a guess from the user and
-prints it</span></p>
-<p>This code contains a lot of information, so let’s go over it line by line. To
-obtain user input and then print the result as output, we need to bring the
-<code>io</code> input/output library into scope. The <code>io</code> library comes from the standard
-library, known as <code>std</code>:</p>
-<pre><code class="language-rust ignore">use std::io;
-<span class="boring">
-</span><span class="boring">fn main() {
-</span><span class="boring">    println!(&quot;Guess the number!&quot;);
-</span><span class="boring">
-</span><span class="boring">    println!(&quot;Please input your guess.&quot;);
-</span><span class="boring">
-</span><span class="boring">    let mut guess = String::new();
-</span><span class="boring">
-</span><span class="boring">    io::stdin()
-</span><span class="boring">        .read_line(&amp;mut guess)
-</span><span class="boring">        .expect(&quot;Failed to read line&quot;);
-</span><span class="boring">
-</span><span class="boring">    println!(&quot;You guessed: {guess}&quot;);
-</span><span class="boring">}</span></code></pre>
-<p>By default, Rust has a set of items defined in the standard library that it
-brings into the scope of every program. This set is called the <em>prelude</em>, and
-you can see everything in it <a href="../std/prelude/index.html">in the standard library documentation</a>.</p>
-<p>If a type you want to use isn’t in the prelude, you have to bring that type
-into scope explicitly with a <code>use</code> statement. Using the <code>std::io</code> library
-provides you with a number of useful features, including the ability to accept
-user input.</p>
-<p>As you saw in Chapter 1, the <code>main</code> function is the entry point into the
-program:</p>
-<pre><code class="language-rust ignore"><span class="boring">use std::io;
-</span><span class="boring">
-</span>fn main() {
-<span class="boring">    println!(&quot;Guess the number!&quot;);
-</span><span class="boring">
-</span><span class="boring">    println!(&quot;Please input your guess.&quot;);
-</span><span class="boring">
-</span><span class="boring">    let mut guess = String::new();
-</span><span class="boring">
-</span><span class="boring">    io::stdin()
-</span><span class="boring">        .read_line(&amp;mut guess)
-</span><span class="boring">        .expect(&quot;Failed to read line&quot;);
-</span><span class="boring">
-</span><span class="boring">    println!(&quot;You guessed: {guess}&quot;);
-</span><span class="boring">}</span></code></pre>
-<p>The <code>fn</code> syntax declares a new function; the parentheses, <code>()</code>, indicate there
-are no parameters; and the curly bracket, <code>{</code>, starts the body of the function.</p>
-<p>As you also learned in Chapter 1, <code>println!</code> is a macro that prints a string to
-the screen:</p>
-<pre><code class="language-rust ignore"><span class="boring">use std::io;
-</span><span class="boring">
-</span><span class="boring">fn main() {
-</span>    println!(&quot;Guess the number!&quot;);
+                        
+                        <h3 id="javafxcommand"><a class="header" href="#javafxcommand">JavaFX on the Command Line</a></h3>
 
-    println!(&quot;Please input your guess.&quot;);
-<span class="boring">
-</span><span class="boring">    let mut guess = String::new();
-</span><span class="boring">
-</span><span class="boring">    io::stdin()
-</span><span class="boring">        .read_line(&amp;mut guess)
-</span><span class="boring">        .expect(&quot;Failed to read line&quot;);
-</span><span class="boring">
-</span><span class="boring">    println!(&quot;You guessed: {guess}&quot;);
-</span><span class="boring">}</span></code></pre>
-<p>This code is printing a prompt stating what the game is and requesting input
-from the user.</p>
-<h3 id="storing-values-with-variables"><a class="header" href="#storing-values-with-variables">Storing Values with Variables</a></h3>
-<p>Next, we’ll create a <em>variable</em> to store the user input, like this:</p>
-<pre><code class="language-rust ignore"><span class="boring">use std::io;
-</span><span class="boring">
-</span><span class="boring">fn main() {
-</span><span class="boring">    println!(&quot;Guess the number!&quot;);
-</span><span class="boring">
-</span><span class="boring">    println!(&quot;Please input your guess.&quot;);
-</span><span class="boring">
-</span>    let mut guess = String::new();
-<span class="boring">
-</span><span class="boring">    io::stdin()
-</span><span class="boring">        .read_line(&amp;mut guess)
-</span><span class="boring">        .expect(&quot;Failed to read line&quot;);
-</span><span class="boring">
-</span><span class="boring">    println!(&quot;You guessed: {guess}&quot;);
-</span><span class="boring">}</span></code></pre>
-<p>Now the program is getting interesting! There’s a lot going on in this little
-line. We use the <code>let</code> statement to create the variable. Here’s another example:</p>
-<pre><code class="language-rust ignore">let apples = 5;</code></pre>
-<p>This line creates a new variable named <code>apples</code> and binds it to the value 5. In
-Rust, variables are immutable by default, meaning once we give the variable a
-value, the value won’t change. We’ll be discussing this concept in detail in
-the <a href="ch03-01-BlocksLoopsBranches.html#variables-and-mutability">“Variables and Mutability”</a><!-- ignore -->
-section in Chapter 3. To make a variable mutable, we add <code>mut</code> before the
-variable name:</p>
-<pre><code class="language-rust ignore">let apples = 5; // immutable
-let mut bananas = 5; // mutable</code></pre>
-<blockquote>
-<p>Note: The <code>//</code> syntax starts a comment that continues until the end of the
-line. Rust ignores everything in comments. We’ll discuss comments in more
-detail in <a href="ch03-04-For.html">Chapter 3</a><!-- ignore -->.</p>
-</blockquote>
-<p>Returning to the guessing game program, you now know that <code>let mut guess</code> will
-introduce a mutable variable named <code>guess</code>. The equal sign (<code>=</code>) tells Rust we
-want to bind something to the variable now. On the right of the equal sign is
-the value that <code>guess</code> is bound to, which is the result of calling
-<code>String::new</code>, a function that returns a new instance of a <code>String</code>.
-<a href="../std/string/struct.String.html"><code>String</code></a><!-- ignore --> is a string type provided by the standard
-library that is a growable, UTF-8 encoded bit of text.</p>
-<p>The <code>::</code> syntax in the <code>::new</code> line indicates that <code>new</code> is an associated
-function of the <code>String</code> type. An <em>associated function</em> is a function that’s
-implemented on a type, in this case <code>String</code>. This <code>new</code> function creates a
-new, empty string. You’ll find a <code>new</code> function on many types because it’s a
-common name for a function that makes a new value of some kind.</p>
-<p>In full, the <code>let mut guess = String::new();</code> line has created a mutable
-variable that is currently bound to a new, empty instance of a <code>String</code>. Whew!</p>
-<h3 id="receiving-user-input"><a class="header" href="#receiving-user-input">Receiving User Input</a></h3>
-<p>Recall that we included the input/output functionality from the standard
-library with <code>use std::io;</code> on the first line of the program. Now we’ll call
-the <code>stdin</code> function from the <code>io</code> module, which will allow us to handle user
-input:</p>
-<pre><code class="language-rust ignore"><span class="boring">use std::io;
-</span><span class="boring">
-</span><span class="boring">fn main() {
-</span><span class="boring">    println!(&quot;Guess the number!&quot;);
-</span><span class="boring">
-</span><span class="boring">    println!(&quot;Please input your guess.&quot;);
-</span><span class="boring">
-</span><span class="boring">    let mut guess = String::new();
-</span><span class="boring">
-</span>    io::stdin()
-        .read_line(&amp;mut guess)
-<span class="boring">        .expect(&quot;Failed to read line&quot;);
-</span><span class="boring">
-</span><span class="boring">    println!(&quot;You guessed: {guess}&quot;);
-</span><span class="boring">}</span></code></pre>
-<p>If we hadn’t imported the <code>io</code> library with <code>use std::io;</code> at the beginning of
-the program, we could still use the function by writing this function call as
-<code>std::io::stdin</code>. The <code>stdin</code> function returns an instance of
-<a href="../std/io/struct.Stdin.html"><code>std::io::Stdin</code></a><!-- ignore -->, which is a type that represents a
-handle to the standard input for your terminal.</p>
-<p>Next, the line <code>.read_line(&amp;mut guess)</code> calls the <a href="../std/io/struct.Stdin.html#method.read_line"><code>read_line</code></a><!--
-ignore --> method on the standard input handle to get input from the user.
-We’re also passing <code>&amp;mut guess</code> as the argument to <code>read_line</code> to tell it what
-string to store the user input in. The full job of <code>read_line</code> is to take
-whatever the user types into standard input and append that into a string
-(without overwriting its contents), so we therefore pass that string as an
-argument. The string argument needs to be mutable so the method can change the
-string’s content.</p>
-<p>The <code>&amp;</code> indicates that this argument is a <em>reference</em>, which gives you a way to
-let multiple parts of your code access one piece of data without needing to
-copy that data into memory multiple times. References are a complex feature,
-and one of Rust’s major advantages is how safe and easy it is to use
-references. You don’t need to know a lot of those details to finish this
-program. For now, all you need to know is that, like variables, references are
-immutable by default. Hence, you need to write <code>&amp;mut guess</code> rather than
-<code>&amp;guess</code> to make it mutable. (Chapter 4 will explain references more
-thoroughly.)</p>
-<!-- Old heading. Do not remove or links may break. -->
-<p><a id="handling-potential-failure-with-the-result-type"></a></p>
-<h3 id="handling-potential-failure-with-result"><a class="header" href="#handling-potential-failure-with-result">Handling Potential Failure with <code>Result</code></a></h3>
-<p>We’re still working on this line of code. We’re now discussing a third line of
-text, but note that it’s still part of a single logical line of code. The next
-part is this method:</p>
-<pre><code class="language-rust ignore"><span class="boring">use std::io;
-</span><span class="boring">
-</span><span class="boring">fn main() {
-</span><span class="boring">    println!(&quot;Guess the number!&quot;);
-</span><span class="boring">
-</span><span class="boring">    println!(&quot;Please input your guess.&quot;);
-</span><span class="boring">
-</span><span class="boring">    let mut guess = String::new();
-</span><span class="boring">
-</span><span class="boring">    io::stdin()
-</span><span class="boring">        .read_line(&amp;mut guess)
-</span>        .expect(&quot;Failed to read line&quot;);
-<span class="boring">
-</span><span class="boring">    println!(&quot;You guessed: {guess}&quot;);
-</span><span class="boring">}</span></code></pre>
-<p>We could have written this code as:</p>
-<pre><code class="language-rust ignore">io::stdin().read_line(&amp;mut guess).expect(&quot;Failed to read line&quot;);</code></pre>
-<p>However, one long line is difficult to read, so it’s best to divide it. It’s
-often wise to introduce a newline and other whitespace to help break up long
-lines when you call a method with the <code>.method_name()</code> syntax. Now let’s
-discuss what this line does.</p>
-<p>As mentioned earlier, <code>read_line</code> puts whatever the user enters into the string
-we pass to it, but it also returns a <code>Result</code> value. <a href="../std/result/enum.Result.html"><code>Result</code></a><!--
-ignore --> is an <a href="ch06-00-GUIProgramming.html"><em>enumeration</em></a><!-- ignore -->, often called an <em>enum</em>,
-which is a type that can be in one of multiple possible states. We call each
-possible state a <em>variant</em>.</p>
-<p><a href="ch06-00-GUIProgramming.html">Chapter 6</a><!-- ignore --> will cover enums in more detail. The purpose
-of these <code>Result</code> types is to encode error-handling information.</p>
-<p><code>Result</code>’s variants are <code>Ok</code> and <code>Err</code>. The <code>Ok</code> variant indicates the
-operation was successful, and inside <code>Ok</code> is the successfully generated value.
-The <code>Err</code> variant means the operation failed, and <code>Err</code> contains information
-about how or why the operation failed.</p>
-<p>Values of the <code>Result</code> type, like values of any type, have methods defined on
-them. An instance of <code>Result</code> has an <a href="../std/result/enum.Result.html#method.expect"><code>expect</code> method</a><!-- ignore -->
-that you can call. If this instance of <code>Result</code> is an <code>Err</code> value, <code>expect</code>
-will cause the program to crash and display the message that you passed as an
-argument to <code>expect</code>. If the <code>read_line</code> method returns an <code>Err</code>, it would
-likely be the result of an error coming from the underlying operating system.
-If this instance of <code>Result</code> is an <code>Ok</code> value, <code>expect</code> will take the return
-value that <code>Ok</code> is holding and return just that value to you so you can use it.
-In this case, that value is the number of bytes in the user’s input.</p>
-<p>If you don’t call <code>expect</code>, the program will compile, but you’ll get a warning:</p>
-<pre><code class="language-console">$ cargo build
-   Compiling guessing_game v0.1.0 (file:///projects/guessing_game)
-warning: unused `Result` that must be used
-  --&gt; src/main.rs:10:5
-   |
-10 |     io::stdin().read_line(&amp;mut guess);
-   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   |
-   = note: `#[warn(unused_must_use)]` on by default
-   = note: this `Result` may be an `Err` variant, which should be handled
+                        <p>Version 7 of this textbook used Swing for GUI programming.  When I began work on Version&nbsp;8, JavaFX
+                            had been added to the standard JDK, and it seemed to be the furture of Java GUIs.  So, in Version&nbsp;8,
+                            I made the switch to JavaFX.  Not long after that, however, JavaFX was removed from the JDK, and it is
+                            now developed and distributed separately.  This has made it somewhat more difficult to use.  So for Version&nbsp;9,
+                            I decided to make the book available in two editions, one covering Swing and one covering JavaFX.
+                            The only significant differences are in the chapters that cover GUI programming, <a href="ch06-00-GUIProgramming.html">Chapter&nbsp;6</a>
+                            and <a href="ch13-00-GUIProgrammingContinued.html">Chapter&nbsp;13</a>.  This edition covers JavaFX.  If you also want to learn Swing, you can
+                            read those two chapters in the <a href="https://math.hws.edu/javanotes-swing/">Swing&nbsp;edition</a>.</p>
 
-warning: `guessing_game` (bin &quot;guessing_game&quot;) generated 1 warning
-    Finished dev [unoptimized + debuginfo] target(s) in 0.59s
-</code></pre>
-<p>Rust warns that you haven’t used the <code>Result</code> value returned from <code>read_line</code>,
-indicating that the program hasn’t handled a possible error.</p>
-<p>The right way to suppress the warning is to actually write error-handling code,
-but in our case we just want to crash this program when a problem occurs, so we
-can use <code>expect</code>. You’ll learn about recovering from errors in <a href="ch09-02-LinkedDataStructures.html">Chapter
-9</a><!-- ignore -->.</p>
-<h3 id="printing-values-with-println-placeholders"><a class="header" href="#printing-values-with-println-placeholders">Printing Values with <code>println!</code> Placeholders</a></h3>
-<p>Aside from the closing curly bracket, there’s only one more line to discuss in
-the code so far:</p>
-<pre><code class="language-rust ignore"><span class="boring">use std::io;
-</span><span class="boring">
-</span><span class="boring">fn main() {
-</span><span class="boring">    println!(&quot;Guess the number!&quot;);
-</span><span class="boring">
-</span><span class="boring">    println!(&quot;Please input your guess.&quot;);
-</span><span class="boring">
-</span><span class="boring">    let mut guess = String::new();
-</span><span class="boring">
-</span><span class="boring">    io::stdin()
-</span><span class="boring">        .read_line(&amp;mut guess)
-</span><span class="boring">        .expect(&quot;Failed to read line&quot;);
-</span><span class="boring">
-</span>    println!(&quot;You guessed: {guess}&quot;);
-<span class="boring">}</span></code></pre>
-<p>This line prints the string that now contains the user’s input. The <code>{}</code> set of
-curly brackets is a placeholder: think of <code>{}</code> as little crab pincers that hold
-a value in place. When printing the value of a variable, the variable name can
-go inside the curly brackets. When printing the result of evaluating an
-expression, place empty curly brackets in the format string, then follow the
-format string with a comma-separated list of expressions to print in each empty
-curly bracket placeholder in the same order. Printing a variable and the result
-of an expression in one call to <code>println!</code> would look like this:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>let x = 5;
-let y = 10;
 
-println!(&quot;x = {x} and y + 2 = {}&quot;, y + 2);
-<span class="boring">}</span></code></pre></pre>
-<p>This code would print <code>x = 5 and y + 2 = 12</code>.</p>
-<h3 id="testing-the-first-part"><a class="header" href="#testing-the-first-part">Testing the First Part</a></h3>
-<p>Let’s test the first part of the guessing game. Run it using <code>cargo run</code>:</p>
-<!-- manual-regeneration
-cd listings/ch02-guessing-game-tutorial/listing-02-01/
-cargo clean
-cargo run
-input 6 -->
-<pre><code class="language-console">$ cargo run
-   Compiling guessing_game v0.1.0 (file:///projects/guessing_game)
-    Finished dev [unoptimized + debuginfo] target(s) in 6.44s
-     Running `target/debug/guessing_game`
-Guess the number!
-Please input your guess.
-6
-You guessed: 6
-</code></pre>
-<p>At this point, the first part of the game is done: we’re getting input from the
-keyboard and then printing it.</p>
-<h2 id="generating-a-secret-number"><a class="header" href="#generating-a-secret-number">Generating a Secret Number</a></h2>
-<p>Next, we need to generate a secret number that the user will try to guess. The
-secret number should be different every time so the game is fun to play more
-than once. We’ll use a random number between 1 and 100 so the game isn’t too
-difficult. Rust doesn’t yet include random number functionality in its standard
-library. However, the Rust team does provide a <a href="https://crates.io/crates/rand"><code>rand</code> crate</a> with
-said functionality.</p>
-<h3 id="using-a-crate-to-get-more-functionality"><a class="header" href="#using-a-crate-to-get-more-functionality">Using a Crate to Get More Functionality</a></h3>
-<p>Remember that a crate is a collection of Rust source code files. The project
-we’ve been building is a <em>binary crate</em>, which is an executable. The <code>rand</code>
-crate is a <em>library crate</em>, which contains code that is intended to be used in
-other programs and can’t be executed on its own.</p>
-<p>Cargo’s coordination of external crates is where Cargo really shines. Before we
-can write code that uses <code>rand</code>, we need to modify the <em>Cargo.toml</em> file to
-include the <code>rand</code> crate as a dependency. Open that file now and add the
-following line to the bottom, beneath the <code>[dependencies]</code> section header that
-Cargo created for you. Be sure to specify <code>rand</code> exactly as we have here, with
-this version number, or the code examples in this tutorial may not work:</p>
-<!-- When updating the version of `rand` used, also update the version of
-`rand` used in these files so they all match:
-* ch07-04-bringing-paths-into-scope-with-the-use-keyword.md
-* ch14-03-cargo-workspaces.md
--->
-<p><span class="filename">Filename: Cargo.toml</span></p>
-<pre><code class="language-toml">[dependencies]
-rand = &quot;0.8.5&quot;
-</code></pre>
-<p>In the <em>Cargo.toml</em> file, everything that follows a header is part of that
-section that continues until another section starts. In <code>[dependencies]</code> you
-tell Cargo which external crates your project depends on and which versions of
-those crates you require. In this case, we specify the <code>rand</code> crate with the
-semantic version specifier <code>0.8.5</code>. Cargo understands <a href="http://semver.org">Semantic
-Versioning</a><!-- ignore --> (sometimes called <em>SemVer</em>), which is a
-standard for writing version numbers. The specifier <code>0.8.5</code> is actually
-shorthand for <code>^0.8.5</code>, which means any version that is at least 0.8.5 but
-below 0.9.0.</p>
-<p>Cargo considers these versions to have public APIs compatible with version
-0.8.5, and this specification ensures you’ll get the latest patch release that
-will still compile with the code in this chapter. Any version 0.9.0 or greater
-is not guaranteed to have the same API as what the following examples use.</p>
-<p>Now, without changing any of the code, let’s build the project, as shown in
-Listing 2-2.</p>
-<!-- manual-regeneration
-cd listings/ch02-guessing-game-tutorial/listing-02-02/
-rm Cargo.lock
-cargo clean
-cargo build -->
-<pre><code class="language-console">$ cargo build
-    Updating crates.io index
-  Downloaded rand v0.8.5
-  Downloaded libc v0.2.127
-  Downloaded getrandom v0.2.7
-  Downloaded cfg-if v1.0.0
-  Downloaded ppv-lite86 v0.2.16
-  Downloaded rand_chacha v0.3.1
-  Downloaded rand_core v0.6.3
-   Compiling libc v0.2.127
-   Compiling getrandom v0.2.7
-   Compiling cfg-if v1.0.0
-   Compiling ppv-lite86 v0.2.16
-   Compiling rand_core v0.6.3
-   Compiling rand_chacha v0.3.1
-   Compiling rand v0.8.5
-   Compiling guessing_game v0.1.0 (file:///projects/guessing_game)
-    Finished dev [unoptimized + debuginfo] target(s) in 2.53s
-</code></pre>
-<p><span class="caption">Listing 2-2: The output from running <code>cargo build</code> after
-adding the rand crate as a dependency</span></p>
-<p>You may see different version numbers (but they will all be compatible with the
-code, thanks to SemVer!) and different lines (depending on the operating
-system), and the lines may be in a different order.</p>
-<p>When we include an external dependency, Cargo fetches the latest versions of
-everything that dependency needs from the <em>registry</em>, which is a copy of data
-from <a href="https://crates.io/">Crates.io</a>. Crates.io is where people in the Rust ecosystem
-post their open source Rust projects for others to use.</p>
-<p>After updating the registry, Cargo checks the <code>[dependencies]</code> section and
-downloads any crates listed that aren’t already downloaded. In this case,
-although we only listed <code>rand</code> as a dependency, Cargo also grabbed other crates
-that <code>rand</code> depends on to work. After downloading the crates, Rust compiles
-them and then compiles the project with the dependencies available.</p>
-<p>If you immediately run <code>cargo build</code> again without making any changes, you
-won’t get any output aside from the <code>Finished</code> line. Cargo knows it has already
-downloaded and compiled the dependencies, and you haven’t changed anything
-about them in your <em>Cargo.toml</em> file. Cargo also knows that you haven’t changed
-anything about your code, so it doesn’t recompile that either. With nothing to
-do, it simply exits.</p>
-<p>If you open the <em>src/main.rs</em> file, make a trivial change, and then save it and
-build again, you’ll only see two lines of output:</p>
-<!-- manual-regeneration
-cd listings/ch02-guessing-game-tutorial/listing-02-02/
-touch src/main.rs
-cargo build -->
-<pre><code class="language-console">$ cargo build
-   Compiling guessing_game v0.1.0 (file:///projects/guessing_game)
-    Finished dev [unoptimized + debuginfo] target(s) in 2.53 secs
-</code></pre>
-<p>These lines show that Cargo only updates the build with your tiny change to the
-<em>src/main.rs</em> file. Your dependencies haven’t changed, so Cargo knows it can
-reuse what it has already downloaded and compiled for those.</p>
-<h4 id="ensuring-reproducible-builds-with-the-cargolock-file"><a class="header" href="#ensuring-reproducible-builds-with-the-cargolock-file">Ensuring Reproducible Builds with the <em>Cargo.lock</em> File</a></h4>
-<p>Cargo has a mechanism that ensures you can rebuild the same artifact every time
-you or anyone else builds your code: Cargo will use only the versions of the
-dependencies you specified until you indicate otherwise. For example, say that
-next week version 0.8.6 of the <code>rand</code> crate comes out, and that version
-contains an important bug fix, but it also contains a regression that will
-break your code. To handle this, Rust creates the <em>Cargo.lock</em> file the first
-time you run <code>cargo build</code>, so we now have this in the <em>guessing_game</em>
-directory.</p>
-<p>When you build a project for the first time, Cargo figures out all the versions
-of the dependencies that fit the criteria and then writes them to the
-<em>Cargo.lock</em> file. When you build your project in the future, Cargo will see
-that the <em>Cargo.lock</em> file exists and will use the versions specified there
-rather than doing all the work of figuring out versions again. This lets you
-have a reproducible build automatically. In other words, your project will
-remain at 0.8.5 until you explicitly upgrade, thanks to the <em>Cargo.lock</em> file.
-Because the <em>Cargo.lock</em> file is important for reproducible builds, it’s often
-checked into source control with the rest of the code in your project.</p>
-<h4 id="updating-a-crate-to-get-a-new-version"><a class="header" href="#updating-a-crate-to-get-a-new-version">Updating a Crate to Get a New Version</a></h4>
-<p>When you <em>do</em> want to update a crate, Cargo provides the command <code>update</code>,
-which will ignore the <em>Cargo.lock</em> file and figure out all the latest versions
-that fit your specifications in <em>Cargo.toml</em>. Cargo will then write those
-versions to the <em>Cargo.lock</em> file. Otherwise, by default, Cargo will only look
-for versions greater than 0.8.5 and less than 0.9.0. If the <code>rand</code> crate has
-released the two new versions 0.8.6 and 0.9.0, you would see the following if
-you ran <code>cargo update</code>:</p>
-<!-- manual-regeneration
-cd listings/ch02-guessing-game-tutorial/listing-02-02/
-cargo update
-assuming there is a new 0.8.x version of rand; otherwise use another update
-as a guide to creating the hypothetical output shown here -->
-<pre><code class="language-console">$ cargo update
-    Updating crates.io index
-    Updating rand v0.8.5 -&gt; v0.8.6
-</code></pre>
-<p>Cargo ignores the 0.9.0 release. At this point, you would also notice a change
-in your <em>Cargo.lock</em> file noting that the version of the <code>rand</code> crate you are
-now using is 0.8.6. To use <code>rand</code> version 0.9.0 or any version in the 0.9.<em>x</em>
-series, you’d have to update the <em>Cargo.toml</em> file to look like this instead:</p>
-<pre><code class="language-toml">[dependencies]
-rand = &quot;0.9.0&quot;
-</code></pre>
-<p>The next time you run <code>cargo build</code>, Cargo will update the registry of crates
-available and reevaluate your <code>rand</code> requirements according to the new version
-you have specified.</p>
-<p>There’s a lot more to say about <a href="http://doc.crates.io">Cargo</a><!-- ignore --> and <a href="http://doc.crates.io/crates-io.html">its
-ecosystem</a><!-- ignore -->, which we’ll discuss in Chapter 14, but
-for now, that’s all you need to know. Cargo makes it very easy to reuse
-libraries, so Rustaceans are able to write smaller projects that are assembled
-from a number of packages.</p>
-<h3 id="generating-a-random-number"><a class="header" href="#generating-a-random-number">Generating a Random Number</a></h3>
-<p>Let’s start using <code>rand</code> to generate a number to guess. The next step is to
-update <em>src/main.rs</em>, as shown in Listing 2-3.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore">use std::io;
-use rand::Rng;
+                        <p>To use JavaFX on the command line or in Eclipse, you have to download it onto your computer.  You can find
+                            download links on this page:</p>
 
-fn main() {
-    println!(&quot;Guess the number!&quot;);
 
-    let secret_number = rand::thread_rng().gen_range(1..=100);
+                        <p align="center">
+                            <a href="https://gluonhq.com/products/javafx/">https://gluonhq.com/products/javafx/</a>
+                        </p>
 
-    println!(&quot;The secret number is: {secret_number}&quot;);
 
-    println!(&quot;Please input your guess.&quot;);
+                        <p>You need to download a JavaFX "SDK"&mdash;<b>not</b> "jmods" or "Monocle SDK"&mdash;that is
+                            appropriate for your operating system (Linux, MacOS, or Windows) and for the JDK that you
+                            are using.  You should get the version number that matches the version
+                            of the JDK; that probably means JavaFX version 17.0.2.  (Only the major version number, 17, has to match.)
+                            Furthermore, you need to select the "Architecture," which refers to the CPU type.
+                            The architecture should match the architecture used by your JDK.  If you are using an "x64" JDK from
+                            Adoptium or if you are using an "x86_64" Eclipse package, then you need JavaFX for the x64 architecture.
+                            If you are using an "aarch64" JDK from Adoptium or an "AArch64" package from Eclipse, then you need
+                            the aarch64 architecture.</p>
 
-    let mut guess = String::new();
 
-    io::stdin()
-        .read_line(&amp;mut guess)
-        .expect(&quot;Failed to read line&quot;);
+                        <p>When you download the JavaFX SDK, it will be in the form of a compressed archive
+                            file.  You will need to extract the contents of the archive.
+                            Usually, simply double-clicking the icon of the archive file
+                            will either extract the contents or open a program that you can use to extract the
+                            contents.  You will get a directory with a name something like
+                            <i>javafx-sdk-17.0.2</i>.  You can put the directory anywhere on your
+                            computer, but you will need to know where it is located.</p>
 
-    println!(&quot;You guessed: {guess}&quot;);
-}</code></pre>
-<p><span class="caption">Listing 2-3: Adding code to generate a random
-number</span></p>
-<p>First we add the line <code>use rand::Rng;</code>. The <code>Rng</code> trait defines methods that
-random number generators implement, and this trait must be in scope for us to
-use those methods. Chapter 10 will cover traits in detail.</p>
-<p>Next, we’re adding two lines in the middle. In the first line, we call the
-<code>rand::thread_rng</code> function that gives us the particular random number
-generator we’re going to use: one that is local to the current thread of
-execution and is seeded by the operating system. Then we call the <code>gen_range</code>
-method on the random number generator. This method is defined by the <code>Rng</code>
-trait that we brought into scope with the <code>use rand::Rng;</code> statement. The
-<code>gen_range</code> method takes a range expression as an argument and generates a
-random number in the range. The kind of range expression we’re using here takes
-the form <code>start..=end</code> and is inclusive on the lower and upper bounds, so we
-need to specify <code>1..=100</code> to request a number between 1 and 100.</p>
-<blockquote>
-<p>Note: You won’t just know which traits to use and which methods and functions
-to call from a crate, so each crate has documentation with instructions for
-using it. Another neat feature of Cargo is that running the <code>cargo doc --open</code> command will build documentation provided by all your dependencies
-locally and open it in your browser. If you’re interested in other
-functionality in the <code>rand</code> crate, for example, run <code>cargo doc --open</code> and
-click <code>rand</code> in the sidebar on the left.</p>
-</blockquote>
-<p>The second new line prints the secret number. This is useful while we’re
-developing the program to be able to test it, but we’ll delete it from the
-final version. It’s not much of a game if the program prints the answer as soon
-as it starts!</p>
-<p>Try running the program a few times:</p>
-<!-- manual-regeneration
-cd listings/ch02-guessing-game-tutorial/listing-02-03/
-cargo run
-4
-cargo run
-5
--->
-<pre><code class="language-console">$ cargo run
-   Compiling guessing_game v0.1.0 (file:///projects/guessing_game)
-    Finished dev [unoptimized + debuginfo] target(s) in 2.53s
-     Running `target/debug/guessing_game`
-Guess the number!
-The secret number is: 7
-Please input your guess.
-4
-You guessed: 4
 
-$ cargo run
-    Finished dev [unoptimized + debuginfo] target(s) in 0.02s
-     Running `target/debug/guessing_game`
-Guess the number!
-The secret number is: 83
-Please input your guess.
-5
-You guessed: 5
-</code></pre>
-<p>You should get different random numbers, and they should all be numbers between
-1 and 100. Great job!</p>
-<h2 id="comparing-the-guess-to-the-secret-number"><a class="header" href="#comparing-the-guess-to-the-secret-number">Comparing the Guess to the Secret Number</a></h2>
-<p>Now that we have user input and a random number, we can compare them. That step
-is shown in Listing 2-4. Note that this code won’t compile just yet, as we will
-explain.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore does_not_compile">use rand::Rng;
-use std::cmp::Ordering;
-use std::io;
+                        <p>JavaFX is a collection of Java classes that can be used for making GUI programs.
+                            In this book, it is first used in <a href="ch03-09-GUI.html">Section&nbsp;3.9</a> and is covered extensively
+                            in <a href="ch06-00-GUIProgramming.html">Chapter&nbsp;6</a> and <a href="ch13-00-GUIProgrammingContinued.html">Chapter&nbsp;13</a>.  It is also used in example
+                            programs in several other chapters.
+                            This subsection explains how to use JavaFX on the command line.
+                            It assumes that you have already downloaded the JavaFX SDK, as described above.
+                            JavaFX is distributed as a set of "modules."  (See <a href="ch04-06-APIPackagesModulesJavadoc.html">Subsection&nbsp;4.6.4</a>)
+                            The modules are stored in .jar files in the <i>lib</i> subdirectory of the JavaFX SDK.
+                            When using the <span class="code">javac</span> and <span class="code">java</span> commands on a program that uses
+                            JavaFX, you need to tell the command where to find the JavaFX modules.</p>
 
-fn main() {
-    // --snip--
-<span class="boring">    println!(&quot;Guess the number!&quot;);
-</span><span class="boring">
-</span><span class="boring">    let secret_number = rand::thread_rng().gen_range(1..=100);
-</span><span class="boring">
-</span><span class="boring">    println!(&quot;The secret number is: {secret_number}&quot;);
-</span><span class="boring">
-</span><span class="boring">    println!(&quot;Please input your guess.&quot;);
-</span><span class="boring">
-</span><span class="boring">    let mut guess = String::new();
-</span><span class="boring">
-</span><span class="boring">    io::stdin()
-</span><span class="boring">        .read_line(&amp;mut guess)
-</span><span class="boring">        .expect(&quot;Failed to read line&quot;);
-</span>
-    println!(&quot;You guessed: {guess}&quot;);
 
-    match guess.cmp(&amp;secret_number) {
-        Ordering::Less =&gt; println!(&quot;Too small!&quot;),
-        Ordering::Greater =&gt; println!(&quot;Too big!&quot;),
-        Ordering::Equal =&gt; println!(&quot;You win!&quot;),
-    }
-}</code></pre>
-<p><span class="caption">Listing 2-4: Handling the possible return values of
-comparing two numbers</span></p>
-<p>First we add another <code>use</code> statement, bringing a type called
-<code>std::cmp::Ordering</code> into scope from the standard library. The <code>Ordering</code> type
-is another enum and has the variants <code>Less</code>, <code>Greater</code>, and <code>Equal</code>. These are
-the three outcomes that are possible when you compare two values.</p>
-<p>Then we add five new lines at the bottom that use the <code>Ordering</code> type. The
-<code>cmp</code> method compares two values and can be called on anything that can be
-compared. It takes a reference to whatever you want to compare with: here it’s
-comparing <code>guess</code> to <code>secret_number</code>. Then it returns a variant of the
-<code>Ordering</code> enum we brought into scope with the <code>use</code> statement. We use a
-<a href="ch06-02-BasicClasses.html"><code>match</code></a><!-- ignore --> expression to decide what to do next based on
-which variant of <code>Ordering</code> was returned from the call to <code>cmp</code> with the values
-in <code>guess</code> and <code>secret_number</code>.</p>
-<p>A <code>match</code> expression is made up of <em>arms</em>. An arm consists of a <em>pattern</em> to
-match against, and the code that should be run if the value given to <code>match</code>
-fits that arm’s pattern. Rust takes the value given to <code>match</code> and looks
-through each arm’s pattern in turn. Patterns and the <code>match</code> construct are
-powerful Rust features: they let you express a variety of situations your code
-might encounter and they make sure you handle them all. These features will be
-covered in detail in Chapter 6 and Chapter 18, respectively.</p>
-<p>Let’s walk through an example with the <code>match</code> expression we use here. Say that
-the user has guessed 50 and the randomly generated secret number this time is
-38.</p>
-<p>When the code compares 50 to 38, the <code>cmp</code> method will return
-<code>Ordering::Greater</code> because 50 is greater than 38. The <code>match</code> expression gets
-the <code>Ordering::Greater</code> value and starts checking each arm’s pattern. It looks
-at the first arm’s pattern, <code>Ordering::Less</code>, and sees that the value
-<code>Ordering::Greater</code> does not match <code>Ordering::Less</code>, so it ignores the code in
-that arm and moves to the next arm. The next arm’s pattern is
-<code>Ordering::Greater</code>, which <em>does</em> match <code>Ordering::Greater</code>! The associated
-code in that arm will execute and print <code>Too big!</code> to the screen. The <code>match</code>
-expression ends after the first successful match, so it won’t look at the last
-arm in this scenario.</p>
-<p>However, the code in Listing 2-4 won’t compile yet. Let’s try it:</p>
-<!--
-The error numbers in this output should be that of the code **WITHOUT** the
-anchor or snip comments
--->
-<pre><code class="language-console">$ cargo build
-   Compiling libc v0.2.86
-   Compiling getrandom v0.2.2
-   Compiling cfg-if v1.0.0
-   Compiling ppv-lite86 v0.2.10
-   Compiling rand_core v0.6.2
-   Compiling rand_chacha v0.3.0
-   Compiling rand v0.8.5
-   Compiling guessing_game v0.1.0 (file:///projects/guessing_game)
-error[E0308]: mismatched types
-  --&gt; src/main.rs:22:21
-   |
-22 |     match guess.cmp(&amp;secret_number) {
-   |                 --- ^^^^^^^^^^^^^^ expected struct `String`, found integer
-   |                 |
-   |                 arguments to this function are incorrect
-   |
-   = note: expected reference `&amp;String`
-              found reference `&amp;{integer}`
-note: associated function defined here
+                        <p>The modules are specified for the <span class="code">javac</span> and <span class="code">java</span> commands
+                            using two command options:  <span class="code">--module-path</span> and <span class="code">--add-modules</span>.
+                            The first option specifies the directory that contains the JavaFX .jar files, and the
+                            second says which modules you actually want to use.  For the purposes of this
+                            textbook, you can set the value of <span class="code">--add-modules</span> to <span class="code">ALL-MODULE-PATH</span>,
+                            which makes all of JavaFX available to your program.  The value of <span class="code">--module-path</span>
+                            is a path to the <i>lib</i> directory that contains the JavaFX .jar files.
+                            For example, let's say that the JavaFX SDK directory is named <i>openjfx-sdk-17.0.2</i> and
+                            that it is in my home directory, <i>/home/eck</i>.  Then the full path to the
+                            <i>lib</i> directory is <span class="code">/home/eck/openjfx-sdk-17.0.2/lib</span>, and the <span class="code">javac</span>
+                            command for compiling JavaFX programs would be:</p>
 
-For more information about this error, try `rustc --explain E0308`.
-error: could not compile `guessing_game` due to previous error
-</code></pre>
-<p>The core of the error states that there are <em>mismatched types</em>. Rust has a
-strong, static type system. However, it also has type inference. When we wrote
-<code>let mut guess = String::new()</code>, Rust was able to infer that <code>guess</code> should be
-a <code>String</code> and didn’t make us write the type. The <code>secret_number</code>, on the other
-hand, is a number type. A few of Rust’s number types can have a value between 1
-and 100: <code>i32</code>, a 32-bit number; <code>u32</code>, an unsigned 32-bit number; <code>i64</code>, a
-64-bit number; as well as others. Unless otherwise specified, Rust defaults to
-an <code>i32</code>, which is the type of <code>secret_number</code> unless you add type information
-elsewhere that would cause Rust to infer a different numerical type. The reason
-for the error is that Rust cannot compare a string and a number type.</p>
-<p>Ultimately, we want to convert the <code>String</code> the program reads as input into a
-real number type so we can compare it numerically to the secret number. We do
-so by adding this line to the <code>main</code> function body:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore"><span class="boring">use rand::Rng;
-</span><span class="boring">use std::cmp::Ordering;
-</span><span class="boring">use std::io;
-</span><span class="boring">
-</span><span class="boring">fn main() {
-</span><span class="boring">    println!(&quot;Guess the number!&quot;);
-</span><span class="boring">
-</span><span class="boring">    let secret_number = rand::thread_rng().gen_range(1..=100);
-</span><span class="boring">
-</span><span class="boring">    println!(&quot;The secret number is: {secret_number}&quot;);
-</span><span class="boring">
-</span><span class="boring">    println!(&quot;Please input your guess.&quot;);
-</span><span class="boring">
-</span>    // --snip--
 
-    let mut guess = String::new();
+                        <pre><code class="console">$ javac --module-path=/home/eck/openjfx-sdk-17.0.2/lib --add-modules=ALL-MODULE-PATH</code></pre>
 
-    io::stdin()
-        .read_line(&amp;mut guess)
-        .expect(&quot;Failed to read line&quot;);
 
-    let guess: u32 = guess.trim().parse().expect(&quot;Please type a number!&quot;);
+                        <p>This would be followed on the same line by the .java files that you want to compile.
+                            Exactly the same options would
+                            be used with the <span class="code">java</span> command to run JavaFX programs.
+                            The option <span class="code">--module-path</span> can also be abbreviated to <span class="code">-p</span>, with no
+                            equals sign.  So this can also be written</p>
 
-    println!(&quot;You guessed: {guess}&quot;);
 
-    match guess.cmp(&amp;secret_number) {
-        Ordering::Less =&gt; println!(&quot;Too small!&quot;),
-        Ordering::Greater =&gt; println!(&quot;Too big!&quot;),
-        Ordering::Equal =&gt; println!(&quot;You win!&quot;),
-    }
-<span class="boring">}</span></code></pre>
-<p>The line is:</p>
-<pre><code class="language-rust ignore">let guess: u32 = guess.trim().parse().expect(&quot;Please type a number!&quot;);</code></pre>
-<p>We create a variable named <code>guess</code>. But wait, doesn’t the program already have
-a variable named <code>guess</code>? It does, but helpfully Rust allows us to shadow the
-previous value of <code>guess</code> with a new one. <em>Shadowing</em> lets us reuse the <code>guess</code>
-variable name rather than forcing us to create two unique variables, such as
-<code>guess_str</code> and <code>guess</code>, for example. We’ll cover this in more detail in
-<a href="ch03-01-BlocksLoopsBranches.html#shadowing">Chapter 3</a><!-- ignore -->, but for now, know that this feature is
-often used when you want to convert a value from one type to another type.</p>
-<p>We bind this new variable to the expression <code>guess.trim().parse()</code>. The <code>guess</code>
-in the expression refers to the original <code>guess</code> variable that contained the
-input as a string. The <code>trim</code> method on a <code>String</code> instance will eliminate any
-whitespace at the beginning and end, which we must do to be able to compare the
-string to the <code>u32</code>, which can only contain numerical data. The user must press
-<span class="keystroke">enter</span> to satisfy <code>read_line</code> and input their
-guess, which adds a newline character to the string. For example, if the user
-types <span class="keystroke">5</span> and presses <span
-class="keystroke">enter</span>, <code>guess</code> looks like this: <code>5\n</code>. The <code>\n</code>
-represents “newline.” (On Windows, pressing <span
-class="keystroke">enter</span> results in a carriage return and a newline,
-<code>\r\n</code>.) The <code>trim</code> method eliminates <code>\n</code> or <code>\r\n</code>, resulting in just <code>5</code>.</p>
-<p>The <a href="../std/primitive.str.html#method.parse"><code>parse</code> method on strings</a><!-- ignore --> converts a string to
-another type. Here, we use it to convert from a string to a number. We need to
-tell Rust the exact number type we want by using <code>let guess: u32</code>. The colon
-(<code>:</code>) after <code>guess</code> tells Rust we’ll annotate the variable’s type. Rust has a
-few built-in number types; the <code>u32</code> seen here is an unsigned, 32-bit integer.
-It’s a good default choice for a small positive number. You’ll learn about
-other number types in <a href="ch03-02-AlgorithmDevelopment.html#integer-types">Chapter 3</a><!-- ignore -->.</p>
-<p>Additionally, the <code>u32</code> annotation in this example program and the comparison
-with <code>secret_number</code> means Rust will infer that <code>secret_number</code> should be a
-<code>u32</code> as well. So now the comparison will be between two values of the same
-type!</p>
-<p>The <code>parse</code> method will only work on characters that can logically be converted
-into numbers and so can easily cause errors. If, for example, the string
-contained <code>A👍%</code>, there would be no way to convert that to a number. Because it
-might fail, the <code>parse</code> method returns a <code>Result</code> type, much as the <code>read_line</code>
-method does (discussed earlier in <a href="#handling-potential-failure-with-result">“Handling Potential Failure with
-<code>Result</code>”</a><!-- ignore-->). We’ll treat
-this <code>Result</code> the same way by using the <code>expect</code> method again. If <code>parse</code>
-returns an <code>Err</code> <code>Result</code> variant because it couldn’t create a number from the
-string, the <code>expect</code> call will crash the game and print the message we give it.
-If <code>parse</code> can successfully convert the string to a number, it will return the
-<code>Ok</code> variant of <code>Result</code>, and <code>expect</code> will return the number that we want from
-the <code>Ok</code> value.</p>
-<p>Let’s run the program now:</p>
-<!-- manual-regeneration
-cd listings/ch02-guessing-game-tutorial/no-listing-03-convert-string-to-number/
-cargo run
-  76
--->
-<pre><code class="language-console">$ cargo run
-   Compiling guessing_game v0.1.0 (file:///projects/guessing_game)
-    Finished dev [unoptimized + debuginfo] target(s) in 0.43s
-     Running `target/debug/guessing_game`
-Guess the number!
-The secret number is: 58
-Please input your guess.
-  76
-You guessed: 76
-Too big!
-</code></pre>
-<p>Nice! Even though spaces were added before the guess, the program still figured
-out that the user guessed 76. Run the program a few times to verify the
-different behavior with different kinds of input: guess the number correctly,
-guess a number that is too high, and guess a number that is too low.</p>
-<p>We have most of the game working now, but the user can make only one guess.
-Let’s change that by adding a loop!</p>
-<h2 id="allowing-multiple-guesses-with-looping"><a class="header" href="#allowing-multiple-guesses-with-looping">Allowing Multiple Guesses with Looping</a></h2>
-<p>The <code>loop</code> keyword creates an infinite loop. We’ll add a loop to give users
-more chances at guessing the number:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore"><span class="boring">use rand::Rng;
-</span><span class="boring">use std::cmp::Ordering;
-</span><span class="boring">use std::io;
-</span><span class="boring">
-</span><span class="boring">fn main() {
-</span><span class="boring">    println!(&quot;Guess the number!&quot;);
-</span><span class="boring">
-</span><span class="boring">    let secret_number = rand::thread_rng().gen_range(1..=100);
-</span><span class="boring">
-</span>    // --snip--
+                        <pre><code class="console">$ javac -p /home/eck/openjfx-sdk-17.0.2/lib --add-modules=ALL-MODULE-PATH</code></pre>
 
-    println!(&quot;The secret number is: {secret_number}&quot;);
 
-    loop {
-        println!(&quot;Please input your guess.&quot;);
+                        <p>If you don't know the full path to the JavaFX SDK, open a command window and use
+                            the <i>cd</i> command to move to the SDK's <i>lib</i> directory. On Mac or Linux,
+                            enter the command <i>pwd</i> to print out the full path of the working directory.
+                            On windows, use the command <i>cd</i>, with no directory specified, to print out the path.
+                            Use the output from that command as the value for the <span class="code">--module-path</span>. On windows, a typical
+                            <span class="code">java</span> command for use with javafx might look something like this:</p>
 
-        // --snip--
 
-<span class="boring">
-</span><span class="boring">        let mut guess = String::new();
-</span><span class="boring">
-</span><span class="boring">        io::stdin()
-</span><span class="boring">            .read_line(&amp;mut guess)
-</span><span class="boring">            .expect(&quot;Failed to read line&quot;);
-</span><span class="boring">
-</span><span class="boring">        let guess: u32 = guess.trim().parse().expect(&quot;Please type a number!&quot;);
-</span><span class="boring">
-</span><span class="boring">        println!(&quot;You guessed: {guess}&quot;);
-</span><span class="boring">
-</span>        match guess.cmp(&amp;secret_number) {
-            Ordering::Less =&gt; println!(&quot;Too small!&quot;),
-            Ordering::Greater =&gt; println!(&quot;Too big!&quot;),
-            Ordering::Equal =&gt; println!(&quot;You win!&quot;),
-        }
-    }
-}</code></pre>
-<p>As you can see, we’ve moved everything from the guess input prompt onward into
-a loop. Be sure to indent the lines inside the loop another four spaces each
-and run the program again. The program will now ask for another guess forever,
-which actually introduces a new problem. It doesn’t seem like the user can quit!</p>
-<p>The user could always interrupt the program by using the keyboard shortcut
-<span class="keystroke">ctrl-c</span>. But there’s another way to escape this
-insatiable monster, as mentioned in the <code>parse</code> discussion in <a href="#comparing-the-guess-to-the-secret-number">“Comparing the
-Guess to the Secret Number”</a><!--
-ignore -->: if the user enters a non-number answer, the program will crash. We
-can take advantage of that to allow the user to quit, as shown here:</p>
-<!-- manual-regeneration
-cd listings/ch02-guessing-game-tutorial/no-listing-04-looping/
-cargo run
-(too small guess)
-(too big guess)
-(correct guess)
-quit
--->
-<pre><code class="language-console">$ cargo run
-   Compiling guessing_game v0.1.0 (file:///projects/guessing_game)
-    Finished dev [unoptimized + debuginfo] target(s) in 1.50s
-     Running `target/debug/guessing_game`
-Guess the number!
-The secret number is: 59
-Please input your guess.
-45
-You guessed: 45
-Too small!
-Please input your guess.
-60
-You guessed: 60
-Too big!
-Please input your guess.
-59
-You guessed: 59
-You win!
-Please input your guess.
-quit
-thread 'main' panicked at 'Please type a number!: ParseIntError { kind: InvalidDigit }', src/main.rs:28:47
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-</code></pre>
-<p>Typing <code>quit</code> will quit the game, but as you’ll notice, so will entering any
-other non-number input. This is suboptimal, to say the least; we want the game
-to also stop when the correct number is guessed.</p>
-<h3 id="quitting-after-a-correct-guess"><a class="header" href="#quitting-after-a-correct-guess">Quitting After a Correct Guess</a></h3>
-<p>Let’s program the game to quit when the user wins by adding a <code>break</code> statement:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore"><span class="boring">use rand::Rng;
-</span><span class="boring">use std::cmp::Ordering;
-</span><span class="boring">use std::io;
-</span><span class="boring">
-</span><span class="boring">fn main() {
-</span><span class="boring">    println!(&quot;Guess the number!&quot;);
-</span><span class="boring">
-</span><span class="boring">    let secret_number = rand::thread_rng().gen_range(1..=100);
-</span><span class="boring">
-</span><span class="boring">    println!(&quot;The secret number is: {secret_number}&quot;);
-</span><span class="boring">
-</span><span class="boring">    loop {
-</span><span class="boring">        println!(&quot;Please input your guess.&quot;);
-</span><span class="boring">
-</span><span class="boring">        let mut guess = String::new();
-</span><span class="boring">
-</span><span class="boring">        io::stdin()
-</span><span class="boring">            .read_line(&amp;mut guess)
-</span><span class="boring">            .expect(&quot;Failed to read line&quot;);
-</span><span class="boring">
-</span><span class="boring">        let guess: u32 = guess.trim().parse().expect(&quot;Please type a number!&quot;);
-</span><span class="boring">
-</span><span class="boring">        println!(&quot;You guessed: {guess}&quot;);
-</span><span class="boring">
-</span>        // --snip--
+                        <pre><code class="console">$ java -p C:\Users\eck\openjfx-sdk-17.0.2\lib --add-modules=ALL-MODULE-PATH</code></pre>
 
-        match guess.cmp(&amp;secret_number) {
-            Ordering::Less =&gt; println!(&quot;Too small!&quot;),
-            Ordering::Greater =&gt; println!(&quot;Too big!&quot;),
-            Ordering::Equal =&gt; {
-                println!(&quot;You win!&quot;);
-                break;
-            }
-        }
-    }
-}</code></pre>
-<p>Adding the <code>break</code> line after <code>You win!</code> makes the program exit the loop when
-the user guesses the secret number correctly. Exiting the loop also means
-exiting the program, because the loop is the last part of <code>main</code>.</p>
-<h3 id="handling-invalid-input"><a class="header" href="#handling-invalid-input">Handling Invalid Input</a></h3>
-<p>To further refine the game’s behavior, rather than crashing the program when
-the user inputs a non-number, let’s make the game ignore a non-number so the
-user can continue guessing. We can do that by altering the line where <code>guess</code>
-is converted from a <code>String</code> to a <code>u32</code>, as shown in Listing 2-5.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore"><span class="boring">use rand::Rng;
-</span><span class="boring">use std::cmp::Ordering;
-</span><span class="boring">use std::io;
-</span><span class="boring">
-</span><span class="boring">fn main() {
-</span><span class="boring">    println!(&quot;Guess the number!&quot;);
-</span><span class="boring">
-</span><span class="boring">    let secret_number = rand::thread_rng().gen_range(1..=100);
-</span><span class="boring">
-</span><span class="boring">    println!(&quot;The secret number is: {secret_number}&quot;);
-</span><span class="boring">
-</span><span class="boring">    loop {
-</span><span class="boring">        println!(&quot;Please input your guess.&quot;);
-</span><span class="boring">
-</span><span class="boring">        let mut guess = String::new();
-</span><span class="boring">
-</span>        // --snip--
 
-        io::stdin()
-            .read_line(&amp;mut guess)
-            .expect(&quot;Failed to read line&quot;);
+                        <p>If the path name includes a space, or certain other special characters, it
+                            must be enclosed in quotation marks.  For example,</p>
 
-        let guess: u32 = match guess.trim().parse() {
-            Ok(num) =&gt; num,
-            Err(_) =&gt; continue,
-        };
 
-        println!(&quot;You guessed: {guess}&quot;);
+                        <pre><code class="console">$ java -p "C:\JavaFX Support\openjfx-sdk-17.0.2\lib" --add-modules=ALL-MODULE-PATH</code></pre>
 
-        // --snip--
-<span class="boring">
-</span><span class="boring">        match guess.cmp(&amp;secret_number) {
-</span><span class="boring">            Ordering::Less =&gt; println!(&quot;Too small!&quot;),
-</span><span class="boring">            Ordering::Greater =&gt; println!(&quot;Too big!&quot;),
-</span><span class="boring">            Ordering::Equal =&gt; {
-</span><span class="boring">                println!(&quot;You win!&quot;);
-</span><span class="boring">                break;
-</span><span class="boring">            }
-</span><span class="boring">        }
-</span><span class="boring">    }
-</span><span class="boring">}</span></code></pre>
-<p><span class="caption">Listing 2-5: Ignoring a non-number guess and asking for
-another guess instead of crashing the program</span></p>
-<p>We switch from an <code>expect</code> call to a <code>match</code> expression to move from crashing
-on an error to handling the error. Remember that <code>parse</code> returns a <code>Result</code>
-type and <code>Result</code> is an enum that has the variants <code>Ok</code> and <code>Err</code>. We’re using
-a <code>match</code> expression here, as we did with the <code>Ordering</code> result of the <code>cmp</code>
-method.</p>
-<p>If <code>parse</code> is able to successfully turn the string into a number, it will
-return an <code>Ok</code> value that contains the resultant number. That <code>Ok</code> value will
-match the first arm’s pattern, and the <code>match</code> expression will just return the
-<code>num</code> value that <code>parse</code> produced and put inside the <code>Ok</code> value. That number
-will end up right where we want it in the new <code>guess</code> variable we’re creating.</p>
-<p>If <code>parse</code> is <em>not</em> able to turn the string into a number, it will return an
-<code>Err</code> value that contains more information about the error. The <code>Err</code> value
-does not match the <code>Ok(num)</code> pattern in the first <code>match</code> arm, but it does
-match the <code>Err(_)</code> pattern in the second arm. The underscore, <code>_</code>, is a
-catchall value; in this example, we’re saying we want to match all <code>Err</code>
-values, no matter what information they have inside them. So the program will
-execute the second arm’s code, <code>continue</code>, which tells the program to go to the
-next iteration of the <code>loop</code> and ask for another guess. So, effectively, the
-program ignores all errors that <code>parse</code> might encounter!</p>
-<p>Now everything in the program should work as expected. Let’s try it:</p>
-<!-- manual-regeneration
-cd listings/ch02-guessing-game-tutorial/listing-02-05/
-cargo run
-(too small guess)
-(too big guess)
-foo
-(correct guess)
--->
-<pre><code class="language-console">$ cargo run
-   Compiling guessing_game v0.1.0 (file:///projects/guessing_game)
-    Finished dev [unoptimized + debuginfo] target(s) in 4.45s
-     Running `target/debug/guessing_game`
-Guess the number!
-The secret number is: 61
-Please input your guess.
-10
-You guessed: 10
-Too small!
-Please input your guess.
-99
-You guessed: 99
-Too big!
-Please input your guess.
-foo
-Please input your guess.
-61
-You guessed: 61
-You win!
-</code></pre>
-<p>Awesome! With one tiny final tweak, we will finish the guessing game. Recall
-that the program is still printing the secret number. That worked well for
-testing, but it ruins the game. Let’s delete the <code>println!</code> that outputs the
-secret number. Listing 2-6 shows the final code.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore">use rand::Rng;
-use std::cmp::Ordering;
-use std::io;
 
-fn main() {
-    println!(&quot;Guess the number!&quot;);
+                        <p>Of course, this is very verbose, and it would be nice not to have to retype it
+                            all the time.  On MacOS or Linux, it is easy to define <span class="newword">aliases</span>,
+                            which are shortcuts for long commands.  On my computer, I use an alias to define
+                            a <i>jfxc</i> command for compiling JavaFX programs. The alias is defined as follows:</p>
 
-    let secret_number = rand::thread_rng().gen_range(1..=100);
 
-    loop {
-        println!(&quot;Please input your guess.&quot;);
+                        <pre><code class="console">$ alias jfxc='javac -p /home/eck/javafx-sdk-17.0.2/lib --add-modules=ALL-MODULE-PATH'</code></pre>
 
-        let mut guess = String::new();
 
-        io::stdin()
-            .read_line(&amp;mut guess)
-            .expect(&quot;Failed to read line&quot;);
+                        <p>Similarly, I defined an alias for running JavaFX programs:</p>
 
-        let guess: u32 = match guess.trim().parse() {
-            Ok(num) =&gt; num,
-            Err(_) =&gt; continue,
-        };
 
-        println!(&quot;You guessed: {guess}&quot;);
+                        <pre><code class="console">$ alias jfx='java -p /home/eck/javafx-sdk-17.0.2/lib --add-modules=ALL-MODULE-PATH'</code></pre>
 
-        match guess.cmp(&amp;secret_number) {
-            Ordering::Less =&gt; println!(&quot;Too small!&quot;),
-            Ordering::Greater =&gt; println!(&quot;Too big!&quot;),
-            Ordering::Equal =&gt; {
-                println!(&quot;You win!&quot;);
-                break;
-            }
-        }
-    }
-}</code></pre>
-<p><span class="caption">Listing 2-6: Complete guessing game code</span></p>
-<p>At this point, you’ve successfully built the guessing game. Congratulations!</p>
-<h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
-<p>This project was a hands-on way to introduce you to many new Rust concepts:
-<code>let</code>, <code>match</code>, functions, the use of external crates, and more. In the next
-few chapters, you’ll learn about these concepts in more detail. Chapter 3
-covers concepts that most programming languages have, such as variables, data
-types, and functions, and shows how to use them in Rust. Chapter 4 explores
-ownership, a feature that makes Rust different from other languages. Chapter 5
-discusses structs and method syntax, and Chapter 6 explains how enums work.</p>
+
+                        <p>This lets me compile and run JavaFX programs using commands such as</p>
+
+
+                        <pre><code class="console">$ jfxc MyJavaFXProgram.java
+jfx MyJavaFXProgram</code></pre>
+
+
+                        <p>To make the alias definitions permanent on my Linux computer, I added them to a file named
+                            <i>.bashrc</i>.  On MacOS, I would put them in
+                            a file named <i>.zshrc</i> (for MacOS 10.15 and later) or in a file named
+                            <i>.bash_profile</i> (for earlier versions of MacOS).  That file must
+                            be placed in your home directory.   The file might or might not already exist;
+                            if it doesn't exist, you can create it.  The file is
+                            executed whenever you open a Terminal window. (In particular, changes do
+                            not become effective until you open a new Terminal.) Note that the file name
+                            begins with a period, which makes it a "hidden file."  That means that
+                            it won't show up in a usual directory listing or file browser, but you should
+                            be able to set your file browser to show hidden files.</p>
+
+
+                        <p>Unfortunately, Windows currently does not have an equivalent of a .bashrc or
+                            .zshrc for its <i>cmd</i> command window.  One option is
+                            to make a batch script file to run the command.  For compilation, you could
+                            create a file named <i>jfxc.bat</i> containing just one line similar to</p>
+
+
+                        <pre><code class="console">$ javac -p C:\Users\eck\javafx-sdk-17.0.2\lib --add-modules=ALL-MODULE-PATH %*</code></pre>
+
+
+                        <p>but, of course, using the appropriate JavaFX location for your own computer.
+                            The "<span class="code">%*</span>" at the end represents the inputs to the <span class="code">javac</span> command.
+                            The file can be in the current directory or somewhere on the system path, such
+                            as the JDK <i>bin</i> directory.  Then you can use <span class="code">jfxc</span> as a
+                            command for compiling JavaFX programs.
+                            You can handle the <span class="code">java</span> command with a similar .bat file.</p>
+
+                        
+                        <h3 id="javafxecl"><a class="header" href="#javafxecl">Using JavaFX in Eclipse</a></h3>
+
+                        <p>To compile and run JavaFX programs in Eclipse, you need to configure
+                            your Eclipse workspace to support it.   My goal here is
+                            <b>not</b> to present the most "correct" or general way to configure Eclipse for JavaFX;
+                            I just want to make it possible to easily work with basic JavaFX programs like the ones that come with this textbook.
+                            I will discuss a one-time configuration of an Eclipse workspace that seems to work reliably for
+                            all the versions of Eclipse in which I have tried it.</p>
+
+
+                        <p>The first step is to download a JavaFX SDK from
+                            <a href="https://gluonhq.com/products/javafx/">the JavaFX download site</a>,
+                            as discussed in the previous subsection.</p>
+
+
+                        <p>To begin, open the Eclipse preferences, using the "Preferences" command (which is in the
+                            "Windows" menu on Linux and Windows and in the "Eclipse" menu on MacOS).
+                            Expand the Java section in the list on the left, by clicking the small triangle or plus
+                            sign next to the word "Java."  Click on "Installed JREs."  You will see a list of the
+                            Java environments that Eclipse knows about. The list should include
+                            at least the JRE that is included in Eclipse, and it might also include other JREs
+                            that have been installed.  You can click on a JRE to select
+                            it and click the "Duplicate" button to make a copy.  You can then add JavaFX support to the copy.
+                            (You could also just "Edit" the original JRE, or "Add" a completely new configuration.
+                            I recommend using "Duplicate", but if you add a new configuration,
+                            you would have the freedom to use a different JDK that you have downloaded,
+                            along with a matching JavaFX.)</p>
+
+
+                        <p>When you "Duplicate" an existing JRE, you should see a dialog
+                            box similar to the following.  The "JRE&nbsp;home"
+                            and "JRE&nbsp;name" will already be filled in, and there will be just one entry under
+                            "JRE system libraries".</p>
+
+
+                        <p align="center">
+                            <img src="./images/eclipse-fx.png" width="696" height="523" alt="editing a JRE to add support for JavaFX to Eclipse" class="bordered"></p>
+
+
+                        <p>You should change the "JRE name" to something that indicates that it supports
+                            JavaFX.  This is just so that you will recognize the name when you create
+                            a new project in Eclipse.  But the main thing is to add the
+                            JavaFX configuration.</p>
+
+
+                        <p>Remember that to use JavaFX, you need to make it available to your program both
+                            at compile time and at run time.  The first step in the configuration is to
+                            make it available at compile time.  To do that, you want to add the
+                            JavaFX .jar files to the JRE system libraries:  Click the "Add External JARs" button,
+                            and navigate to the <i>lib</i> directory in the JavaFX&nbsp;SDK that you downloaded.
+                            You should see the JavaFX .jar files.  Select them all,
+                            and click "OK".  They should appear in the "JRE system libraries" list.</p>
+
+
+                        <p>The second step is to configure the JavaFX source file.
+                            This step is optional, but it will allow Eclipse to find the documentation for JavaFX,
+                            which can be very useful when you are writing programs.
+                            For this step,
+                            make sure that all of the JavaFX jar files are selected in the
+                            list of .jar files, as shown in the above illustration.  Click the "Source Attachment"
+                            button.  In the "Source Attachment Configuration" dialog box, select "External Location",
+                            and click "External File".  Select the file <i>src.zip</i> from the JavaFX SDK directory, and click
+                            "OK".  That's all there is to it.</p>
+
+
+                        <p>Finally, you must make JavaFX available to your programs at run time.
+                            To do that, you need to fill in the
+                            "Default VM arguments" input box by typing in the JavaFX command line options for
+                            the <i>java</i> command.
+                            The input box contains options that will be added to the
+                            <i>java</i> command every time you run a program in Eclipse using this JRE.
+                            The <span class="code">-p</span> (or <span class="code">--module-path</span>) and <span class="code">--add-modules</span>
+                            options that are needed were discussed in the previous subsection.
+                            Examples appropriate for my own computer are shown in the above illustration.
+                            The value of the <span class="code">-p</span>
+                            option is the location of the JavaFX <i>lib</i> directory.  It should
+                            be exactly the same as the beginning of the paths for the JavaFX .jar files
+                            as shown in the "JRE system libraries" list.  (But enclose the value in quotation
+                            marks if it includes spaces or other special characters.)
+                            The value for <span class="code">--add-modules</span> can be <span class="code">ALL-MODULE-PATH</span>,
+                            as shown in the illustration.</p>
+
+
+                        <p>When everything is set up, click "Finish" and then click "Apply and Close" in
+                            the main "Preferences" dialog box. When you create a new Java project in the
+                            workspace, make sure that the JRE that you set up to use JavaFX is selected in
+                            the project creation dialog box. Look in the "JRE" section of the dialog box,
+                            select "Use project-specific JRE," and select the JRE with JavaFX from the popup menu.
+                            You should then be able to use JavaFX in that project.  If not, check your JRE configuration.
+                            You can "Edit" it in the same Java preferences where you set it up in the first place.
+                            If you can't compile JavaFX programs, make sure that you are using a JavaFX SDK with
+                            the same major version number as the built-in JDK in Eclipse (JavaFX&nbsp;17 for the
+                            March 2022 version of Eclipse, for example). If you can compile JavaFX programs but not run them,
+                            check the "Default VM arguments" and check that you have the JavaFX SDK for the
+                            correct operating system and architecture.</p>
 
                     </main>
 

@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Data Types - Introduction to Programming Using Java</title>
+        <title>Algorithm Development - Introduction to Programming Using Java</title>
 
 
         <!-- Custom HTML head -->
@@ -31,6 +31,8 @@
         <!-- Custom theme stylesheets -->
         <link rel="stylesheet" href="ferris.css">
         <link rel="stylesheet" href="theme/2018-edition.css">
+
+        <link rel="stylesheet" href="code-class.css">
 
     </head>
     <body>
@@ -146,364 +148,544 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h2 id="data-types"><a class="header" href="#data-types">Data Types</a></h2>
-<p>Every value in Rust is of a certain <em>data type</em>, which tells Rust what kind of
-data is being specified so it knows how to work with that data. We’ll look at
-two data type subsets: scalar and compound.</p>
-<p>Keep in mind that Rust is a <em>statically typed</em> language, which means that it
-must know the types of all variables at compile time. The compiler can usually
-infer what type we want to use based on the value and how we use it. In cases
-when many types are possible, such as when we converted a <code>String</code> to a numeric
-type using <code>parse</code> in the <a href="ch02-00-NameAndThings.html#comparing-the-guess-to-the-secret-number">“Comparing the Guess to the Secret
-Number”</a><!-- ignore --> section in
-Chapter 2, we must add a type annotation, like this:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>let guess: u32 = &quot;42&quot;.parse().expect(&quot;Not a number!&quot;);
-<span class="boring">}</span></code></pre></pre>
-<p>If we don’t add the <code>: u32</code> type annotation shown in the preceding code, Rust
-will display the following error, which means the compiler needs more
-information from us to know which type we want to use:</p>
-<pre><code class="language-console">$ cargo build
-   Compiling no_type_annotations v0.1.0 (file:///projects/no_type_annotations)
-error[E0282]: type annotations needed
- --&gt; src/main.rs:2:9
-  |
-2 |     let guess = &quot;42&quot;.parse().expect(&quot;Not a number!&quot;);
-  |         ^^^^^
-  |
-help: consider giving `guess` an explicit type
-  |
-2 |     let guess: _ = &quot;42&quot;.parse().expect(&quot;Not a number!&quot;);
-  |              +++
+                        <h2 id="AlgorithmDevelopment"><a class="header" href="#AlgorithmDevelopment">Algorithm Development</a></h2>
+                        <p>
+                            When you write a program, you have to tell the
+                            computer every small detail of what to do. And you have to get everything
+                            exactly right, since the computer will blindly follow your program exactly as
+                            written. How, then, do people write any but the most simple programs? It's not
+                            a big mystery, actually. It's a matter of learning to think in the right
+                            way.</p>
 
-For more information about this error, try `rustc --explain E0282`.
-error: could not compile `no_type_annotations` due to previous error
-</code></pre>
-<p>You’ll see different type annotations for other data types.</p>
-<h3 id="scalar-types"><a class="header" href="#scalar-types">Scalar Types</a></h3>
-<p>A <em>scalar</em> type represents a single value. Rust has four primary scalar types:
-integers, floating-point numbers, Booleans, and characters. You may recognize
-these from other programming languages. Let’s jump into how they work in Rust.</p>
-<h4 id="integer-types"><a class="header" href="#integer-types">Integer Types</a></h4>
-<p>An <em>integer</em> is a number without a fractional component. We used one integer
-type in Chapter 2, the <code>u32</code> type. This type declaration indicates that the
-value it’s associated with should be an unsigned integer (signed integer types
-start with <code>i</code> instead of <code>u</code>) that takes up 32 bits of space. Table 3-1 shows
-the built-in integer types in Rust. We can use any of these variants to declare
-the type of an integer value.</p>
-<p><span class="caption">Table 3-1: Integer Types in Rust</span></p>
-<div class="table-wrapper"><table><thead><tr><th>Length</th><th>Signed</th><th>Unsigned</th></tr></thead><tbody>
-<tr><td>8-bit</td><td><code>i8</code></td><td><code>u8</code></td></tr>
-<tr><td>16-bit</td><td><code>i16</code></td><td><code>u16</code></td></tr>
-<tr><td>32-bit</td><td><code>i32</code></td><td><code>u32</code></td></tr>
-<tr><td>64-bit</td><td><code>i64</code></td><td><code>u64</code></td></tr>
-<tr><td>128-bit</td><td><code>i128</code></td><td><code>u128</code></td></tr>
-<tr><td>arch</td><td><code>isize</code></td><td><code>usize</code></td></tr>
-</tbody></table>
-</div>
-<p>Each variant can be either signed or unsigned and has an explicit size.
-<em>Signed</em> and <em>unsigned</em> refer to whether it’s possible for the number to be
-negative—in other words, whether the number needs to have a sign with it
-(signed) or whether it will only ever be positive and can therefore be
-represented without a sign (unsigned). It’s like writing numbers on paper: when
-the sign matters, a number is shown with a plus sign or a minus sign; however,
-when it’s safe to assume the number is positive, it’s shown with no sign.
-Signed numbers are stored using <a href="https://en.wikipedia.org/wiki/Two%27s_complement">two’s complement</a><!-- ignore
---> representation.</p>
-<p>Each signed variant can store numbers from -(2<sup>n - 1</sup>) to 2<sup>n -
-1</sup> - 1 inclusive, where <em>n</em> is the number of bits that variant uses. So an
-<code>i8</code> can store numbers from -(2<sup>7</sup>) to 2<sup>7</sup> - 1, which equals
--128 to 127. Unsigned variants can store numbers from 0 to 2<sup>n</sup> - 1,
-so a <code>u8</code> can store numbers from 0 to 2<sup>8</sup> - 1, which equals 0 to 255.</p>
-<p>Additionally, the <code>isize</code> and <code>usize</code> types depend on the architecture of the
-computer your program is running on, which is denoted in the table as “arch”:
-64 bits if you’re on a 64-bit architecture and 32 bits if you’re on a 32-bit
-architecture.</p>
-<p>You can write integer literals in any of the forms shown in Table 3-2. Note
-that number literals that can be multiple numeric types allow a type suffix,
-such as <code>57u8</code>, to designate the type. Number literals can also use <code>_</code> as a
-visual separator to make the number easier to read, such as <code>1_000</code>, which will
-have the same value as if you had specified <code>1000</code>.</p>
-<p><span class="caption">Table 3-2: Integer Literals in Rust</span></p>
-<div class="table-wrapper"><table><thead><tr><th>Number literals</th><th>Example</th></tr></thead><tbody>
-<tr><td>Decimal</td><td><code>98_222</code></td></tr>
-<tr><td>Hex</td><td><code>0xff</code></td></tr>
-<tr><td>Octal</td><td><code>0o77</code></td></tr>
-<tr><td>Binary</td><td><code>0b1111_0000</code></td></tr>
-<tr><td>Byte (<code>u8</code> only)</td><td><code>b'A'</code></td></tr>
-</tbody></table>
-</div>
-<p>So how do you know which type of integer to use? If you’re unsure, Rust’s
-defaults are generally good places to start: integer types default to <code>i32</code>.
-The primary situation in which you’d use <code>isize</code> or <code>usize</code> is when indexing
-some sort of collection.</p>
-<blockquote>
-<h5 id="integer-overflow"><a class="header" href="#integer-overflow">Integer Overflow</a></h5>
-<p>Let’s say you have a variable of type <code>u8</code> that can hold values between 0 and
-255. If you try to change the variable to a value outside that range, such as
-256, <em>integer overflow</em> will occur, which can result in one of two behaviors.
-When you’re compiling in debug mode, Rust includes checks for integer overflow
-that cause your program to <em>panic</em> at runtime if this behavior occurs. Rust
-uses the term <em>panicking</em> when a program exits with an error; we’ll discuss
-panics in more depth in the <a href="ch09-01-Recursion.html">“Unrecoverable Errors with
-<code>panic!</code>”</a><!-- ignore --> section in Chapter
-9.</p>
-<p>When you’re compiling in release mode with the <code>--release</code> flag, Rust does
-<em>not</em> include checks for integer overflow that cause panics. Instead, if
-overflow occurs, Rust performs <em>two’s complement wrapping</em>. In short, values
-greater than the maximum value the type can hold “wrap around” to the minimum
-of the values the type can hold. In the case of a <code>u8</code>, the value 256 becomes
-0, the value 257 becomes 1, and so on. The program won’t panic, but the
-variable will have a value that probably isn’t what you were expecting it to
-have. Relying on integer overflow’s wrapping behavior is considered an error.</p>
-<p>To explicitly handle the possibility of overflow, you can use these families
-of methods provided by the standard library for primitive numeric types:</p>
-<ul>
-<li>Wrap in all modes with the <code>wrapping_*</code> methods, such as <code>wrapping_add</code>.</li>
-<li>Return the <code>None</code> value if there is overflow with the <code>checked_*</code> methods.</li>
-<li>Return the value and a boolean indicating whether there was overflow with
-the <code>overflowing_*</code> methods.</li>
-<li>Saturate at the value’s minimum or maximum values with the <code>saturating_*</code>
-methods.</li>
-</ul>
-</blockquote>
-<h4 id="floating-point-types"><a class="header" href="#floating-point-types">Floating-Point Types</a></h4>
-<p>Rust also has two primitive types for <em>floating-point numbers</em>, which are
-numbers with decimal points. Rust’s floating-point types are <code>f32</code> and <code>f64</code>,
-which are 32 bits and 64 bits in size, respectively. The default type is <code>f64</code>
-because on modern CPUs, it’s roughly the same speed as <code>f32</code> but is capable of
-more precision. All floating-point types are signed.</p>
-<p>Here’s an example that shows floating-point numbers in action:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
-    let x = 2.0; // f64
 
-    let y: f32 = 3.0; // f32
-}</code></pre></pre>
-<p>Floating-point numbers are represented according to the IEEE-754 standard. The
-<code>f32</code> type is a single-precision float, and <code>f64</code> has double precision.</p>
-<h4 id="numeric-operations"><a class="header" href="#numeric-operations">Numeric Operations</a></h4>
-<p>Rust supports the basic mathematical operations you’d expect for all the number
-types: addition, subtraction, multiplication, division, and remainder. Integer
-division truncates toward zero to the nearest integer. The following code shows
-how you’d use each numeric operation in a <code>let</code> statement:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
-    // addition
-    let sum = 5 + 10;
+                        <p>A program is an expression of an idea. A programmer starts with a general
+                            idea of a task for the computer to perform. Presumably, the programmer has some
+                            idea of how to perform the task by hand, at least in general outline. The
+                            problem is to flesh out that outline into a complete, unambiguous, step-by-step
+                            procedure for carrying out the task. Such a procedure is called an "algorithm."
+                            (Technically, an <span class="newword">algorithm</span> is an unambiguous,
+                            step-by-step procedure that always terminates after a finite number of steps. We don't
+                            want to count procedures that might go on forever.) An algorithm is not the same as a
+                            program. A program is written in some particular programming language. An
+                            algorithm is more like the <b>idea</b> behind the program, but it's the idea of
+                            the <b>steps</b> the program will take to perform its task, not just the idea
+                            of what the task needs to accomplish in the end. When describing an algorithm, the steps
+                            don't necessarily have to be specified in complete detail,
+                            as long as the steps are unambiguous and it's clear that
+                            carrying out the steps will accomplish the assigned task. An algorithm can be
+                            expressed in any language, including English. Of course, an algorithm can only
+                            be expressed as an actual program if all the details have been filled in.</p>
 
-    // subtraction
-    let difference = 95.5 - 4.3;
 
-    // multiplication
-    let product = 4 * 30;
+                        <p>So, where do algorithms come from? Usually, they have to be developed, often
+                            with a lot of thought and hard work. Skill at algorithm development is
+                            something that comes with practice, but there are techniques and guidelines
+                            that can help. I'll talk here about some techniques and guidelines that are
+                            relevant to "programming in the small," and I will return to the subject
+                            several times in later chapters.</p>
 
-    // division
-    let quotient = 56.7 / 32.2;
-    let truncated = -5 / 3; // Results in -1
 
-    // remainder
-    let remainder = 43 % 5;
-}</code></pre></pre>
-<p>Each expression in these statements uses a mathematical operator and evaluates
-to a single value, which is then bound to a variable. <a href="appendix-02-operators.html">Appendix
-B</a><!-- ignore --> contains a list of all operators that Rust
-provides.</p>
-<h4 id="the-boolean-type"><a class="header" href="#the-boolean-type">The Boolean Type</a></h4>
-<p>As in most other programming languages, a Boolean type in Rust has two possible
-values: <code>true</code> and <code>false</code>. Booleans are one byte in size. The Boolean type in
-Rust is specified using <code>bool</code>. For example:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
-    let t = true;
+                        
+                        <h3 id="PseudocodeandStepwiseRefinement"><a class="header" href="#PseudocodeandStepwiseRefinement">Pseudocode and Stepwise Refinement</a></h3>
 
-    let f: bool = false; // with explicit type annotation
-}</code></pre></pre>
-<p>The main way to use Boolean values is through conditionals, such as an <code>if</code>
-expression. We’ll cover how <code>if</code> expressions work in Rust in the <a href="ch03-05-If.html#control-flow">“Control
-Flow”</a><!-- ignore --> section.</p>
-<h4 id="the-character-type"><a class="header" href="#the-character-type">The Character Type</a></h4>
-<p>Rust’s <code>char</code> type is the language’s most primitive alphabetic type. Here are
-some examples of declaring <code>char</code> values:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
-    let c = 'z';
-    let z: char = 'ℤ'; // with explicit type annotation
-    let heart_eyed_cat = '😻';
-}</code></pre></pre>
-<p>Note that we specify <code>char</code> literals with single quotes, as opposed to string
-literals, which use double quotes. Rust’s <code>char</code> type is four bytes in size and
-represents a Unicode Scalar Value, which means it can represent a lot more than
-just ASCII. Accented letters; Chinese, Japanese, and Korean characters; emoji;
-and zero-width spaces are all valid <code>char</code> values in Rust. Unicode Scalar
-Values range from <code>U+0000</code> to <code>U+D7FF</code> and <code>U+E000</code> to <code>U+10FFFF</code> inclusive.
-However, a “character” isn’t really a concept in Unicode, so your human
-intuition for what a “character” is may not match up with what a <code>char</code> is in
-Rust. We’ll discuss this topic in detail in <a href="ch08-02-WritingCorrectPrograms.html#storing-utf-8-encoded-text-with-strings">“Storing UTF-8 Encoded Text with
-Strings”</a><!-- ignore --> in Chapter 8.</p>
-<h3 id="compound-types"><a class="header" href="#compound-types">Compound Types</a></h3>
-<p><em>Compound types</em> can group multiple values into one type. Rust has two
-primitive compound types: tuples and arrays.</p>
-<h4 id="the-tuple-type"><a class="header" href="#the-tuple-type">The Tuple Type</a></h4>
-<p>A <em>tuple</em> is a general way of grouping together a number of values with a
-variety of types into one compound type. Tuples have a fixed length: once
-declared, they cannot grow or shrink in size.</p>
-<p>We create a tuple by writing a comma-separated list of values inside
-parentheses. Each position in the tuple has a type, and the types of the
-different values in the tuple don’t have to be the same. We’ve added optional
-type annotations in this example:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
-    let tup: (i32, f64, u8) = (500, 6.4, 1);
-}</code></pre></pre>
-<p>The variable <code>tup</code> binds to the entire tuple because a tuple is considered a
-single compound element. To get the individual values out of a tuple, we can
-use pattern matching to destructure a tuple value, like this:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
-    let tup = (500, 6.4, 1);
+                        <p>When programming in the small, you have a few basics to work with:
+                            variables, assignment statements, and input/output routines. You might also
+                            have some subroutines, objects, or other building blocks that have already been
+                            written by you or someone else. (Input/output routines fall into this class.)
+                            You can build sequences of these basic instructions, and you can also combine
+                            them into more complex control structures such as <span class="code">while</span> loops and
+                            <span class="code">if</span> statements.</p>
 
-    let (x, y, z) = tup;
 
-    println!(&quot;The value of y is: {y}&quot;);
-}</code></pre></pre>
-<p>This program first creates a tuple and binds it to the variable <code>tup</code>. It then
-uses a pattern with <code>let</code> to take <code>tup</code> and turn it into three separate
-variables, <code>x</code>, <code>y</code>, and <code>z</code>. This is called <em>destructuring</em> because it breaks
-the single tuple into three parts. Finally, the program prints the value of
-<code>y</code>, which is <code>6.4</code>.</p>
-<p>We can also access a tuple element directly by using a period (<code>.</code>) followed by
-the index of the value we want to access. For example:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
-    let x: (i32, f64, u8) = (500, 6.4, 1);
+                        <p>Suppose you have a task in mind that you want the computer to perform. One
+                            way to proceed is to write a description of the task, and take that description
+                            as an outline of the algorithm you want to develop. Then you can refine and
+                            elaborate that description, gradually adding steps and detail, until you have a
+                            complete algorithm that can be translated directly into programming language.
+                            This method is called <span class="newword">stepwise refinement</span>, and it
+                            is a type of top-down design. As you proceed through the stages of stepwise
+                            refinement, you can write out descriptions of your algorithm in
+                            <span class="newword">pseudocode</span>&mdash;informal instructions that imitate the structure
+                            of programming languages without the complete detail and perfect syntax of
+                            actual program code.</p>
 
-    let five_hundred = x.0;
 
-    let six_point_four = x.1;
+                        <p>As an example, let's see how one might develop the program from the previous
+                            section, which computes the value of an investment over five years. The task
+                            that you want the program to perform is: "Compute and display the value of an
+                            investment for each of the next five years, where the initial investment and
+                            interest rate are to be specified by the user." You might then write&mdash;or more likely
+                            just think&mdash;that this can be expanded as:</p>
 
-    let one = x.2;
-}</code></pre></pre>
-<p>This program creates the tuple <code>x</code> and then accesses each element of the tuple
-using their respective indices. As with most programming languages, the first
-index in a tuple is 0.</p>
-<p>The tuple without any values has a special name, <em>unit</em>. This value and its
-corresponding type are both written <code>()</code> and represent an empty value or an
-empty return type. Expressions implicitly return the unit value if they don’t
-return any other value.</p>
-<h4 id="the-array-type"><a class="header" href="#the-array-type">The Array Type</a></h4>
-<p>Another way to have a collection of multiple values is with an <em>array</em>. Unlike
-a tuple, every element of an array must have the same type. Unlike arrays in
-some other languages, arrays in Rust have a fixed length.</p>
-<p>We write the values in an array as a comma-separated list inside square
-brackets:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
-    let a = [1, 2, 3, 4, 5];
-}</code></pre></pre>
-<p>Arrays are useful when you want your data allocated on the stack rather than
-the heap (we will discuss the stack and the heap more in <a href="ch04-01-BlackBoxes.html#the-stack-and-the-heap">Chapter
-4</a><!-- ignore -->) or when you want to ensure you always have a
-fixed number of elements. An array isn’t as flexible as the vector type,
-though. A <em>vector</em> is a similar collection type provided by the standard
-library that <em>is</em> allowed to grow or shrink in size. If you’re unsure whether
-to use an array or a vector, chances are you should use a vector. <a href="ch08-01-IntroductionCorrectnessandRobustness.html">Chapter
-8</a><!-- ignore --> discusses vectors in more detail.</p>
-<p>However, arrays are more useful when you know the number of elements will not
-need to change. For example, if you were using the names of the month in a
-program, you would probably use an array rather than a vector because you know
-it will always contain 12 elements:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>let months = [&quot;January&quot;, &quot;February&quot;, &quot;March&quot;, &quot;April&quot;, &quot;May&quot;, &quot;June&quot;, &quot;July&quot;,
-              &quot;August&quot;, &quot;September&quot;, &quot;October&quot;, &quot;November&quot;, &quot;December&quot;];
-<span class="boring">}</span></code></pre></pre>
-<p>You write an array’s type using square brackets with the type of each element,
-a semicolon, and then the number of elements in the array, like so:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>let a: [i32; 5] = [1, 2, 3, 4, 5];
-<span class="boring">}</span></code></pre></pre>
-<p>Here, <code>i32</code> is the type of each element. After the semicolon, the number <code>5</code>
-indicates the array contains five elements.</p>
-<p>You can also initialize an array to contain the same value for each element by
-specifying the initial value, followed by a semicolon, and then the length of
-the array in square brackets, as shown here:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>let a = [3; 5];
-<span class="boring">}</span></code></pre></pre>
-<p>The array named <code>a</code> will contain <code>5</code> elements that will all be set to the value
-<code>3</code> initially. This is the same as writing <code>let a = [3, 3, 3, 3, 3];</code> but in a
-more concise way.</p>
-<h5 id="accessing-array-elements"><a class="header" href="#accessing-array-elements">Accessing Array Elements</a></h5>
-<p>An array is a single chunk of memory of a known, fixed size that can be
-allocated on the stack. You can access elements of an array using indexing,
-like this:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
-    let a = [1, 2, 3, 4, 5];
 
-    let first = a[0];
-    let second = a[1];
-}</code></pre></pre>
-<p>In this example, the variable named <code>first</code> will get the value <code>1</code> because that
-is the value at index <code>[0]</code> in the array. The variable named <code>second</code> will get
-the value <code>2</code> from index <code>[1]</code> in the array.</p>
-<h5 id="invalid-array-element-access"><a class="header" href="#invalid-array-element-access">Invalid Array Element Access</a></h5>
-<p>Let’s see what happens if you try to access an element of an array that is past
-the end of the array. Say you run this code, similar to the guessing game in
-Chapter 2, to get an array index from the user:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore panics">use std::io;
+                        <pre><code class="plain-text">Get the user's input
+Compute the value of the investment after 1 year
+Display the value
+Compute the value after 2 years
+Display the value
+Compute the value after 3 years
+Display the value
+Compute the value after 4 years
+Display the value
+Compute the value after 5 years
+Display the value</code></pre>
 
-fn main() {
-    let a = [1, 2, 3, 4, 5];
 
-    println!(&quot;Please enter an array index.&quot;);
+                        <p>This is correct, but rather repetitive. And seeing that repetition, you
+                            might notice an opportunity to use a loop. A loop would take less typing. More
+                            important, it would be more <b>general</b>: Essentially the same loop
+                            will work no matter how many years you want to process. So, you might rewrite
+                            the above sequence of steps as:</p>
 
-    let mut index = String::new();
 
-    io::stdin()
-        .read_line(&amp;mut index)
-        .expect(&quot;Failed to read line&quot;);
+                        <pre><code class="plain-text">Get the user's input
+while there are more years to process:
+    Compute the value after the next year
+    Display the value</code></pre>
 
-    let index: usize = index
-        .trim()
-        .parse()
-        .expect(&quot;Index entered was not a number&quot;);
 
-    let element = a[index];
+                        <p>Following this algorithm would certainly solve the problem, but
+                            for a computer we'll have to be more explicit about how to "Get the
+                            user's input," how to "Compute the value after the next year," and what it
+                            means to say "there are more years to process." We can expand the step, "Get
+                            the user's input" into</p>
 
-    println!(&quot;The value of the element at index {index} is: {element}&quot;);
+
+                        <pre><code class="plain-text">Ask the user for the initial investment
+Read the user's response
+Ask the user for the interest rate
+Read the user's response</code></pre>
+
+
+                        <p>To fill in the details of the step "Compute the value after the next year,"
+                            you have to know how to do the computation yourself. (Maybe you need to ask
+                            your boss or professor for clarification?) Let's say you know that the value is
+                            computed by adding some interest to the previous value. Then we can refine the
+                            <span class="code">while</span> loop to:</p>
+
+
+                        <pre><code class="plain-text">while there are more years to process:
+    Compute the interest
+    Add the interest to the value
+    Display the value</code></pre>
+
+
+                        <p>As for testing whether there are more years to process, the only way that we
+                            can do that is by counting the years ourselves. This displays a very common
+                            pattern, and you should expect to use something similar in a lot of programs:
+                            We have to start with zero years, add one each time we process a year, and stop
+                            when we reach the desired number of years.  This is sometimes called a <span class="newword">counting loop</span>.
+                            So the <span class="code">while</span> loop
+                            becomes:</p>
+
+
+                        <pre><code class="plain-text">years = 0
+while years &lt; 5:
+    years = years + 1
+    Compute the interest
+    Add the interest to the value
+    Display the value</code></pre>
+
+
+                        <p>We still have to know how to compute the interest. Let's say that the
+                            interest is to be computed by multiplying the interest rate by the current
+                            value of the investment. Putting this together with the part of the algorithm
+                            that gets the user's inputs, we have the complete algorithm:</p>
+
+
+                        <pre><code class="plain-text">Ask the user for the initial investment
+Read the user's response
+Ask the user for the interest rate
+Read the user's response
+years = 0
+while years &lt; 5:
+    years = years + 1
+    Compute interest = value * interest rate
+    Add the interest to the value
+    Display the value</code></pre>
+
+
+                        <p>Finally, we are at the point where we can translate pretty directly into
+                            proper programming-language syntax. We still have to choose names for the
+                            variables, decide exactly what we want to say to the user, and so forth. Having
+                            done this, we could express our algorithm in Java as:</p>
+
+
+                        <pre><code class="java">double principal, rate, interest;  // declare the variables
+int years;
+System.out.print("Type initial investment: ");
+principal = TextIO.getlnDouble();
+System.out.print("Type interest rate: ");
+rate = TextIO.getlnDouble();
+years = 0;
+while (years &lt; 5) {
+   years = years + 1;
+   interest = principal * rate;
+   principal = principal + interest;
+   System.out.println(principal);
 }</code></pre>
-<p>This code compiles successfully. If you run this code using <code>cargo run</code> and
-enter <code>0</code>, <code>1</code>, <code>2</code>, <code>3</code>, or <code>4</code>, the program will print out the corresponding
-value at that index in the array. If you instead enter a number past the end of
-the array, such as <code>10</code>, you’ll see output like this:</p>
-<!-- manual-regeneration
-cd listings/ch03-common-programming-concepts/no-listing-15-invalid-array-access
-cargo run
-10
--->
-<pre><code class="language-console">thread 'main' panicked at 'index out of bounds: the len is 5 but the index is 10', src/main.rs:19:19
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-</code></pre>
-<p>The program resulted in a <em>runtime</em> error at the point of using an invalid
-value in the indexing operation. The program exited with an error message and
-didn’t execute the final <code>println!</code> statement. When you attempt to access an
-element using indexing, Rust will check that the index you’ve specified is less
-than the array length. If the index is greater than or equal to the length,
-Rust will panic. This check has to happen at runtime, especially in this case,
-because the compiler can’t possibly know what value a user will enter when they
-run the code later.</p>
-<p>This is an example of Rust’s memory safety principles in action. In many
-low-level languages, this kind of check is not done, and when you provide an
-incorrect index, invalid memory can be accessed. Rust protects you against this
-kind of error by immediately exiting instead of allowing the memory access and
-continuing. Chapter 9 discusses more of Rust’s error handling and how you can
-write readable, safe code that neither panics nor allows invalid memory access.</p>
+
+
+                        <p>This still needs to be wrapped inside a complete program, it still needs to
+                            be commented, and it really needs to print out more information in a nicer format for the user.
+                            But it's essentially the same program as the one in the previous section. (Note
+                            that the pseudocode algorithm used indentation to show which statements are
+                            inside the loop. In Java, indentation is completely ignored by the computer, so
+                            you need a pair of braces to tell the computer which statements are in the
+                            loop. If you leave out the braces, the only statement inside the loop would be
+                            "<span class="code">years&nbsp;=&nbsp;years&nbsp;+&nbsp;1;"</span>. The other statements would only be executed
+                            once, after the loop ends. The nasty thing is that the computer won't notice
+                            this error for you, like it would if you left out the parentheses around
+                            "<span class="code">(years&nbsp;&lt;&nbsp;5)</span>". The parentheses are required by the syntax of the
+                            <span class="code">while</span> statement. The braces are only required semantically. The
+                            computer can recognize syntax errors but not semantic errors.)</p>
+
+
+                        <p>One thing you should have noticed here is that my original specification of
+                            the problem&mdash;"Compute and display the value of an investment for each of the
+                            next five years"&mdash;was far from being complete. Before you start writing a
+                            program, you should make sure you have a complete specification of exactly what
+                            the program is supposed to do. In particular, you need to know what information
+                            the program is going to input and output and what computation it is going to
+                            perform. Here is what a reasonably complete specification of the problem might
+                            look like in this example:</p>
+
+
+                        <div style="margin-left: 100; margin-right: 100;">
+
+                            <p>
+                                "Write a program that will compute and display the value of an investment
+                                for each of the next five years. Each year, interest is added to the value. The
+                                interest is computed by multiplying the current value by a fixed interest rate.
+                                Assume that the initial value and the rate of interest are to be input by the
+                                user when the program is run."</p>
+
+                        </div>
+
+
+
+                        
+                        <h3 id="The3N+1Problem"><a class="header" href="#The3N+1Problem">The 3N+1 Problem</a></h3>
+
+
+                        <p>Let's do another example, working this time with a program that you haven't
+                            already seen. The assignment here is an abstract mathematical problem that is
+                            one of my favorite programming exercises. This time, we'll start with a more
+                            complete specification of the task to be performed:</p>
+
+
+                        <div style="margin-left: 100; margin-right: 100;">
+
+                            <p>
+                                "Given a positive integer, N, define the '3N+1' sequence starting from N as
+                                follows: If N is an even number, then divide N by two; but if N is odd, then
+                                multiply N by 3 and add 1. Continue to generate numbers in this way until N
+                                becomes equal to 1. For example, starting from N = 3, which is odd, we multiply
+                                by 3 and add 1, giving N = 3*3+1 = 10. Then, since N is even, we divide by 2,
+                                giving N = 10/2 = 5. We continue in this way, stopping when we reach 1.
+                                The complete sequence is: 3, 10, 5, 16, 8, 4, 2, 1.</p>
+
+                            <p>
+                                "Write a program that will read a positive integer from the user and will
+                                print out the 3N+1 sequence starting from that integer. The program should also
+                                count and print out the number of terms in the sequence."</p>
+
+                        </div>
+
+
+                        <p>A general outline of the algorithm for the program we want is:</p>
+
+
+                        <pre><code class="java">   Get a positive integer N from the user.
+   Compute, print, and count each number in the sequence.
+   Output the number of terms.</code></pre>
+
+
+                        <p>The bulk of the program is in the second step. We'll need a loop, since we
+                            want to keep computing numbers until we get 1. To put this in terms appropriate
+                            for a <span class="code">while</span> loop, we need to know when to <b>continue</b> the
+                            loop rather than when to stop it: We want to continue as long as the number is
+                            <b>not</b> 1. So, we can expand our pseudocode algorithm to:</p>
+
+
+                        <pre><code class="java">Get a positive integer N from the user;
+while N is not 1:
+    Compute N = next term;
+    Output N;
+    Count this term;
+Output the number of terms;</code></pre>
+
+
+                        <p>In order to compute the next term, the computer must take different actions
+                            depending on whether N is even or odd. We need an <span class="code">if</span> statement to
+                            decide between the two cases:</p>
+
+
+                        <pre><code class="java">Get a positive integer N from the user;
+while N is not 1:
+    if N is even:
+       Compute N = N/2;
+    else
+       Compute N = 3 * N + 1;
+    Output N;
+    Count this term;
+Output the number of terms;</code></pre>
+
+
+                        <p>We are almost there. The one problem that remains is counting. Counting
+                            means that you start with zero, and every time you have something to count, you
+                            add one. We need a variable to do the counting. The variable must be set
+                            to zero once, <b>before</b> the loop starts, and it must be incremented
+                            within the loop.  (Again, this is a common
+                            pattern that you should expect to see over and over.) With the counter added,
+                            we get:</p>
+
+
+                        <pre><code class="java">Get a positive integer N from the user;
+Let counter = 0;
+while N is not 1:
+    if N is even:
+       Compute N = N/2;
+    else
+       Compute N = 3 * N + 1;
+    Output N;
+    Add 1 to counter;
+Output the counter;</code></pre>
+
+
+                        <p>We still have to worry about the very first step. How can we get a
+                            <b>positive</b> integer from the user? If we just read in a number,
+                            it's possible that the user might type in a negative number or zero. If you
+                            follow what happens when the value of N is negative or zero, you'll see that
+                            the program will go on forever, since the value of N will never become equal to
+                            1. This is bad. In this case, the problem is probably no big deal, but in
+                            general you should try to write programs that are foolproof. One way to fix
+                            this is to keep reading in numbers until the user types in a positive
+                            number:</p>
+
+
+                        <pre><code class="plain-text" >Ask user to input a positive number;
+Let N be the user's response;
+while N is not positive:
+   Print an error message;
+   Read another value for N;
+Let counter = 0;
+while N is not 1:
+    if N is even:
+       Compute N = N/2;
+    else
+       Compute N = 3 * N + 1;
+    Output N;
+    Add 1 to counter;
+Output the counter;</code></pre>
+
+
+                        <p>The first <span class="code">while</span> loop will end only when N is a positive number, as
+                            required. (A common beginning programmer's error is to use an <span class="code">if</span>
+                            statement instead of a <span class="code">while</span> statement here: "If N is not positive,
+                            ask the user to input another value." The problem arises if the second number
+                            input by the user is also non-positive. The <span class="code">if</span> statement is only
+                            executed once, so the second input number is never tested, and the program
+                            proceeds into an infinite loop. With the
+                            <span class="code">while</span> loop, after the second number is input, the computer jumps back
+                            to the beginning of the loop and tests whether the second number is positive.
+                            If not, it asks the user for a third number, and it will continue asking for
+                            numbers until the user enters an acceptable input.  After the while loop ends, we
+                            can be absolutely sure that <span class="code">N</span> is a positive number.)</p>
+
+
+                        <p>Here is a Java program implementing this algorithm. It uses the operators
+                            <span class="code">&lt;=</span> to mean "is less than or equal to" and <span class="code">!=</span> to mean "is
+                            not equal to." To test whether N is even, it uses "<span class="code">N&nbsp;%&nbsp;2&nbsp;==&nbsp;0</span>". All
+                            the operators used here were discussed in <a href="ch02-05-DetailsOfExpressions.html">Section&nbsp;2.5</a>.</p>
+
+
+                        <pre><code class="java">import textio.TextIO;
+
+/**
+ * This program prints out a 3N+1 sequence starting from a positive
+ * integer specified by the user.  It also counts the number of
+ * terms in the sequence, and prints out that number.
+ */
+ public class ThreeN1 {
+
+      public static void main(String[] args) {
+
+         int N;       // for computing terms in the sequence
+         int counter; // for counting the terms
+
+         System.out.print("Starting point for sequence: ");
+         N = TextIO.getlnInt();
+         while (N &lt;= 0) {
+            System.out.print(
+                   "The starting point must be positive. Please try again: " );
+            N = TextIO.getlnInt();
+         }
+         // At this point, we know that N &gt; 0
+
+         counter = 0;
+         while (N != 1) {
+             if (N % 2 == 0)
+                N = N / 2;
+             else
+                N = 3 * N + 1;
+             System.out.println(N);
+             counter = counter + 1;
+         }
+
+         System.out.println();
+         System.out.print("There were ");
+         System.out.print(counter);
+         System.out.println(" terms in the sequence.");
+
+     }  // end of main()
+
+ }  // end of class ThreeN1</code></pre>
+
+
+
+                        <p>Two final notes on this program: First, you might have noticed that the
+                            first term of the sequence&mdash;the value of N input by the user&mdash;is not
+                            printed or counted by this program. Is this an error? It's hard to say. Was the
+                            specification of the program careful enough to decide? This is the type of
+                            thing that might send you back to the boss/professor for clarification. The
+                            problem (if it is one!) can be fixed easily enough. Just replace the line
+                            "counter = 0" before the while loop with the two lines:</p>
+
+
+                        <pre><code class="java">System.out.println(N);   // print out initial term
+counter = 1;       // and count it</code></pre>
+
+
+                        <p>Second, there is the question of why this problem might be interesting.
+                            Well, it's interesting to mathematicians and computer scientists because of a
+                            simple question about the problem that they haven't been able to answer: Will
+                            the process of computing the 3N+1 sequence finish after a finite number of
+                            steps for all possible starting values of N? Although individual sequences are
+                            easy to compute, no one has been able to answer the general question. To put
+                            this another way, no one knows whether the process of computing 3N+1 sequences
+                            can properly be called an algorithm, since an algorithm is required to
+                            terminate after a finite number of steps!  (Note: This discussion
+                            really applies to integers, not to values of type <span class="ptype">int</span>!  That is, it
+                            assumes that
+                            the value of <span class="code">N</span> can take on arbitrarily large integer values, which
+                            is not true for a variable of type <span class="ptype">int</span> in a Java program.
+                            When the value of <span class="code">N</span> in the program becomes too large to be
+                            represented as a 32-bit <span class="ptype">int</span>, the values output by the program
+                            are no longer mathematically correct.  So the Java program does not compute
+                            the correct 3N+1 sequence if <span class="code">N</span> becomes too large.  See <a href="ch08-06-Exercises.html">Exercise&nbsp;8.2</a>.)
+                        </p>
+
+
+
+
+                        
+                        <h3 id="CodingTestingDebugging"><a class="header" href="#CodingTestingDebugging">Coding, Testing, Debugging</a></h3>
+
+
+                        <p>It would be nice if, having developed an algorithm for your program, you
+                            could relax, press a button, and get a perfectly working program.
+                            Unfortunately, the process of turning an algorithm into Java source code
+                            doesn't always go smoothly. And when you do get to the stage of a working
+                            program, it's often only working in the sense that it does <b>something</b>.
+                            Unfortunately not what you want it to do.</p>
+
+
+                        <p>After program design comes coding: translating the design into a program
+                            written in Java or some other language. Usually, no matter how careful you are,
+                            a few syntax errors will creep in from somewhere, and the Java compiler will
+                            reject your program with some kind of error message. Unfortunately, while a
+                            compiler will always detect syntax errors, it's not very good about telling you
+                            exactly what's wrong. Sometimes, it's not even good about telling you where the
+                            real error is. A spelling error or missing "{" on line 45 might cause the
+                            compiler to choke on line 105. You can avoid lots of errors by making sure that
+                            you really understand the syntax rules of the language and by following some
+                            basic programming guidelines. For example, I never type a "{" without typing
+                            the matching "}". Then I go back and fill in the statements between the braces.
+                            A missing or extra brace can be one of the hardest errors to find in a large
+                            program. Always, always indent your program nicely. If you change the program,
+                            change the indentation to match. It's worth the trouble. Use a consistent
+                            naming scheme, so you don't have to struggle to remember whether you called
+                            that variable <span class="code">interestrate</span> or <span class="code">interestRate</span>. In general, when
+                            the compiler gives multiple error messages, don't try to fix the second error
+                            message from the compiler until you've fixed the first one. Once the compiler
+                            hits an error in your program, it can get confused, and the rest of the error
+                            messages might just be guesses. Maybe the best advice is: Take the time to
+                            understand the error before you try to fix it. Programming is not an
+                            experimental science.</p>
+
+
+                        <p>When your program compiles without error, you are still not done. You have
+                            to test the program to make sure it works correctly. Remember that the goal is
+                            not to get the right output for the two sample inputs that the professor gave
+                            in class. The goal is a program that will work correctly for all reasonable
+                            inputs. Ideally, when faced with an unreasonable input, it should respond by
+                            gently chiding the user rather than by crashing. Test your program on a wide
+                            variety of inputs. Try to find a set of inputs that will test the full range of
+                            functionality that you've coded into your program. As you begin writing larger
+                            programs, write them in stages and test each stage along the way. You might
+                            even have to write some extra code to do the testing&mdash;for example to call a
+                            subroutine that you've just written. You don't want to be faced, if you can
+                            avoid it, with 500 newly written lines of code that have an error in there
+                            <i>somewhere.</i>
+                        </p>
+
+
+                        <p>The point of testing is to find <span class="newword">bugs</span>&mdash;semantic
+                            errors that show up as incorrect behavior rather than as compilation
+                            errors. And the sad fact is that you will probably find them. Again, you can
+                            minimize bugs by careful design and careful coding, but no one has found a way
+                            to avoid them altogether. Once you've detected a bug, it's time for
+                            <span class="newword">debugging</span>. You have to track down the cause of the
+                            bug in the program's source code and eliminate it. Debugging is a skill that,
+                            like other aspects of programming, requires practice to master. So don't be
+                            afraid of bugs. Learn from them. One essential debugging skill is the ability
+                            to read source code&mdash;the ability to put aside preconceptions about what you
+                            <i>think</i> it does and to follow it the way the computer does&mdash;mechanically,
+                            step-by-step&mdash;to see what it really does. This is hard. I can
+                            still remember the time I spent hours looking for a bug only to find that a
+                            line of code that I had looked at ten times had a "1" where it should have had
+                            an "i", or the time when I wrote a subroutine named <span class="code">WindowClosing</span>
+                            which would have done exactly what I wanted except that the computer was
+                            looking for <span class="code">windowClosing</span> (with a lower case "w"). Sometimes it can
+                            help to have someone who doesn't share your preconceptions look at your
+                            code.</p>
+
+
+                        <p>Often, it's a problem just to find the part of the program that contains the
+                            error. Most programming environments come with a <span class="newword">debugger</span>,
+                            which is a program that can help you find bugs.
+                            Typically, your program can be run under the control of the debugger. The
+                            debugger allows you to set "breakpoints" in your program. A breakpoint is a
+                            point in the program where the debugger will pause the program so you can look
+                            at the values of the program's variables. The idea is to track down exactly
+                            when things start to go wrong during the program's execution. The debugger will
+                            also let you execute your program one line at a time, so that you can watch
+                            what happens in detail once you know the general area in the program where the
+                            bug is lurking.</p>
+
+
+                        <p>I will confess that I only occasionally use debuggers myself. A more traditional
+                            approach to debugging is to insert <span class="newword">debugging statements</span> into your program.
+                            These are output statements that print out
+                            information about the state of the program. Typically, a debugging statement
+                            would say something like</p>
+
+
+                        <pre><code class="java">System.out.println("At start of while loop, N = " + N);</code></pre>
+
+
+                        <p>You need to be able to tell from the output where in your program the output is
+                            coming from, and you want to know the value of important variables. Sometimes,
+                            you will find that the computer isn't even getting to a part of the program
+                            that you think it should be executing. Remember that the goal is to find the
+                            first point in the program where the state is not what you expect it to be.
+                            That's where the bug is.</p>
+
+
+                        <p>And finally, remember the golden rule of debugging: If you are absolutely
+                            sure that everything in your program is right, and if it still doesn't work,
+                            then one of the things that you are absolutely sure of is wrong.</p>
 
                     </main>
 

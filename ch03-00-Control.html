@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Common Programming Concepts - Introduction to Programming Using Java</title>
+        <title>Control - Introduction to Programming Using Java</title>
 
 
         <!-- Custom HTML head -->
@@ -31,6 +31,8 @@
         <!-- Custom theme stylesheets -->
         <link rel="stylesheet" href="ferris.css">
         <link rel="stylesheet" href="theme/2018-edition.css">
+
+        <link rel="stylesheet" href="code-class.css">
 
     </head>
     <body>
@@ -146,25 +148,37 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="common-programming-concepts"><a class="header" href="#common-programming-concepts">Common Programming Concepts</a></h1>
-<p>This chapter covers concepts that appear in almost every programming language
-and how they work in Rust. Many programming languages have much in common at
-their core. None of the concepts presented in this chapter are unique to Rust,
-but we’ll discuss them in the context of Rust and explain the conventions
-around using these concepts.</p>
-<p>Specifically, you’ll learn about variables, basic types, functions, comments,
-and control flow. These foundations will be in every Rust program, and learning
-them early will give you a strong core to start from.</p>
-<blockquote>
-<h4 id="keywords"><a class="header" href="#keywords">Keywords</a></h4>
-<p>The Rust language has a set of <em>keywords</em> that are reserved for use by the
-language only, much as in other languages. Keep in mind that you cannot use
-these words as names of variables or functions. Most of the keywords have
-special meanings, and you’ll be using them to do various tasks in your Rust
-programs; a few have no current functionality associated with them but have
-been reserved for functionality that might be added to Rust in the future. You
-can find a list of the keywords in <a href="appendix-01-keywords.html">Appendix A</a><!-- ignore -->.</p>
-</blockquote>
+                        <h1 id="control"><a class="header" href="#control">Control</a></h1>
+                        <p>
+                            The basic building blocks of programs&mdash;variables,
+                            expressions, assignment statements, and subroutine call statements&mdash;were
+                            covered in the previous chapter. Starting with this chapter, we look at how
+                            these building blocks can be put together to build complex programs with more
+                            interesting behavior.</p>
+
+
+                        <p>Since we are still working on the level of "programming in the small" in
+                            this chapter, we are interested in the kind of complexity that can occur within
+                            a single subroutine. On this level, complexity is provided by <span class="newword">control structures</span>.
+                            The two types of control structures, loops
+                            and branches, can be used to repeat a sequence of statements over and over or
+                            to choose among two or more possible courses of action. Java includes several
+                            control structures of each type, and we will look at each of them in some
+                            detail.</p>
+
+
+                        <p>Program complexity can be seen not just in control structures but also in
+                            <span class="newword">data structures</span>.  A data structure is an organized collection
+                            of data, chunked together so that it can be treated as a unit.
+                            <a href="ch03-08-Arrays.html">Section&nbsp;3.8</a> in this chapter includes an introduction to one of the most common data structures:
+                            <span class="newword">arrays</span>.</p>
+
+
+                        <p>The chapter will also begin the study of program design. Given a problem,
+                            how can you come up with a program to solve that problem? We'll look at a
+                            partial answer to this question in <a href="ch03-02-AlgorithmDevelopment.html">Section&nbsp;3.2</a>.  Finally,
+                            <a href="ch03-09-GUI.html">Section&nbsp;3.9</a> is a very brief first look at GUI programming.
+                        </p>
 
                     </main>
 
