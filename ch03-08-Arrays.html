@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Control Flow - Introduction to Programming Using Java</title>
+        <title>Arrays - Introduction to Programming Using Java</title>
 
 
         <!-- Custom HTML head -->
@@ -31,6 +31,8 @@
         <!-- Custom theme stylesheets -->
         <link rel="stylesheet" href="ferris.css">
         <link rel="stylesheet" href="theme/2018-edition.css">
+        
+        <link rel="stylesheet" href="code-class.css">
 
     </head>
     <body>
@@ -146,432 +148,567 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h2 id="control-flow"><a class="header" href="#control-flow">Control Flow</a></h2>
-<p>The ability to run some code depending on whether a condition is <code>true</code> and to
-run some code repeatedly while a condition is <code>true</code> are basic building blocks
-in most programming languages. The most common constructs that let you control
-the flow of execution of Rust code are <code>if</code> expressions and loops.</p>
-<h3 id="if-expressions"><a class="header" href="#if-expressions"><code>if</code> Expressions</a></h3>
-<p>An <code>if</code> expression allows you to branch your code depending on conditions. You
-provide a condition and then state, “If this condition is met, run this block
-of code. If the condition is not met, do not run this block of code.”</p>
-<p>Create a new project called <em>branches</em> in your <em>projects</em> directory to explore
-the <code>if</code> expression. In the <em>src/main.rs</em> file, input the following:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
-    let number = 3;
+                        <h2 id="arrays"><a class="header" href="#arrays">Arrays</a></h2>
+                        <p>
+                            In previous sections of this chapter,we have
+                            already covered all of Java's control structures.  But before moving on to the next chapter, we will
+                            take preliminary looks at two additional topics that are at least somewhat related to control structures.</p>
 
-    if number &lt; 5 {
-        println!(&quot;condition was true&quot;);
-    } else {
-        println!(&quot;condition was false&quot;);
-    }
-}</code></pre></pre>
-<p>All <code>if</code> expressions start with the keyword <code>if</code>, followed by a condition. In
-this case, the condition checks whether or not the variable <code>number</code> has a
-value less than 5. We place the block of code to execute if the condition is
-<code>true</code> immediately after the condition inside curly brackets. Blocks of code
-associated with the conditions in <code>if</code> expressions are sometimes called <em>arms</em>,
-just like the arms in <code>match</code> expressions that we discussed in the <a href="ch02-00-NameAndThings.html#comparing-the-guess-to-the-secret-number">“Comparing
-the Guess to the Secret Number”</a><!--
-ignore --> section of Chapter 2.</p>
-<p>Optionally, we can also include an <code>else</code> expression, which we chose to do
-here, to give the program an alternative block of code to execute should the
-condition evaluate to <code>false</code>. If you don’t provide an <code>else</code> expression and
-the condition is <code>false</code>, the program will just skip the <code>if</code> block and move on
-to the next bit of code.</p>
-<p>Try running this code; you should see the following output:</p>
-<pre><code class="language-console">$ cargo run
-   Compiling branches v0.1.0 (file:///projects/branches)
-    Finished dev [unoptimized + debuginfo] target(s) in 0.31s
-     Running `target/debug/branches`
-condition was true
-</code></pre>
-<p>Let’s try changing the value of <code>number</code> to a value that makes the condition
-<code>false</code> to see what happens:</p>
-<pre><code class="language-rust ignore"><span class="boring">fn main() {
-</span>    let number = 7;
-<span class="boring">
-</span><span class="boring">    if number &lt; 5 {
-</span><span class="boring">        println!(&quot;condition was true&quot;);
-</span><span class="boring">    } else {
-</span><span class="boring">        println!(&quot;condition was false&quot;);
-</span><span class="boring">    }
-</span><span class="boring">}</span></code></pre>
-<p>Run the program again, and look at the output:</p>
-<pre><code class="language-console">$ cargo run
-   Compiling branches v0.1.0 (file:///projects/branches)
-    Finished dev [unoptimized + debuginfo] target(s) in 0.31s
-     Running `target/debug/branches`
-condition was false
-</code></pre>
-<p>It’s also worth noting that the condition in this code <em>must</em> be a <code>bool</code>. If
-the condition isn’t a <code>bool</code>, we’ll get an error. For example, try running the
-following code:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore does_not_compile">fn main() {
-    let number = 3;
+                        <p>This section
+                            is an introduction to arrays.  Arrays are a basic and very commonly used
+                            data structure, and array processing is often an exercise in using control
+                            structures. The <a href="ch03-09-GUI.html">next section</a> will
+                            introduce computer graphics and will allow you to apply what you know
+                            about control structures in another context.
+                        </p>
 
-    if number {
-        println!(&quot;number was three&quot;);
-    }
+                     
+                       <h3 id="Creating and Using Arrays"><a class="header" href="#Creating and Using Arrays">Creating and Using Arrays</a></h3>
+
+                        <p>A <span class="newword">data structure</span> consists of a number of data items
+                            chunked together so that they can be treated as a unit.  An <span class="newword">array</span> is
+                            a data structure in which the items are arranged as a numbered sequence,
+                            so that each individual item can be referred to by its position number.
+                            In Java&mdash;but not in some other programming languages&mdash;all the items must
+                            be of the same type, and the numbering always starts at zero.
+                            You will need to learn several new terms to talk about arrays:
+                            The number of items in an array is called the
+                            <span class="newword">length</span> of the array.
+                            The type of the individual items in an array is called the
+                            <span class="newword">base type</span> of the array. And the position number of an
+                            item in an array is called the <span class="newword">index</span> of that item.</p>
+
+
+                        <p>Suppose that you want to write a program that will process the names of, say, one thousand people.
+                            You will need a way to deal with all that data.  Before you knew about arrays,
+                            you might have thought that the program would need a thousand variables to hold
+                            the thousand names, and if you wanted to print out all the names, you would need
+                            a thousand print statements.  Clearly, that would be ridiculous!  In reality,
+                            you can put all the names into an array.  The array is represented by a single
+                            variable, but it holds the entire list of names.  The length of the array would
+                            be 1000, since there are 1000 individual names.  The base type of the array
+                            would be <span class="classname">String</span> since the items in the array are
+                            strings.  The first name would be at index 0 in the array, the second name
+                            at index 1, and so on, up to the thousandth name at index 999.</p>
+
+
+                        <p>The base type of an array can be any Java type, but for now, we will stick to
+                            arrays whose base type is <span class="classname">String</span> or one of the eight primitive
+                            types.   If the base type of an
+                            array is <span class="ptype">int</span>, it is referred to as an "array of <span class="ptype">ints</span>." An
+                            array with base type <span class="classname">String</span> is referred to as an "array of
+                            <span class="classname">Strings</span>." However, an array is not, properly speaking, a list of
+                            integers or strings or other <b>values</b>. It is better thought of
+                            as a list of <b>variables</b> of type <span class="ptype">int</span>, or a list of variables of type
+                            <span class="classname">String</span>, or of some other type. As always, there is some potential for
+                            confusion between the two uses of a variable: as a name for a memory location
+                            and as a name for the value stored in that memory location. Each position in an
+                            array acts as a variable. Each position can hold a value of a specified type
+                            (the base type of the array), just as a variable can hold a value.
+                            The value can be changed at any time, just as the value of a variable can be
+                            changed.  The items in an array&mdash;really, the individual variables that make up the
+                            array&mdash;are more often referred to as the <span class="newword">elements</span>
+                            of the array.</p>
+
+
+                        <p>As I mentioned above, when you use an array in a program, you can use a variable
+                            to refer to the array as a whole.  But you often need to refer to the individual elements
+                            of the array.  The name for an element of an array is based on the name for the array
+                            and the index number of the element.  The syntax for referring to an element
+                            looks, for example, like this:  <span class="code">namelist[7]</span>.  Here, <span class="code">namelist</span>
+                            is the variable that names the array as a whole, and <span class="code">namelist[7]</span> refers to the
+                            element at index 7 in that array.   That is, to refer to an element of an array,
+                            you use the array name, followed by element index enclosed in square brackets.
+                            An element name of this form can be used like any other variable: You can assign
+                            a value to it, print it out, use it in an expression, and so on.</p>
+
+
+                        <p>An array also contains a kind of variable representing its length.  For example,
+                            you can refer to the length of the array <span class="code">namelist</span> as <span class="code">namelist.length</span>.
+                            However, you cannot assign a value to <span class="code">namelist.length</span>, since the length of an
+                            array cannot be changed.
+                        </p>
+
+
+                        <p>Before you can use a variable to refer to an array, that
+                            variable must be declared, and it must
+                            have a type.  For an array of <span class="classname">Strings</span>, for example,
+                            the type for the array variable would be <span class="atype">String[]</span>, and
+                            for an array of <span class="ptype">ints</span>, it would be <span class="atype">int[]</span>.
+                            In general, an array type consists of the base type of the array followed
+                            by a pair of empty square brackets.  Array types can be used to declare
+                            variables; for example,</p>
+
+
+                        <pre><code class="java">String[] namelist;
+int[] A;
+double[] prices;
+</code></pre>
+
+
+                        <p>and variables declared in this way can refer to arrays.  However, declaring
+                            a variable does not make the actual array.  Like all variables, an array variable has
+                            to be assigned a value before it can be used.  In this case, the value is
+                            an array.  Arrays have to be created using a special syntax.  (The syntax
+                            is related to the fact that arrays in Java are actually objects, but that doesn't
+                            need to concern us here.)  Arrays are created with an operator named <span class="newword">new</span>.
+                            Here are some examples:</p>
+
+
+                        <pre><code class="java">namelist = new String[1000];
+A = new int[5];
+prices = new double[100];</code></pre>
+
+
+                        <p>The general syntax is</p>
+
+
+                        <pre><code class="java">
+<span class="bnf">array-variable</span> = new <span class="bnf">base-type</span>[<span class="bnf">array-length</span>];</code></pre>
+
+
+                        <p>The length of the array can be given as either an integer or an integer-valued
+                            expression.  For example, after the assignment statement
+                            "<span class="code">A&nbsp;=&nbsp;new&nbsp;int[5];</span>", <span class="code">A</span> is an array
+                            containing the five integer elements <span class="code">A[0]</span>, <span class="code">A[1]</span>, <span class="code">A[2]</span>,
+                            <span class="code">A[3]</span>, and <span class="code">A[4]</span>.  Also, <span class="code">A.length</span> would have
+                            the value&nbsp;5.  It's useful to have a picture in mind:</p>
+
+
+                        <p align="center">
+                            <img src="./images/array-of-ints.png" width="573" height="149" alt="illustration of an array of 5 ints" class="bordered"></p>
+
+
+                        <p>When you create an array of <span class="ptype">int</span>, each element of the array is
+                            automatically initialized to zero.  Any array of numbers is filled with zeros
+                            when it is created.  An array of <span class="ptype">boolean</span> is filled with the
+                            value <span class="code">false</span>.  And an array of <span class="ptype">char</span> is filled
+                            with the character that has Unicode code number zero.  (For an array of
+                            <span class="classname">String</span>, the initial value is <span class="code">null</span>,
+                            a special value used for objects that we won't encounter officially until
+                            <a href="ch05-01-ObjectsAndInstanceMethods.html">Section&nbsp;5.1</a>.)</p>
+
+                     
+                       <h3 id="Arrays and For Loops"><a class="header" href="#Arrays and For Loops">Arrays and For Loops</a></h3>
+
+                        <p>A lot of the real power of arrays comes from the fact that
+                            the index of an element can be given by an integer variable or
+                            even an integer-valued expression.  For example, if <span class="code">list</span>
+                            is an array and <span class="code">i</span> is a variable of type <span class="ptype">int</span>,
+                            then you can use <span class="code">list[i]</span> and even <span class="code">list[2*i+1]</span>
+                            as variable names.  The meaning of <span class="code">list[i]</span> depends on
+                            the value of <span class="code">i</span>.  This becomes especially useful when we want to
+                            process all the elements of an array, since that can be
+                            done with a <span class="code">for</span> loop.  For example, to print out
+                            all the items in an array, <span class="code">list</span>, we can just
+                            write</p>
+
+
+                        <pre><code class="java">
+int i;  // the array index
+for (i = 0; i &lt; list.length; i++) {
+    System.out.println( list[i] );
 }</code></pre>
-<p>The <code>if</code> condition evaluates to a value of <code>3</code> this time, and Rust throws an
-error:</p>
-<pre><code class="language-console">$ cargo run
-   Compiling branches v0.1.0 (file:///projects/branches)
-error[E0308]: mismatched types
- --&gt; src/main.rs:4:8
-  |
-4 |     if number {
-  |        ^^^^^^ expected `bool`, found integer
 
-For more information about this error, try `rustc --explain E0308`.
-error: could not compile `branches` due to previous error
-</code></pre>
-<p>The error indicates that Rust expected a <code>bool</code> but got an integer. Unlike
-languages such as Ruby and JavaScript, Rust will not automatically try to
-convert non-Boolean types to a Boolean. You must be explicit and always provide
-<code>if</code> with a Boolean as its condition. If we want the <code>if</code> code block to run
-only when a number is not equal to <code>0</code>, for example, we can change the <code>if</code>
-expression to the following:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
-    let number = 3;
 
-    if number != 0 {
-        println!(&quot;number was something other than zero&quot;);
+                        <p>The first time through the loop, <span class="code">i</span> is 0, and <span class="code">list[i]</span>
+                            refers to <span class="code">list[0]</span>. So, it is the value stored in the variable
+                            <span class="code">list[0]</span> that is printed. The second time through the loop, <span class="code">i</span>
+                            is 1, and the value stored in <span class="code">list[1]</span> is printed. If the length of the list is 5, then the loop ends after
+                            printing the value of <span class="code">list[4]</span>, when <span class="code">i</span> becomes equal to 5 and
+                            the continuation condition "<span class="code">i&nbsp;&lt;&nbsp;list.length</span>" is no longer true. This
+                            is a typical example of using a loop to process an array.</p>
+
+
+                        <p>Let's look at a few more examples.  Suppose that <span class="code">A</span> is an array
+                            of <span class="ptype">double</span>, and we want to find the average of all the elements of
+                            the array.  We can use a <span class="code">for</span> loop to add up the numbers, and then
+                            divide by the length of the array to get the average:</p>
+
+
+                        <pre><code class="java">double total;    // The sum of the numbers in the array.
+double average;  // The average of the numbers.
+int i;  // The array index.
+total = 0;
+for ( i = 0; i &lt; A.length; i++ ) {
+    total = total + A[i];  // Add element number i to the total.
+}
+average = total / A.length;  // A.length is the number of items</code></pre>
+
+
+                        <p>Another typical problem is to find the largest number in the array <span class="code">A</span>. The
+                            strategy is to go through the array, keeping track of the largest number found
+                            so far. We'll store the largest number found so far in a variable called
+                            <span class="code">max</span>. As we look through the array, whenever we find a number larger
+                            than the current value of <span class="code">max</span>, we change the value of <span class="code">max</span> to
+                            that larger value. After the whole array has been processed, <span class="code">max</span> is
+                            the largest item in the array overall. The only question is, what should the
+                            original value of <span class="code">max</span> be? One possibility is to start with
+                            <span class="code">max</span> equal to <span class="code">A[0]</span>, and then to look through the rest of the
+                            array, starting from <span class="code">A[1]</span>, for larger items:</p>
+
+
+                        <pre><code class="java">double max;  // The largest number seen so far.
+max = A[0];   // At first, the largest number seen is A[0].
+int i;
+for ( i = 1; i &lt; A.length; i++ ) {
+    if (A[i] &gt; max) {
+       max = A[i];
     }
-}</code></pre></pre>
-<p>Running this code will print <code>number was something other than zero</code>.</p>
-<h4 id="handling-multiple-conditions-with-else-if"><a class="header" href="#handling-multiple-conditions-with-else-if">Handling Multiple Conditions with <code>else if</code></a></h4>
-<p>You can use multiple conditions by combining <code>if</code> and <code>else</code> in an <code>else if</code>
-expression. For example:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
-    let number = 6;
+}
+// at this point, max is the largest item in A</code></pre>
 
-    if number % 4 == 0 {
-        println!(&quot;number is divisible by 4&quot;);
-    } else if number % 3 == 0 {
-        println!(&quot;number is divisible by 3&quot;);
-    } else if number % 2 == 0 {
-        println!(&quot;number is divisible by 2&quot;);
-    } else {
-        println!(&quot;number is not divisible by 4, 3, or 2&quot;);
+
+                        <p>Sometimes, you only want to process some elements of the array.  In that
+                            case, you can use an <span class="code">if</span> statement inside the <span class="code">for</span>
+                            loop to decide whether or not to process a given element.  Let's look
+                            at the problem of averaging the elements of an array, but this time,
+                            suppose that we only want to average the non-zero elements.  In this case,
+                            the number of items that we add up can be less than the length of the array,
+                            so we will need to keep a count of the number of items added to the sum:</p>
+
+
+                        <pre><code class="java">double total;    // The sum of the non-zero numbers in the array.
+int count;       // The number of non-zero numbers.
+double average;  // The average of the non-zero numbers.
+int i;
+total = 0;
+count = 0;
+for ( i = 0; i &lt; A.length; i++ ) {
+    if ( A[i] != 0 ) {  // Only process non-zero elements!
+        total = total + A[i];  // Add element to the total
+        count = count + 1;     //      and count it.
     }
-}</code></pre></pre>
-<p>This program has four possible paths it can take. After running it, you should
-see the following output:</p>
-<pre><code class="language-console">$ cargo run
-   Compiling branches v0.1.0 (file:///projects/branches)
-    Finished dev [unoptimized + debuginfo] target(s) in 0.31s
-     Running `target/debug/branches`
-number is divisible by 3
-</code></pre>
-<p>When this program executes, it checks each <code>if</code> expression in turn and executes
-the first body for which the condition evaluates to <code>true</code>. Note that even
-though 6 is divisible by 2, we don’t see the output <code>number is divisible by 2</code>,
-nor do we see the <code>number is not divisible by 4, 3, or 2</code> text from the <code>else</code>
-block. That’s because Rust only executes the block for the first <code>true</code>
-condition, and once it finds one, it doesn’t even check the rest.</p>
-<p>Using too many <code>else if</code> expressions can clutter your code, so if you have more
-than one, you might want to refactor your code. Chapter 6 describes a powerful
-Rust branching construct called <code>match</code> for these cases.</p>
-<h4 id="using-if-in-a-let-statement"><a class="header" href="#using-if-in-a-let-statement">Using <code>if</code> in a <code>let</code> Statement</a></h4>
-<p>Because <code>if</code> is an expression, we can use it on the right side of a <code>let</code>
-statement to assign the outcome to a variable, as in Listing 3-2.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
-    let condition = true;
-    let number = if condition { 5 } else { 6 };
-
-    println!(&quot;The value of number is: {number}&quot;);
-}</code></pre></pre>
-<p><span class="caption">Listing 3-2: Assigning the result of an <code>if</code> expression
-to a variable</span></p>
-<p>The <code>number</code> variable will be bound to a value based on the outcome of the <code>if</code>
-expression. Run this code to see what happens:</p>
-<pre><code class="language-console">$ cargo run
-   Compiling branches v0.1.0 (file:///projects/branches)
-    Finished dev [unoptimized + debuginfo] target(s) in 0.30s
-     Running `target/debug/branches`
-The value of number is: 5
-</code></pre>
-<p>Remember that blocks of code evaluate to the last expression in them, and
-numbers by themselves are also expressions. In this case, the value of the
-whole <code>if</code> expression depends on which block of code executes. This means the
-values that have the potential to be results from each arm of the <code>if</code> must be
-the same type; in Listing 3-2, the results of both the <code>if</code> arm and the <code>else</code>
-arm were <code>i32</code> integers. If the types are mismatched, as in the following
-example, we’ll get an error:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore does_not_compile">fn main() {
-    let condition = true;
-
-    let number = if condition { 5 } else { &quot;six&quot; };
-
-    println!(&quot;The value of number is: {number}&quot;);
+}
+if (count == 0) {
+    System.out.println("There were no non-zero elements.");
+}
+else {
+    average = total / count;  // Divide by number of items
+    System.out.printf("Average of %d elements is %1.5g%n",
+                            count, average);
 }</code></pre>
-<p>When we try to compile this code, we’ll get an error. The <code>if</code> and <code>else</code> arms
-have value types that are incompatible, and Rust indicates exactly where to
-find the problem in the program:</p>
-<pre><code class="language-console">$ cargo run
-   Compiling branches v0.1.0 (file:///projects/branches)
-error[E0308]: `if` and `else` have incompatible types
- --&gt; src/main.rs:4:44
-  |
-4 |     let number = if condition { 5 } else { &quot;six&quot; };
-  |                                 -          ^^^^^ expected integer, found `&amp;str`
-  |                                 |
-  |                                 expected because of this
 
-For more information about this error, try `rustc --explain E0308`.
-error: could not compile `branches` due to previous error
-</code></pre>
-<p>The expression in the <code>if</code> block evaluates to an integer, and the expression in
-the <code>else</code> block evaluates to a string. This won’t work because variables must
-have a single type, and Rust needs to know at compile time what type the
-<code>number</code> variable is, definitively. Knowing the type of <code>number</code> lets the
-compiler verify the type is valid everywhere we use <code>number</code>. Rust wouldn’t be
-able to do that if the type of <code>number</code> was only determined at runtime; the
-compiler would be more complex and would make fewer guarantees about the code
-if it had to keep track of multiple hypothetical types for any variable.</p>
-<h3 id="repetition-with-loops"><a class="header" href="#repetition-with-loops">Repetition with Loops</a></h3>
-<p>It’s often useful to execute a block of code more than once. For this task,
-Rust provides several <em>loops</em>, which will run through the code inside the loop
-body to the end and then start immediately back at the beginning. To experiment
-with loops, let’s make a new project called <em>loops</em>.</p>
-<p>Rust has three kinds of loops: <code>loop</code>, <code>while</code>, and <code>for</code>. Let’s try each one.</p>
-<h4 id="repeating-code-with-loop"><a class="header" href="#repeating-code-with-loop">Repeating Code with <code>loop</code></a></h4>
-<p>The <code>loop</code> keyword tells Rust to execute a block of code over and over again
-forever or until you explicitly tell it to stop.</p>
-<p>As an example, change the <em>src/main.rs</em> file in your <em>loops</em> directory to look
-like this:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore">fn main() {
-    loop {
-        println!(&quot;again!&quot;);
-    }
-}</code></pre>
-<p>When we run this program, we’ll see <code>again!</code> printed over and over continuously
-until we stop the program manually. Most terminals support the keyboard
-shortcut <span class="keystroke">ctrl-c</span> to interrupt a program that is
-stuck in a continual loop. Give it a try:</p>
-<!-- manual-regeneration
-cd listings/ch03-common-programming-concepts/no-listing-32-loop
-cargo run
-CTRL-C
--->
-<pre><code class="language-console">$ cargo run
-   Compiling loops v0.1.0 (file:///projects/loops)
-    Finished dev [unoptimized + debuginfo] target(s) in 0.29s
-     Running `target/debug/loops`
-again!
-again!
-again!
-again!
-^Cagain!
-</code></pre>
-<p>The symbol <code>^C</code> represents where you pressed <span
-class="keystroke">ctrl-c</span>. You may or may not see the word <code>again!</code>
-printed after the <code>^C</code>, depending on where the code was in the loop when it
-received the interrupt signal.</p>
-<p>Fortunately, Rust also provides a way to break out of a loop using code. You
-can place the <code>break</code> keyword within the loop to tell the program when to stop
-executing the loop. Recall that we did this in the guessing game in the
-<a href="ch02-00-NameAndThings.html#quitting-after-a-correct-guess">“Quitting After a Correct Guess”</a><!-- ignore
---> section of Chapter 2 to exit the program when the user won the game by
-guessing the correct number.</p>
-<p>We also used <code>continue</code> in the guessing game, which in a loop tells the program
-to skip over any remaining code in this iteration of the loop and go to the
-next iteration.</p>
-<h4 id="returning-values-from-loops"><a class="header" href="#returning-values-from-loops">Returning Values from Loops</a></h4>
-<p>One of the uses of a <code>loop</code> is to retry an operation you know might fail, such
-as checking whether a thread has completed its job. You might also need to pass
-the result of that operation out of the loop to the rest of your code. To do
-this, you can add the value you want returned after the <code>break</code> expression you
-use to stop the loop; that value will be returned out of the loop so you can
-use it, as shown here:</p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
-    let mut counter = 0;
 
-    let result = loop {
-        counter += 1;
+                       <h3 id="Random Access"><a class="header" href="#Random Access">Random Access</a></h3>
 
-        if counter == 10 {
-            break counter * 2;
+                        <p>So far, my examples of array processing have used <span class="newword">sequential access</span>.
+                            That is, the elements of the array were
+                            processed one after the other in the sequence in which they occur in the array.
+                            But one of the big advantages of arrays is that they allow <span class="newword">random access</span>.
+                            That is, every element of the array is equally accessible at any given time.</p>
+
+
+                        <p>As an example, let's look at a well-known problem called the birthday
+                            problem: Suppose that there are <span class="code">N</span> people in a room. What's the chance
+                            that there are two people in the room who have the same birthday? (That is,
+                            they were born on the same day in the same month, but not necessarily in the
+                            same year.) Most people severely underestimate the probability. We will actually
+                            look at a different version of the question:  Suppose you choose people at random
+                            and check their birthdays. How many people will you check before you find one
+                            who has the same birthday as someone you've already checked? Of course, the
+                            answer in a particular case depends on random factors, but we can simulate the
+                            experiment with a computer program and run the program several times to get an
+                            idea of how many people need to be checked on average.</p>
+
+
+                        <p>To simulate the experiment, we need to keep track of each birthday that we
+                            find. There are 365 different possible birthdays. (We'll ignore leap years.)
+                            For each possible birthday, we need to keep track of whether or not we
+                            have already found a person who has that birthday.
+                            The answer to this question is a boolean value, true or false. To hold the data
+                            for all 365 possible birthdays, we can
+                            use an array of 365 boolean values:</p>
+
+
+                        <pre><code class="java">boolean[] used; 
+used = new boolean[365];</code></pre>
+
+
+                        <p>For this problem, the days of the year are numbered from 0 to 364. The value of
+                            <span class="code">used[i]</span> is true if someone has been selected whose birthday is day
+                            number <span class="code">i</span>. Initially, all the values in the array are
+                            false. (Remember that this is done automatically when the array is created.)
+                            When we select someone whose birthday is day number <span class="code">i</span>, we first
+                            check whether <span class="code">used[i]</span> is <span class="code">true</span>. If it is <span class="code">true</span>, then this is the second person
+                            with that birthday. We are done. On the other hand, if <span class="code">used[i]</span> is <span class="code">false</span>, we set
+                            <span class="code">used[i]</span> to be <span class="code">true</span> to record the fact that we've encountered someone
+                            with that birthday, and we go on to the next person. Here is a program that
+                            carries out the simulated experiment (of course, in the program, there are
+                            no simulated people, only simulated birthdays):</p>
+
+
+                        <pre><code class="java">/**
+ * Simulate choosing people at random and checking the day of the year they 
+ * were born on.  If the birthday is the same as one that was seen previously, 
+ * stop, and output the number of people who were checked.
+ */
+public class BirthdayProblem {
+
+   public static void main(String[] args) {
+
+       boolean[] used;  // For recording the possible birthdays
+                        //   that have been seen so far.  A value
+                        //   of true in used[i] means that a person
+                        //   whose birthday is the i-th day of the
+                        //   year has been found.
+
+       int count;       // The number of people who have been checked.
+
+       used = new boolean[365];  // Initially, all entries are false.
+   
+       count = 0;
+
+       while (true) {
+             // Select a birthday at random, from 0 to 364.
+             // If the birthday has already been used, quit.
+             // Otherwise, record the birthday as used.
+
+          int birthday;  // The selected birthday.
+          birthday = (int)(Math.random()*365);
+          count++;
+
+          System.out.printf("Person %d has birthday number %d%n", count, birthday);
+
+          if ( used[birthday] ) {  
+                // This day was found before; it's a duplicate.  We are done.
+             break;
+          }
+
+          used[birthday] = true;
+
+       } // end while
+
+       System.out.println();
+       System.out.println("A duplicate birthday was found after " 
+                                             + count + " tries.");
+   }
+
+} // end class BirthdayProblem</code></pre>
+
+
+
+                        <p>You should study the program to understand how it works and how
+                            it uses the array.  Also,
+                            try it out!  You will probably find that a duplicate
+                            birthday tends to occur sooner than you expect.</p>
+
+
+                       <h3 id="Partially Full Arrays"><a class="header" href="#Partially Full Arrays">Partially Full Arrays</a></h3>
+
+                        <p>Consider an application where the number of items that we want to store in
+                            an array changes as the program runs. Since the size of the array can't
+                            be changed, a separate counter variable must be used to keep track of
+                            how many spaces in the array are in use. (Of course, every space in the array
+                            has to contain something; the question is, how many spaces contain useful or
+                            valid items?)</p>
+
+
+                        <p>Consider, for example, a program that reads positive integers entered by the
+                            user and stores them for later processing. The program stops reading when the
+                            user inputs a number that is less than or equal to zero. The input numbers can
+                            be kept in an array, <span class="code">numbers</span>, of type <span class="atype">int[]</span>. Let's say that
+                            no more than 100 numbers will be input. Then the size of the array can be fixed
+                            at 100. But the program must keep track of how many numbers have actually been
+                            read and stored in the array. For this, it can use an integer variable.
+                            Each time a number is stored in the array, we have to count it;
+                            that is, the value of the counter variable must be incremented by one.
+                            One question is, when we add a new item to the array, where do we put
+                            it?  Well, if the number of items is <span class="code">count</span>, then they would
+                            be stored in the array in positions number 0, 1, ..., (count-1).
+                            The next open spot would be position number <span class="code">count</span>, so that's
+                            where we should put the new item.</p>
+
+
+                        <p>As a rather silly example, let's write a program that
+                            will read the numbers input by the user and then print them in the reverse of the
+                            order in which they were entered.  Assume that an input value equal to zero
+                            marks the end of the data.
+                            (This is, at least, a processing task that requires that the numbers be saved
+                            in an array. Note that many types of processing, such as finding the sum or
+                            average or maximum of the numbers, can be done without saving the individual
+                            numbers.)</p>
+
+
+                        <pre><code class="java">import textio.TextIO;
+
+public class ReverseInputNumbers {
+
+   public static void main(String[] args) {
+   
+     int[] numbers;  // An array for storing the input values.
+     int count;      // The number of numbers saved in the array.
+     int num;        // One of the numbers input by the user.
+     int i;          // for-loop variable.
+     
+     numbers = new int[100];   // Space for 100 ints.
+     count = 0;                // No numbers have been saved yet.
+     
+     System.out.println("Enter up to 100 positive integers; enter 0 to end.");
+     
+     while (true) {   // Get the numbers and put them in the array.
+        System.out.print("? ");
+        num = TextIO.getlnInt();
+        if (num &lt;= 0) {
+              // Zero marks the end of input; we have all the numbers.
+           break;
         }
-    };
+        numbers[count] = num;  // Put num in position count.
+        count++;  // Count the number
+     }
+     
+     System.out.println("\nYour numbers in reverse order are:\n");
+     
+     for ( i = count - 1; i &gt;= 0; i-- ) {
+         System.out.println( numbers[i] );
+     }
+     
+   } // end main();
+   
+}  // end class ReverseInputNumbers</code></pre>
 
-    println!(&quot;The result is {result}&quot;);
-}</code></pre></pre>
-<p>Before the loop, we declare a variable named <code>counter</code> and initialize it to
-<code>0</code>. Then we declare a variable named <code>result</code> to hold the value returned from
-the loop. On every iteration of the loop, we add <code>1</code> to the <code>counter</code> variable,
-and then check whether the <code>counter</code> is equal to <code>10</code>. When it is, we use the
-<code>break</code> keyword with the value <code>counter * 2</code>. After the loop, we use a
-semicolon to end the statement that assigns the value to <code>result</code>. Finally, we
-print the value in <code>result</code>, which in this case is <code>20</code>.</p>
-<h4 id="loop-labels-to-disambiguate-between-multiple-loops"><a class="header" href="#loop-labels-to-disambiguate-between-multiple-loops">Loop Labels to Disambiguate Between Multiple Loops</a></h4>
-<p>If you have loops within loops, <code>break</code> and <code>continue</code> apply to the innermost
-loop at that point. You can optionally specify a <em>loop label</em> on a loop that
-you can then use with <code>break</code> or <code>continue</code> to specify that those keywords
-apply to the labeled loop instead of the innermost loop. Loop labels must begin
-with a single quote. Here’s an example with two nested loops:</p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
-    let mut count = 0;
-    'counting_up: loop {
-        println!(&quot;count = {count}&quot;);
-        let mut remaining = 10;
 
-        loop {
-            println!(&quot;remaining = {remaining}&quot;);
-            if remaining == 9 {
-                break;
-            }
-            if count == 2 {
-                break 'counting_up;
-            }
-            remaining -= 1;
-        }
+                        <p>It is especially important to note how the variable <span class="code">count</span> plays a
+                            dual role. It is the number of items that have been entered into the array.
+                            But it is also the index of the next available spot in the array.</p>
 
-        count += 1;
+
+                        <p> When the time comes to print
+                            out the numbers in the array, the last occupied spot in the array is location
+                            <span class="code">count&nbsp;-&nbsp;1</span>, so the <span class="code">for</span> loop prints out values starting from
+                            location <span class="code">count&nbsp;-&nbsp;1</span> and going down to 0.  This is also a nice
+                            example of processing the elements of an array in reverse order.</p>
+
+
+                     
+
+
+                        <p>You might wonder what would happen in this program if the user tries to input
+                            more than 100 numbers.  The result would be an error that would crash the
+                            program.  When the user enters the 101-st number, the program tries to store
+                            that number in an array element <span class="code">number[100]</span>.  However, there is
+                            no such array element.  There are only 100 items in the array, and the index
+                            of the last item is 99.  The attempt to use <span class="code">number[100]</span>
+                            generates an exception of type <span class="classname">ArrayIndexOutOfBoundsException</span>.
+                            Exceptions of this type are a common source of run-time errors in programs that use arrays.</p>
+
+                     
+                       <h3 id="Two-dimensional Arrays"><a class="header" href="#Two-dimensional Arrays">Two-dimensional Arrays</a></h3>
+
+                        <p>The arrays that we have considered so far are "one-dimensional."  This means that the
+                            array consists of a sequence of elements that can be thought of as being laid out along a line.
+                            It is also possible to have <span class="newword">two-dimensional arrays</span>, where the elements can
+                            be laid out in a rectangular grid.  We consider them only briefly here, but will return
+                            to the topic in <a href="ch07-06-2DArrays.html">Section&nbsp;7.6</a>.</p>
+
+
+                        <p>In a two-dimensional, or "2D," array, the elements can be
+                            arranged in rows and columns.  Here, for example, is a 2D array of <span class="ptype">int</span>
+                            that has five rows and seven columns:</p>
+
+
+                        <p align="center">
+                            <img src="./images/two-d-array.png" width="318" height="130" alt="an array of its with 5 rows and 7 columns"></p>
+
+
+                        <p>This 5-by-7 grid contains a total of 35 elements.
+                            The rows in a 2D array are numbered 0, 1, 2, ..., up to the number of rows minus one.
+                            Similarly, the columns are numbered from zero up to the number of columns minus one.  Each individual
+                            element in the array can be picked out by specifying its row number and its column number.
+                            (The illustration shown here is not what the array actually looks like in the computer's
+                            memory, but it does show the logical structure of the array.)</p>
+
+
+                        <p>In Java, the syntax for two-dimensional arrays is similar to the syntax for one-dimensional
+                            arrays, except that an extra index is involved, since picking out an element requires both
+                            a row number and a column number.  For example, if <span class="code">A</span> is a 2D array of <span class="ptype">int</span>, then
+                            <span class="code">A[3][2]</span> would be the element in row&nbsp;3, column&nbsp;2.  That would pick out the
+                            number 17 in the array shown above.  The type for <span class="code">A</span>
+                            would be given as <span class="atype">int[][]</span>, with two pairs of empty brackets.  To declare the
+                            array variable and create the array, you could say,</p>
+
+
+                        <pre><code class="java">int[][]  A;
+A  =  new int[5][7];</code></pre>
+
+
+                        <p>The second line creates a 2D array with 5 rows and 7 columns.  Two-dimensional arrays
+                            are often processed using nested <span class="code">for</span> loops.  For example, the following code
+                            segment will print out the elements of <span class="code">A</span> in neat columns:</p>
+
+
+                        <pre><code class="java">int row, col;  // loop-control-variables for accessing rows and columns in A
+for ( row = 0; row &lt; 5; row++ ) {
+    for ( col = 0; col &lt; 7; col++ ) {
+        System.out.printf( "%7d",  A[row][col] );
     }
-    println!(&quot;End count = {count}&quot;);
-}</code></pre></pre>
-<p>The outer loop has the label <code>'counting_up</code>, and it will count up from 0 to 2.
-The inner loop without a label counts down from 10 to 9. The first <code>break</code> that
-doesn’t specify a label will exit the inner loop only. The <code>break 'counting_up;</code> statement will exit the outer loop. This code prints:</p>
-<pre><code class="language-console">$ cargo run
-   Compiling loops v0.1.0 (file:///projects/loops)
-    Finished dev [unoptimized + debuginfo] target(s) in 0.58s
-     Running `target/debug/loops`
-count = 0
-remaining = 10
-remaining = 9
-count = 1
-remaining = 10
-remaining = 9
-count = 2
-remaining = 10
-End count = 2
-</code></pre>
-<h4 id="conditional-loops-with-while"><a class="header" href="#conditional-loops-with-while">Conditional Loops with <code>while</code></a></h4>
-<p>A program will often need to evaluate a condition within a loop. While the
-condition is <code>true</code>, the loop runs. When the condition ceases to be <code>true</code>, the
-program calls <code>break</code>, stopping the loop. It’s possible to implement behavior
-like this using a combination of <code>loop</code>, <code>if</code>, <code>else</code>, and <code>break</code>; you could
-try that now in a program, if you’d like. However, this pattern is so common
-that Rust has a built-in language construct for it, called a <code>while</code> loop. In
-Listing 3-3, we use <code>while</code> to loop the program three times, counting down each
-time, and then, after the loop, print a message and exit.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
-    let mut number = 3;
+    System.out.println();
+}</code></pre>
 
-    while number != 0 {
-        println!(&quot;{number}!&quot;);
 
-        number -= 1;
-    }
 
-    println!(&quot;LIFTOFF!!!&quot;);
-}</code></pre></pre>
-<p><span class="caption">Listing 3-3: Using a <code>while</code> loop to run code while a
-condition holds true</span></p>
-<p>This construct eliminates a lot of nesting that would be necessary if you used
-<code>loop</code>, <code>if</code>, <code>else</code>, and <code>break</code>, and it’s clearer. While a condition
-evaluates to <code>true</code>, the code runs; otherwise, it exits the loop.</p>
-<h4 id="looping-through-a-collection-with-for"><a class="header" href="#looping-through-a-collection-with-for">Looping Through a Collection with <code>for</code></a></h4>
-<p>You can choose to use the <code>while</code> construct to loop over the elements of a
-collection, such as an array. For example, the loop in Listing 3-4 prints each
-element in the array <code>a</code>.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
-    let a = [10, 20, 30, 40, 50];
-    let mut index = 0;
+                        <p>The base type of a 2D array can be anything, so you can have arrays of type
+                            <span class="atype">double[][]</span>, <span class="atype">String[][]</span>, and so on.</p>
 
-    while index &lt; 5 {
-        println!(&quot;the value is: {}&quot;, a[index]);
 
-        index += 1;
-    }
-}</code></pre></pre>
-<p><span class="caption">Listing 3-4: Looping through each element of a collection
-using a <code>while</code> loop</span></p>
-<p>Here, the code counts up through the elements in the array. It starts at index
-<code>0</code>, and then loops until it reaches the final index in the array (that is,
-when <code>index &lt; 5</code> is no longer <code>true</code>). Running this code will print every
-element in the array:</p>
-<pre><code class="language-console">$ cargo run
-   Compiling loops v0.1.0 (file:///projects/loops)
-    Finished dev [unoptimized + debuginfo] target(s) in 0.32s
-     Running `target/debug/loops`
-the value is: 10
-the value is: 20
-the value is: 30
-the value is: 40
-the value is: 50
-</code></pre>
-<p>All five array values appear in the terminal, as expected. Even though <code>index</code>
-will reach a value of <code>5</code> at some point, the loop stops executing before trying
-to fetch a sixth value from the array.</p>
-<p>However, this approach is error prone; we could cause the program to panic if
-the index value or test condition is incorrect. For example, if you changed the
-definition of the <code>a</code> array to have four elements but forgot to update the
-condition to <code>while index &lt; 4</code>, the code would panic. It’s also slow, because
-the compiler adds runtime code to perform the conditional check of whether the
-index is within the bounds of the array on every iteration through the loop.</p>
-<p>As a more concise alternative, you can use a <code>for</code> loop and execute some code
-for each item in a collection. A <code>for</code> loop looks like the code in Listing 3-5.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
-    let a = [10, 20, 30, 40, 50];
+                        <p>There are some natural uses for 2D arrays.  For example,
+                            a 2D array can be used to store the contents of the board in a game such as
+                            chess or checkers.  And an example in <a href="ch04-07-MoreOnProgramDesign.html">Subsection&nbsp;4.7.3</a> uses a 2D array
+                            to hold the colors of a grid of colored squares.  But sometimes
+                            two-dimensional arrays are used in problems in which the grid is
+                            not so visually obvious. Consider a company that owns 25 stores. Suppose that
+                            the company has data about the profit earned at each store for each month in
+                            the year 2022. If the stores are numbered from 0 to 24, and if the twelve
+                            months from January 2022 through December 2022 are numbered from 0 to 11, then
+                            the profit data could be stored in an array, <span class="code">profit</span>, created as
+                            follows:</p>
 
-    for element in a {
-        println!(&quot;the value is: {element}&quot;);
-    }
-}</code></pre></pre>
-<p><span class="caption">Listing 3-5: Looping through each element of a collection
-using a <code>for</code> loop</span></p>
-<p>When we run this code, we’ll see the same output as in Listing 3-4. More
-importantly, we’ve now increased the safety of the code and eliminated the
-chance of bugs that might result from going beyond the end of the array or not
-going far enough and missing some items.</p>
-<p>Using the <code>for</code> loop, you wouldn’t need to remember to change any other code if
-you changed the number of values in the array, as you would with the method
-used in Listing 3-4.</p>
-<p>The safety and conciseness of <code>for</code> loops make them the most commonly used loop
-construct in Rust. Even in situations in which you want to run some code a
-certain number of times, as in the countdown example that used a <code>while</code> loop
-in Listing 3-3, most Rustaceans would use a <code>for</code> loop. The way to do that
-would be to use a <code>Range</code>, provided by the standard library, which generates
-all numbers in sequence starting from one number and ending before another
-number.</p>
-<p>Here’s what the countdown would look like using a <code>for</code> loop and another method
-we’ve not yet talked about, <code>rev</code>, to reverse the range:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
-    for number in (1..4).rev() {
-        println!(&quot;{number}!&quot;);
-    }
-    println!(&quot;LIFTOFF!!!&quot;);
-}</code></pre></pre>
-<p>This code is a bit nicer, isn’t it?</p>
-<h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
-<p>You made it! This was a sizable chapter: you learned about variables, scalar
-and compound data types, functions, comments, <code>if</code> expressions, and loops! To
-practice with the concepts discussed in this chapter, try building programs to
-do the following:</p>
-<ul>
-<li>Convert temperatures between Fahrenheit and Celsius.</li>
-<li>Generate the <em>n</em>th Fibonacci number.</li>
-<li>Print the lyrics to the Christmas carol “The Twelve Days of Christmas,”
-taking advantage of the repetition in the song.</li>
-</ul>
-<p>When you’re ready to move on, we’ll talk about a concept in Rust that <em>doesn’t</em>
-commonly exist in other programming languages: ownership.</p>
+
+                        <pre><code class="java">double[][]  profit;
+profit  =  new double[25][12];</code></pre>
+
+
+                        <p>
+                            <span class="code">profit[3][2]</span> would be the amount of profit earned at store number 3
+                            in March, and more generally, <span class="code">profit[storeNum][monthNum]</span> would be the
+                            amount of profit earned in store number <span class="code">storeNum</span> in month number
+                            <span class="code">monthNum</span> (where the numbering, remember, starts from zero).</p>
+
+
+                        <p>Let's assume that the <span class="code">profit</span> array has already been filled with
+                            data. This data can be processed in a lot of interesting ways. For example, the
+                            total profit for the company&mdash;for the whole year from all its stores&mdash;can
+                            be calculated by adding up all the entries in the array:</p>
+
+
+                        <pre><code class="java">double totalProfit;  // Company's total profit in 2022.
+int store, month;  // variables for looping through the stores and the months
+totalProfit = 0;
+for ( store = 0; store &lt; 25; store++ ) {
+   for ( month = 0; month &lt; 12; month++ )
+      totalProfit += profit[store][month];
+}</code></pre>
+
+
+                        <p>Sometimes it is necessary to process a single row or a single column of an
+                            array, not the entire array. For example, to compute the total profit earned by
+                            the company in December, that is, in month number 11, you could use the
+                            loop:</p>
+
+
+                        <pre><code class="java">double decemberProfit;
+int storeNum;
+decemberProfit = 0.0;
+for ( storeNum = 0; storeNum &lt; 25; storeNum++ ) {
+   decemberProfit += profit[storeNum][11];
+}</code></pre>
+
+
+                        <p>Two-dimensional arrays are sometimes useful, but they are much less common
+                            than one-dimensional arrays.  Java actually allows arrays of even higher dimension,
+                            but they are only rarely encountered in practice.</p>
+
+                        
 
                     </main>
 

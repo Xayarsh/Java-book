@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Control Flow - Introduction to Programming Using Java</title>
+        <title>The If Statement - Introduction to Programming Using Java</title>
 
 
         <!-- Custom HTML head -->
@@ -31,6 +31,8 @@
         <!-- Custom theme stylesheets -->
         <link rel="stylesheet" href="ferris.css">
         <link rel="stylesheet" href="theme/2018-edition.css">
+
+        <link rel="stylesheet" href="code-class.css">
 
     </head>
     <body>
@@ -146,433 +148,507 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h2 id="control-flow"><a class="header" href="#control-flow">Control Flow</a></h2>
-<p>The ability to run some code depending on whether a condition is <code>true</code> and to
-run some code repeatedly while a condition is <code>true</code> are basic building blocks
-in most programming languages. The most common constructs that let you control
-the flow of execution of Rust code are <code>if</code> expressions and loops.</p>
-<h3 id="if-expressions"><a class="header" href="#if-expressions"><code>if</code> Expressions</a></h3>
-<p>An <code>if</code> expression allows you to branch your code depending on conditions. You
-provide a condition and then state, “If this condition is met, run this block
-of code. If the condition is not met, do not run this block of code.”</p>
-<p>Create a new project called <em>branches</em> in your <em>projects</em> directory to explore
-the <code>if</code> expression. In the <em>src/main.rs</em> file, input the following:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
-    let number = 3;
+                        <h2 id="if"><a class="header" href="#if">The If statement</a></h2>
+                        <p>
+                            The first of the two branching statements in Java
+                            is the <span class="code">if</span> statement, which you have already seen in <a href="ch03-01-BlocksLoopsBranches.html">Section&nbsp;3.1</a>. It takes the form</p>
 
-    if number &lt; 5 {
-        println!(&quot;condition was true&quot;);
-    } else {
-        println!(&quot;condition was false&quot;);
-    }
-}</code></pre></pre>
-<p>All <code>if</code> expressions start with the keyword <code>if</code>, followed by a condition. In
-this case, the condition checks whether or not the variable <code>number</code> has a
-value less than 5. We place the block of code to execute if the condition is
-<code>true</code> immediately after the condition inside curly brackets. Blocks of code
-associated with the conditions in <code>if</code> expressions are sometimes called <em>arms</em>,
-just like the arms in <code>match</code> expressions that we discussed in the <a href="ch02-00-NameAndThings.html#comparing-the-guess-to-the-secret-number">“Comparing
-the Guess to the Secret Number”</a><!--
-ignore --> section of Chapter 2.</p>
-<p>Optionally, we can also include an <code>else</code> expression, which we chose to do
-here, to give the program an alternative block of code to execute should the
-condition evaluate to <code>false</code>. If you don’t provide an <code>else</code> expression and
-the condition is <code>false</code>, the program will just skip the <code>if</code> block and move on
-to the next bit of code.</p>
-<p>Try running this code; you should see the following output:</p>
-<pre><code class="language-console">$ cargo run
-   Compiling branches v0.1.0 (file:///projects/branches)
-    Finished dev [unoptimized + debuginfo] target(s) in 0.31s
-     Running `target/debug/branches`
-condition was true
-</code></pre>
-<p>Let’s try changing the value of <code>number</code> to a value that makes the condition
-<code>false</code> to see what happens:</p>
-<pre><code class="language-rust ignore"><span class="boring">fn main() {
-</span>    let number = 7;
-<span class="boring">
-</span><span class="boring">    if number &lt; 5 {
-</span><span class="boring">        println!(&quot;condition was true&quot;);
-</span><span class="boring">    } else {
-</span><span class="boring">        println!(&quot;condition was false&quot;);
-</span><span class="boring">    }
-</span><span class="boring">}</span></code></pre>
-<p>Run the program again, and look at the output:</p>
-<pre><code class="language-console">$ cargo run
-   Compiling branches v0.1.0 (file:///projects/branches)
-    Finished dev [unoptimized + debuginfo] target(s) in 0.31s
-     Running `target/debug/branches`
-condition was false
-</code></pre>
-<p>It’s also worth noting that the condition in this code <em>must</em> be a <code>bool</code>. If
-the condition isn’t a <code>bool</code>, we’ll get an error. For example, try running the
-following code:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore does_not_compile">fn main() {
-    let number = 3;
 
-    if number {
-        println!(&quot;number was three&quot;);
-    }
+                        <pre><code class="java">if (<span class="bnf">boolean-expression</span>)
+     <span class="bnf">statement-1</span>
+else
+     <span class="bnf">statement-2</span>
+</code></pre>
+
+
+                        <p>As usual, the statements inside an <span class="code">if</span> statement can be blocks. The
+                            <span class="code">if</span> statement represents a two-way branch. The <span class="code">else</span> part of an
+                            <span class="code">if</span> statement&mdash;consisting of the word "else" and the statement that
+                            follows it&mdash;can be omitted.</p>
+
+
+                        
+                       <h3 id="TheDanglingelseProblem"><a class="header" href="#TheDanglingelseProblem">The Dangling else Problem</a></h3>
+
+                        <p>Now, an <span class="code">if</span> statement is, in particular, a statement. This means
+                            that either <span class="bnf">statement-1</span> or <span class="bnf">statement-2</span> in the above <span class="code">if</span> statement can itself
+                            be an <span class="code">if</span> statement. A problem arises, however,
+                            if <span class="bnf">statement-1</span> is an <span class="code">if</span> statement that has no
+                            <span class="code">else</span> part. This special case is effectively forbidden by the syntax of
+                            Java. Suppose, for example, that you type</p>
+
+
+                        <pre><code class="java">if ( x &gt; 0 )
+    if (y &gt; 0)
+       System.out.println("First case");
+else
+    System.out.println("Second case");</code></pre>
+
+
+                        <p>Now, remember that the way you've indented this doesn't mean anything at all
+                            to the computer. You might think that the <span class="code">else</span> part is the second half
+                            of your "<span class="code">if&nbsp;(x&nbsp;&gt;&nbsp;0)</span>" statement, but the rule that the computer
+                            follows attaches the <span class="code">else</span> to "<span class="code">if&nbsp;(y&nbsp;&gt;&nbsp;0)</span>", which is
+                            closer. That is, the computer reads your statement as if it were formatted:</p>
+
+
+                        <pre><code class="java">if ( x &gt; 0 )
+    if (y &gt; 0)
+       System.out.println("First case");
+    else
+        System.out.println("Second case");</code></pre>
+
+
+                        <p>You can force the computer to use the other interpretation by enclosing the
+                            nested <span class="code">if</span> in a block:</p>
+
+
+                        <pre><code class="java">if ( x &gt; 0 ) {
+    if (y &gt; 0)
+       System.out.println("First case");
+}
+else
+    System.out.println("Second case");</code></pre>
+
+
+                        <p>These two <span class="code">if</span> statements have different meanings: In the case when <span class="code">x&nbsp;&lt;=&nbsp;0</span>, the
+                            first statement doesn't print anything, but the second statement prints "Second
+                            case".</p>
+
+
+
+
+                        
+                       <h3 id="MultiwayBranching"><a class="header" href="#MultiwayBranching">Multiway Branching</a></h3>
+
+                        <p>Much more interesting than this technicality is the case where <span class="bnf">statement-2</span>,
+                            the <span class="code">else</span> part of the <span class="code">if</span>
+                            statement, is itself an <span class="code">if</span> statement. The statement would look like
+                            this (perhaps without the final else part):</p>
+
+
+                        <pre><code class="java">if (<span class="bnf">boolean-expression-1</span>)
+     <span class="bnf">statement-1</span>
+else
+     if (<span class="bnf">boolean-expression-2</span>)
+         <span class="bnf">statement-2</span>
+     else
+         <span class="bnf">statement-3</span>
+</code></pre>
+
+
+                        <p>However, since the computer doesn't care how a program is laid out on the
+                            page, this is almost always written in the format:</p>
+
+
+                        <pre><code class="java">if (<span class="bnf">boolean-expression-1</span>)
+     <span class="bnf">statement-1</span>
+else if (<span class="bnf">boolean-expression-2</span>)
+     <span class="bnf">statement-2</span>
+else
+     <span class="bnf">statement-3</span>
+</code></pre>
+
+
+                        <p>You should think of this as a single statement representing a three-way
+                            branch. When the computer executes this, one and only one of the three
+                            statements&mdash;<span class="bnf">statement-1</span>, <span class="bnf">statement-2</span>, or <span class="bnf">statement-3</span>&mdash;will
+                            be executed. The computer starts by evaluating <span class="bnf">boolean-expression-1</span>. If it is <span class="code">true</span>, the computer
+                            executes <span class="bnf">statement-1</span> and then jumps all the way
+                            to the end of the outer if statement, skipping the other two <span class="bnf">statements</span>. If <span class="bnf">boolean-expression-1</span>
+                            is <span class="code">false</span>, the computer skips
+                            <span class="bnf">statement-1</span> and executes the second, nested if
+                            statement. To do this, it tests the value of <span class="bnf">boolean-expression-2</span> and uses it to decide between
+                            <span class="bnf">statement-2</span> and <span class="bnf">statement-3</span>.</p>
+
+
+                        <p>Here is an example that will print out one of three different messages,
+                            depending on the value of a variable named <span class="code">temperature</span>:</p>
+
+
+                        <pre><code class="java">if (temperature &lt; 50)
+   System.out.println("It's cold.");
+else if (temperature &lt; 80)
+   System.out.println("It's nice.");
+else
+   System.out.println("It's hot.");</code></pre>
+
+
+                        <p>If <span class="code">temperature</span> is, say, 42, the first test is <span class="code">true</span>. The
+                            computer prints out the message "It's cold", and skips the rest&mdash;without even
+                            evaluating the second condition. For a temperature of 75, the first test is
+                            <span class="code">false</span>, so the computer goes on to the second test. This test is
+                            <span class="code">true</span>, so the computer prints "It's nice" and skips the rest. If the
+                            temperature is 173, both of the tests evaluate to <span class="code">false</span>, so the
+                            computer says "It's hot" (unless its circuits have been fried by the heat, that
+                            is).</p>
+
+
+                        <p>You can go on stringing together "else-if's" to make multiway branches with
+                            any number of cases:</p>
+
+
+                        <pre><code class="java">if (<span class="bnf">test-1</span>)
+     <span class="bnf">statement-1</span>
+else if (<span class="bnf">test-2</span>)
+     <span class="bnf">statement-2</span>
+else if (<span class="bnf">test-3</span>)
+     <span class="bnf">statement-3</span>
+  .
+  . // (more cases)
+  .
+else if (<span class="bnf">test-N</span>)
+     <span class="bnf">statement-N</span>
+else
+     <span class="bnf">statement-(N+1)</span>
+</code></pre>
+
+
+                        <p>The computer evaluates the tests, which are boolean expressions, one after the other until it
+                            comes to one that is <span class="code">true</span>. It executes the associated statement and
+                            skips the rest. If none of the boolean expressions evaluate to <span class="code">true</span>,
+                            then the statement in the <span class="code">else</span> part is executed. This statement is
+                            called a multiway branch because one and only one of the statements will be executed.
+                            The final <span class="code">else</span> part can be omitted. In that case, if all the boolean
+                            expressions are false, none of the statements are executed. Of course, each of
+                            the statements can be a block, consisting of a number of statements enclosed
+                            between { and }. Admittedly, there is lot of syntax here; as you study and
+                            practice, you'll become comfortable with it.  It might be useful to look at a
+                            flow control diagram for the general "if..else&nbsp;if" statement shown above:</p>
+
+
+                        <p align="center">
+                            <img src="./images/multiway-if-flow-control.png" width="547" height="463" alt="Flow control diagram for a multiway if statement" class="bordered"></p>
+
+
+
+
+                        
+                       <h3 id="IfStatementExamples"><a class="header" href="#IfStatementExamples">If Statement Examples</a></h3>
+
+                        <p>As an example of using <span class="code">if</span> statements, let's suppose that <span class="code">x</span>,
+                            <span class="code">y</span>, and <span class="code">z</span> are variables of type <span class="ptype">int</span>, and that each
+                            variable has already been assigned a value. Consider the problem of printing
+                            out the values of the three variables in increasing order. For example, if the
+                            values are 42, 17, and 20, then the output should be in the order 17, 20,
+                            42.</p>
+
+
+                        <p>One way to approach this is to ask, where does <span class="code">x</span> belong in the
+                            list? It comes first if it's less than both <span class="code">y</span> and <span class="code">z</span>. It comes
+                            last if it's greater than both <span class="code">y</span> and <span class="code">z</span>. Otherwise, it comes
+                            in the middle. We can express this with a 3-way <span class="code">if</span> statement, but we
+                            still have to worry about the order in which <span class="code">y</span> and <span class="code">z</span> should
+                            be printed. In pseudocode,</p>
+
+
+                        <pre><code class="java">if (x &lt; y &amp;&amp; x &lt; z) {
+    output x, followed by y and z in their correct order
+}
+else if (x &gt; y &amp;&amp; x &gt; z) {
+    output y and z in their correct order, followed by x
+}
+else {
+    output x in between y and z in their correct order
 }</code></pre>
-<p>The <code>if</code> condition evaluates to a value of <code>3</code> this time, and Rust throws an
-error:</p>
-<pre><code class="language-console">$ cargo run
-   Compiling branches v0.1.0 (file:///projects/branches)
-error[E0308]: mismatched types
- --&gt; src/main.rs:4:8
-  |
-4 |     if number {
-  |        ^^^^^^ expected `bool`, found integer
 
-For more information about this error, try `rustc --explain E0308`.
-error: could not compile `branches` due to previous error
-</code></pre>
-<p>The error indicates that Rust expected a <code>bool</code> but got an integer. Unlike
-languages such as Ruby and JavaScript, Rust will not automatically try to
-convert non-Boolean types to a Boolean. You must be explicit and always provide
-<code>if</code> with a Boolean as its condition. If we want the <code>if</code> code block to run
-only when a number is not equal to <code>0</code>, for example, we can change the <code>if</code>
-expression to the following:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
-    let number = 3;
 
-    if number != 0 {
-        println!(&quot;number was something other than zero&quot;);
-    }
-}</code></pre></pre>
-<p>Running this code will print <code>number was something other than zero</code>.</p>
-<h4 id="handling-multiple-conditions-with-else-if"><a class="header" href="#handling-multiple-conditions-with-else-if">Handling Multiple Conditions with <code>else if</code></a></h4>
-<p>You can use multiple conditions by combining <code>if</code> and <code>else</code> in an <code>else if</code>
-expression. For example:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
-    let number = 6;
+                        <p>Determining the relative order of <span class="code">y</span> and <span class="code">z</span> requires another
+                            <span class="code">if</span> statement, so this becomes</p>
 
-    if number % 4 == 0 {
-        println!(&quot;number is divisible by 4&quot;);
-    } else if number % 3 == 0 {
-        println!(&quot;number is divisible by 3&quot;);
-    } else if number % 2 == 0 {
-        println!(&quot;number is divisible by 2&quot;);
-    } else {
-        println!(&quot;number is not divisible by 4, 3, or 2&quot;);
-    }
-}</code></pre></pre>
-<p>This program has four possible paths it can take. After running it, you should
-see the following output:</p>
-<pre><code class="language-console">$ cargo run
-   Compiling branches v0.1.0 (file:///projects/branches)
-    Finished dev [unoptimized + debuginfo] target(s) in 0.31s
-     Running `target/debug/branches`
-number is divisible by 3
-</code></pre>
-<p>When this program executes, it checks each <code>if</code> expression in turn and executes
-the first body for which the condition evaluates to <code>true</code>. Note that even
-though 6 is divisible by 2, we don’t see the output <code>number is divisible by 2</code>,
-nor do we see the <code>number is not divisible by 4, 3, or 2</code> text from the <code>else</code>
-block. That’s because Rust only executes the block for the first <code>true</code>
-condition, and once it finds one, it doesn’t even check the rest.</p>
-<p>Using too many <code>else if</code> expressions can clutter your code, so if you have more
-than one, you might want to refactor your code. Chapter 6 describes a powerful
-Rust branching construct called <code>match</code> for these cases.</p>
-<h4 id="using-if-in-a-let-statement"><a class="header" href="#using-if-in-a-let-statement">Using <code>if</code> in a <code>let</code> Statement</a></h4>
-<p>Because <code>if</code> is an expression, we can use it on the right side of a <code>let</code>
-statement to assign the outcome to a variable, as in Listing 3-2.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
-    let condition = true;
-    let number = if condition { 5 } else { 6 };
 
-    println!(&quot;The value of number is: {number}&quot;);
-}</code></pre></pre>
-<p><span class="caption">Listing 3-2: Assigning the result of an <code>if</code> expression
-to a variable</span></p>
-<p>The <code>number</code> variable will be bound to a value based on the outcome of the <code>if</code>
-expression. Run this code to see what happens:</p>
-<pre><code class="language-console">$ cargo run
-   Compiling branches v0.1.0 (file:///projects/branches)
-    Finished dev [unoptimized + debuginfo] target(s) in 0.30s
-     Running `target/debug/branches`
-The value of number is: 5
-</code></pre>
-<p>Remember that blocks of code evaluate to the last expression in them, and
-numbers by themselves are also expressions. In this case, the value of the
-whole <code>if</code> expression depends on which block of code executes. This means the
-values that have the potential to be results from each arm of the <code>if</code> must be
-the same type; in Listing 3-2, the results of both the <code>if</code> arm and the <code>else</code>
-arm were <code>i32</code> integers. If the types are mismatched, as in the following
-example, we’ll get an error:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore does_not_compile">fn main() {
-    let condition = true;
-
-    let number = if condition { 5 } else { &quot;six&quot; };
-
-    println!(&quot;The value of number is: {number}&quot;);
+                        <pre><code class="java">if (x &lt; y &amp;&amp; x &lt; z) {        // x comes first
+    if (y &lt; z)
+       System.out.println( x + " " + y + " " + z );
+    else
+       System.out.println( x + " " + z + " " + y );
+}
+else if (x &gt; y &amp;&amp; x &gt; z) {   // x comes last
+    if (y &lt; z)
+       System.out.println( y + " " + z + " " + x );
+    else
+       System.out.println( z + " " + y + " " + x );
+}
+else {                       // x in the middle
+    if (y &lt; z)
+       System.out.println( y + " " + x + " " + z);
+    else
+       System.out.println( z + " " + x + " " + y);
 }</code></pre>
-<p>When we try to compile this code, we’ll get an error. The <code>if</code> and <code>else</code> arms
-have value types that are incompatible, and Rust indicates exactly where to
-find the problem in the program:</p>
-<pre><code class="language-console">$ cargo run
-   Compiling branches v0.1.0 (file:///projects/branches)
-error[E0308]: `if` and `else` have incompatible types
- --&gt; src/main.rs:4:44
-  |
-4 |     let number = if condition { 5 } else { &quot;six&quot; };
-  |                                 -          ^^^^^ expected integer, found `&amp;str`
-  |                                 |
-  |                                 expected because of this
 
-For more information about this error, try `rustc --explain E0308`.
-error: could not compile `branches` due to previous error
-</code></pre>
-<p>The expression in the <code>if</code> block evaluates to an integer, and the expression in
-the <code>else</code> block evaluates to a string. This won’t work because variables must
-have a single type, and Rust needs to know at compile time what type the
-<code>number</code> variable is, definitively. Knowing the type of <code>number</code> lets the
-compiler verify the type is valid everywhere we use <code>number</code>. Rust wouldn’t be
-able to do that if the type of <code>number</code> was only determined at runtime; the
-compiler would be more complex and would make fewer guarantees about the code
-if it had to keep track of multiple hypothetical types for any variable.</p>
-<h3 id="repetition-with-loops"><a class="header" href="#repetition-with-loops">Repetition with Loops</a></h3>
-<p>It’s often useful to execute a block of code more than once. For this task,
-Rust provides several <em>loops</em>, which will run through the code inside the loop
-body to the end and then start immediately back at the beginning. To experiment
-with loops, let’s make a new project called <em>loops</em>.</p>
-<p>Rust has three kinds of loops: <code>loop</code>, <code>while</code>, and <code>for</code>. Let’s try each one.</p>
-<h4 id="repeating-code-with-loop"><a class="header" href="#repeating-code-with-loop">Repeating Code with <code>loop</code></a></h4>
-<p>The <code>loop</code> keyword tells Rust to execute a block of code over and over again
-forever or until you explicitly tell it to stop.</p>
-<p>As an example, change the <em>src/main.rs</em> file in your <em>loops</em> directory to look
-like this:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore">fn main() {
-    loop {
-        println!(&quot;again!&quot;);
-    }
+
+                        <p>You might check that this code will work correctly even if some of the
+                            values are the same. If the values of two variables are the same, it doesn't
+                            matter which order you print them in.</p>
+
+
+                        <p>Note, by the way, that even though you can say in English "if x is less than
+                            y and z," you can't say in Java "<span class="code">if (x &lt; y &amp;&amp; z)</span>". The
+                            <span class="code">&amp;&amp;</span> operator can only be used between boolean values, so you
+                            have to make separate tests, <span class="code">x&lt;y</span> and <span class="code">x&lt;z</span>, and then
+                            combine the two tests with <span class="code">&amp;&amp;</span>.</p>
+
+
+                        <p>There is an alternative approach to this problem that begins by asking,
+                            "which order should <span class="code">x</span> and <span class="code">y</span> be printed in?" Once that's
+                            known, you only have to decide where to stick in <span class="code">z</span>. This line of
+                            thought leads to different Java code:</p>
+
+
+                        <pre><code class="java">if ( x &lt; y ) {  // x comes before y
+   if ( z &lt; x )   // z comes first
+      System.out.println( z + " " + x + " " + y);
+   else if ( z &gt; y )   // z comes last
+      System.out.println( x + " " + y + " " + z);
+   else   // z is in the middle
+      System.out.println( x + " " + z + " " + y);
+}
+else {          // y comes before x
+   if ( z &lt; y )   // z comes first
+      System.out.println( z + " " + y + " " + x);
+   else if ( z &gt; x )  // z comes last
+      System.out.println( y + " " + x + " " + z);
+   else  // z is in the middle
+      System.out.println( y + " " + z + " " + x);
 }</code></pre>
-<p>When we run this program, we’ll see <code>again!</code> printed over and over continuously
-until we stop the program manually. Most terminals support the keyboard
-shortcut <span class="keystroke">ctrl-c</span> to interrupt a program that is
-stuck in a continual loop. Give it a try:</p>
-<!-- manual-regeneration
-cd listings/ch03-common-programming-concepts/no-listing-32-loop
-cargo run
-CTRL-C
--->
-<pre><code class="language-console">$ cargo run
-   Compiling loops v0.1.0 (file:///projects/loops)
-    Finished dev [unoptimized + debuginfo] target(s) in 0.29s
-     Running `target/debug/loops`
-again!
-again!
-again!
-again!
-^Cagain!
+
+
+                        <p>Once again, we see how the same problem can be solved in many different
+                            ways. The two approaches to this problem have not exhausted all the
+                            possibilities. For example, you might start by testing whether <span class="code">x</span> is
+                            greater than <span class="code">y</span>. If so, you could swap their values. Once you've done
+                            that, you know that <span class="code">x</span> should be printed before <span class="code">y</span>.</p>
+
+
+                        
+
+
+                        <p>Finally, let's write a complete program that uses an <span class="code">if</span> statement
+                            in an interesting way. I want a program that will convert measurements of
+                            length from one unit of measurement to another, such as miles to yards or
+                            inches to feet. So far, the problem is extremely under-specified. Let's say
+                            that the program will only deal with measurements in inches, feet, yards, and
+                            miles. It would be easy to extend it later to deal with other units. The user
+                            will type in a measurement in one of these units, such as "17 feet" or "2.73
+                            miles". The output will show the length in terms of <b>each</b> of
+                            the four units of measure. (This is easier than asking the user which units to
+                            use in the output.) An outline of the process is</p>
+
+
+                        <pre><code class="java">Read the user's input measurement and units of measure
+Express the measurement in inches, feet, yards, and miles
+Display the four results</code></pre>
+
+
+                        <p>The program can read both parts of the user's input from the same line by
+                            using <span class="code">TextIO.getDouble()</span> to read the numerical measurement and
+                            <span class="code">TextIO.getlnWord()</span> to read the unit of measure. The conversion into
+                            different units of measure can be simplified by first converting the user's
+                            input into inches. From there, the number of inches can easily be converted into feet, yards, and miles.
+                            Before converting into inches, we have to test the input to determine which unit of measure the user has
+                            specified:</p>
+
+
+                        <pre><code class="java">Let measurement = TextIO.getDouble()
+Let units = TextIO.getlnWord()
+if the units are inches
+   Let inches = measurement
+else if the units are feet
+   Let inches = measurement * 12         // 12 inches per foot
+else if the units are yards
+   Let inches = measurement * 36         // 36 inches per yard
+else if the units are miles
+   Let inches = measurement * 12 * 5280  // 5280 feet per mile
+else
+   The units are illegal!
+   Print an error message and stop processing
+Let feet = inches / 12.0
+Let yards = inches / 36.0
+Let miles = inches / (12.0 * 5280.0)
+Display the results</code></pre>
+
+
+                        <p>Since <span class="code">units</span> is a <span class="classname">String</span>, we can use
+                            <span class="code">units.equals("inches")</span> to check whether the specified unit of measure
+                            is "inches". However, it would be nice to allow the units to be specified as
+                            "inch" or abbreviated to "in". To allow these three possibilities, we can check
+                            <span class="code">if (units.equals("inches") || units.equals("inch") ||
+units.equals("in"))</span>. It would also be nice to allow upper case letters, as
+                            in "Inches" or "IN". We can do this by converting <span class="code">units</span> to lower case
+                            before testing it or by substituting the function
+                            <span class="code">units.equalsIgnoreCase</span> for <span class="code">units.equals</span>.</p>
+
+
+                        <p>In my final program, I decided to make things more interesting by allowing
+                            the user to repeat the process of entering a measurement and seeing the
+                            results of the conversion for each measurement.  The program will end only
+                            when the user inputs 0. To program that, I just had to wrap the above algorithm
+                            inside a <span class="code">while</span> loop, and make sure that the loop ends when the user
+                            inputs a&nbsp;0. Here's the complete program:</p>
+
+
+                        <pre><code class="java">import textio.TextIO;
+
+/**
+ * This program will convert measurements expressed in inches,
+ * feet, yards, or miles into each of the possible units of
+ * measure.  The measurement is input by the user, followed by
+ * the unit of measure.  For example:  "17 feet", "1 inch", or
+ * "2.73 mi".  Abbreviations in, ft, yd, and mi are accepted.
+ * The program will continue to read and convert measurements
+ * until the user enters an input of 0.
+ */
+ public class LengthConverter {
+
+    public static void main(String[] args) {
+
+       double measurement;  // Numerical measurement, input by user.
+       String units;        // The unit of measure for the input, also
+                            //    specified by the user.
+
+       double inches, feet, yards, miles;  // Measurement expressed in
+                                           //   each possible unit of
+                                           //   measure.
+
+       System.out.println("""
+                Enter measurements in inches, feet, yards, or miles.
+                For example:  1 inch    17 feet    2.73 miles
+                You can use abbreviations:   in   ft  yd   mi
+                I will convert your input into the other units
+                of measure.
+                """);
+
+       while (true) {
+
+          /* Get the user's input, and convert units to lower case. */
+
+          System.out.print("Enter your measurement, or 0 to end:  ");
+          measurement = TextIO.getDouble();
+          if (measurement == 0)
+             break;  // Terminate the while loop.
+          units = TextIO.getlnWord();
+          units = units.toLowerCase();  // convert units to lower case
+
+          /* Convert the input measurement to inches. */
+
+          if (units.equals("inch") || units.equals("inches")
+                                          || units.equals("in")) {
+              inches = measurement;
+          }
+          else if (units.equals("foot") || units.equals("feet")
+                                          || units.equals("ft")) {
+              inches = measurement * 12;
+          }
+          else if (units.equals("yard") || units.equals("yards")
+                                           || units.equals("yd")) {
+              inches = measurement * 36;
+          }
+          else if (units.equals("mile") || units.equals("miles")
+                                             || units.equals("mi")) {
+              inches = measurement * 12 * 5280;
+          }
+          else {
+              System.out.println("Sorry, but I don't understand \""
+                                                   + units + "\".");
+              continue;  // back to start of while loop
+          }
+
+          /* Convert measurement in inches to feet, yards, and miles. */
+
+          feet = inches / 12;
+          yards = inches / 36;
+          miles = inches / (12*5280);
+
+          /* Output measurement in terms of each unit of measure. */
+
+          System.out.printf("""
+                    That's equivalent to:
+                    %14.5g inches
+                    %14.5g feet
+                    %14.5g yards
+                    %14.5g miles
+                    """, inches, feet, yards, miles);
+
+          System.out.println();
+
+       } // end while
+
+       System.out.println();
+       System.out.println("OK!  Bye for now.");
+
+    } // end main()
+
+ } // end class LengthConverter
 </code></pre>
-<p>The symbol <code>^C</code> represents where you pressed <span
-class="keystroke">ctrl-c</span>. You may or may not see the word <code>again!</code>
-printed after the <code>^C</code>, depending on where the code was in the loop when it
-received the interrupt signal.</p>
-<p>Fortunately, Rust also provides a way to break out of a loop using code. You
-can place the <code>break</code> keyword within the loop to tell the program when to stop
-executing the loop. Recall that we did this in the guessing game in the
-<a href="ch02-00-NameAndThings.html#quitting-after-a-correct-guess">“Quitting After a Correct Guess”</a><!-- ignore
---> section of Chapter 2 to exit the program when the user won the game by
-guessing the correct number.</p>
-<p>We also used <code>continue</code> in the guessing game, which in a loop tells the program
-to skip over any remaining code in this iteration of the loop and go to the
-next iteration.</p>
-<h4 id="returning-values-from-loops"><a class="header" href="#returning-values-from-loops">Returning Values from Loops</a></h4>
-<p>One of the uses of a <code>loop</code> is to retry an operation you know might fail, such
-as checking whether a thread has completed its job. You might also need to pass
-the result of that operation out of the loop to the rest of your code. To do
-this, you can add the value you want returned after the <code>break</code> expression you
-use to stop the loop; that value will be returned out of the loop so you can
-use it, as shown here:</p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
-    let mut counter = 0;
 
-    let result = loop {
-        counter += 1;
 
-        if counter == 10 {
-            break counter * 2;
-        }
-    };
 
-    println!(&quot;The result is {result}&quot;);
-}</code></pre></pre>
-<p>Before the loop, we declare a variable named <code>counter</code> and initialize it to
-<code>0</code>. Then we declare a variable named <code>result</code> to hold the value returned from
-the loop. On every iteration of the loop, we add <code>1</code> to the <code>counter</code> variable,
-and then check whether the <code>counter</code> is equal to <code>10</code>. When it is, we use the
-<code>break</code> keyword with the value <code>counter * 2</code>. After the loop, we use a
-semicolon to end the statement that assigns the value to <code>result</code>. Finally, we
-print the value in <code>result</code>, which in this case is <code>20</code>.</p>
-<h4 id="loop-labels-to-disambiguate-between-multiple-loops"><a class="header" href="#loop-labels-to-disambiguate-between-multiple-loops">Loop Labels to Disambiguate Between Multiple Loops</a></h4>
-<p>If you have loops within loops, <code>break</code> and <code>continue</code> apply to the innermost
-loop at that point. You can optionally specify a <em>loop label</em> on a loop that
-you can then use with <code>break</code> or <code>continue</code> to specify that those keywords
-apply to the labeled loop instead of the innermost loop. Loop labels must begin
-with a single quote. Here’s an example with two nested loops:</p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
-    let mut count = 0;
-    'counting_up: loop {
-        println!(&quot;count = {count}&quot;);
-        let mut remaining = 10;
+                        <p>(Note that this program uses text blocks for multiline outputs (see <a href="ch02-03-ObjectsAndSubroutines.html">Subsection&nbsp;2.3.4</a>;
+                            text blocks require Java&nbsp;17).
+                            It also uses formatted output with the "g" format specifier.  In this program,
+                            we have no control over how large or how small the numbers might be.  It could easily make
+                            sense for the user to enter very large or very small measurements.  The "g" format will
+                            print a real number in exponential form if it is very large or very small, and in the usual decimal form
+                            otherwise.  Remember that in the format specification <span class="code">%14.5g</span>, the 5 is the total
+                            number of significant digits that are to be printed, so we will always get the same number of
+                            significant digits in the output, no matter what the size of the number.  If we had used an
+                            "f" format specifier such as <span class="code">%14.5f</span>, the output would be in decimal form with
+                            5 digits after the decimal point.  This would print the number 0.000000000745482 as <span class="code">0.00000</span>,
+                            with no <b>significant</b> digits at all!
+                            With the "g" format specifier, the output would be <span class="code">7.4549e-10</span>.)</p>
 
-        loop {
-            println!(&quot;remaining = {remaining}&quot;);
-            if remaining == 9 {
-                break;
-            }
-            if count == 2 {
-                break 'counting_up;
-            }
-            remaining -= 1;
-        }
 
-        count += 1;
-    }
-    println!(&quot;End count = {count}&quot;);
-}</code></pre></pre>
-<p>The outer loop has the label <code>'counting_up</code>, and it will count up from 0 to 2.
-The inner loop without a label counts down from 10 to 9. The first <code>break</code> that
-doesn’t specify a label will exit the inner loop only. The <code>break 'counting_up;</code> statement will exit the outer loop. This code prints:</p>
-<pre><code class="language-console">$ cargo run
-   Compiling loops v0.1.0 (file:///projects/loops)
-    Finished dev [unoptimized + debuginfo] target(s) in 0.58s
-     Running `target/debug/loops`
-count = 0
-remaining = 10
-remaining = 9
-count = 1
-remaining = 10
-remaining = 9
-count = 2
-remaining = 10
-End count = 2
-</code></pre>
-<h4 id="conditional-loops-with-while"><a class="header" href="#conditional-loops-with-while">Conditional Loops with <code>while</code></a></h4>
-<p>A program will often need to evaluate a condition within a loop. While the
-condition is <code>true</code>, the loop runs. When the condition ceases to be <code>true</code>, the
-program calls <code>break</code>, stopping the loop. It’s possible to implement behavior
-like this using a combination of <code>loop</code>, <code>if</code>, <code>else</code>, and <code>break</code>; you could
-try that now in a program, if you’d like. However, this pattern is so common
-that Rust has a built-in language construct for it, called a <code>while</code> loop. In
-Listing 3-3, we use <code>while</code> to loop the program three times, counting down each
-time, and then, after the loop, print a message and exit.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
-    let mut number = 3;
 
-    while number != 0 {
-        println!(&quot;{number}!&quot;);
 
-        number -= 1;
-    }
+                        
+                       <h3 id="TheEmptyStatement"><a class="header" href="#TheEmptyStatement">The Empty Statement</a></h3>
 
-    println!(&quot;LIFTOFF!!!&quot;);
-}</code></pre></pre>
-<p><span class="caption">Listing 3-3: Using a <code>while</code> loop to run code while a
-condition holds true</span></p>
-<p>This construct eliminates a lot of nesting that would be necessary if you used
-<code>loop</code>, <code>if</code>, <code>else</code>, and <code>break</code>, and it’s clearer. While a condition
-evaluates to <code>true</code>, the code runs; otherwise, it exits the loop.</p>
-<h4 id="looping-through-a-collection-with-for"><a class="header" href="#looping-through-a-collection-with-for">Looping Through a Collection with <code>for</code></a></h4>
-<p>You can choose to use the <code>while</code> construct to loop over the elements of a
-collection, such as an array. For example, the loop in Listing 3-4 prints each
-element in the array <code>a</code>.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
-    let a = [10, 20, 30, 40, 50];
-    let mut index = 0;
+                        <p>As a final note in this section, I will mention one more type of statement
+                            in Java: the <span class="newword">empty statement</span>. This is a statement
+                            that consists simply of a semicolon and which tells the computer to
+                            do nothing. The existence of the empty statement makes
+                            the following legal, even though you would not ordinarily see a semicolon after
+                            a&nbsp;}&nbsp;:</p>
 
-    while index &lt; 5 {
-        println!(&quot;the value is: {}&quot;, a[index]);
 
-        index += 1;
-    }
-}</code></pre></pre>
-<p><span class="caption">Listing 3-4: Looping through each element of a collection
-using a <code>while</code> loop</span></p>
-<p>Here, the code counts up through the elements in the array. It starts at index
-<code>0</code>, and then loops until it reaches the final index in the array (that is,
-when <code>index &lt; 5</code> is no longer <code>true</code>). Running this code will print every
-element in the array:</p>
-<pre><code class="language-console">$ cargo run
-   Compiling loops v0.1.0 (file:///projects/loops)
-    Finished dev [unoptimized + debuginfo] target(s) in 0.32s
-     Running `target/debug/loops`
-the value is: 10
-the value is: 20
-the value is: 30
-the value is: 40
-the value is: 50
-</code></pre>
-<p>All five array values appear in the terminal, as expected. Even though <code>index</code>
-will reach a value of <code>5</code> at some point, the loop stops executing before trying
-to fetch a sixth value from the array.</p>
-<p>However, this approach is error prone; we could cause the program to panic if
-the index value or test condition is incorrect. For example, if you changed the
-definition of the <code>a</code> array to have four elements but forgot to update the
-condition to <code>while index &lt; 4</code>, the code would panic. It’s also slow, because
-the compiler adds runtime code to perform the conditional check of whether the
-index is within the bounds of the array on every iteration through the loop.</p>
-<p>As a more concise alternative, you can use a <code>for</code> loop and execute some code
-for each item in a collection. A <code>for</code> loop looks like the code in Listing 3-5.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
-    let a = [10, 20, 30, 40, 50];
+                        <pre><code class="java">if (x &lt; 0) {
+    x = -x;
+};</code></pre>
 
-    for element in a {
-        println!(&quot;the value is: {element}&quot;);
-    }
-}</code></pre></pre>
-<p><span class="caption">Listing 3-5: Looping through each element of a collection
-using a <code>for</code> loop</span></p>
-<p>When we run this code, we’ll see the same output as in Listing 3-4. More
-importantly, we’ve now increased the safety of the code and eliminated the
-chance of bugs that might result from going beyond the end of the array or not
-going far enough and missing some items.</p>
-<p>Using the <code>for</code> loop, you wouldn’t need to remember to change any other code if
-you changed the number of values in the array, as you would with the method
-used in Listing 3-4.</p>
-<p>The safety and conciseness of <code>for</code> loops make them the most commonly used loop
-construct in Rust. Even in situations in which you want to run some code a
-certain number of times, as in the countdown example that used a <code>while</code> loop
-in Listing 3-3, most Rustaceans would use a <code>for</code> loop. The way to do that
-would be to use a <code>Range</code>, provided by the standard library, which generates
-all numbers in sequence starting from one number and ending before another
-number.</p>
-<p>Here’s what the countdown would look like using a <code>for</code> loop and another method
-we’ve not yet talked about, <code>rev</code>, to reverse the range:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
-    for number in (1..4).rev() {
-        println!(&quot;{number}!&quot;);
-    }
-    println!(&quot;LIFTOFF!!!&quot;);
-}</code></pre></pre>
-<p>This code is a bit nicer, isn’t it?</p>
-<h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
-<p>You made it! This was a sizable chapter: you learned about variables, scalar
-and compound data types, functions, comments, <code>if</code> expressions, and loops! To
-practice with the concepts discussed in this chapter, try building programs to
-do the following:</p>
-<ul>
-<li>Convert temperatures between Fahrenheit and Celsius.</li>
-<li>Generate the <em>n</em>th Fibonacci number.</li>
-<li>Print the lyrics to the Christmas carol “The Twelve Days of Christmas,”
-taking advantage of the repetition in the song.</li>
-</ul>
-<p>When you’re ready to move on, we’ll talk about a concept in Rust that <em>doesn’t</em>
-commonly exist in other programming languages: ownership.</p>
 
+                        <p>The semicolon is legal after the }, but the computer considers it to be an
+                            empty statement, not part of the <span class="code">if</span> statement. Occasionally, you might
+                            find yourself using the empty statement when what you mean is, in fact, "do
+                            nothing." For example, the rather contrived <span class="code">if</span> statement</p>
+
+
+                        <pre><code class="java">if ( done )
+   ;  // Empty statement
+else
+   System.out.println( "Not done yet.");</code></pre>
+
+
+                        <p>does nothing when the <span class="ptype">boolean</span> variable <span class="code">done</span> is true,
+                            and prints out "Not done yet" when it is false. You can't just leave out the semicolon
+                            in this example, since Java syntax requires an actual statement between the <span class="code">if</span>
+                            and the <span class="code">else</span>.   I prefer, though, to use an empty block, consisting
+                            of&nbsp;{&nbsp;and&nbsp;} with nothing between, for such cases.</p>
+
+
+                        <p>Occasionally, stray empty statements can cause annoying, hard-to-find errors
+                            in a program. For example, the following program segment prints out "Hello"
+                            just <b>once</b>, not ten times:</p>
+
+
+                        <pre><code class="java">for (i = 0; i &lt; 10; i++);
+    System.out.println("Hello");</code></pre>
+
+
+                        <p>Why? Because the ";" at the end of the first line is a statement, and it is
+                            this empty statement that is executed ten times. The <span class="code">System.out.println</span>
+                            statement is not really inside the <span class="code">for</span> statement at all, so it is
+                            executed just once, after the <span class="code">for</span> loop has completed.  The
+                            <span class="code">for</span> loop just does nothing, ten times!</p>
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
