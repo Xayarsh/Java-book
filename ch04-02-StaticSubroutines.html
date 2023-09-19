@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>References and Borrowing - Introduction to Programming Using Java</title>
+        <title>Static Subroutines - Introduction to Programming Using Java</title>
 
 
         <!-- Custom HTML head -->
@@ -31,6 +31,8 @@
         <!-- Custom theme stylesheets -->
         <link rel="stylesheet" href="ferris.css">
         <link rel="stylesheet" href="theme/2018-edition.css">
+        
+        <link rel="stylesheet" href="code-class.css">
 
     </head>
     <body>
@@ -146,327 +148,595 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h2 id="references-and-borrowing"><a class="header" href="#references-and-borrowing">References and Borrowing</a></h2>
-<p>The issue with the tuple code in Listing 4-5 is that we have to return the
-<code>String</code> to the calling function so we can still use the <code>String</code> after the
-call to <code>calculate_length</code>, because the <code>String</code> was moved into
-<code>calculate_length</code>. Instead, we can provide a reference to the <code>String</code> value.
-A <em>reference</em> is like a pointer in that it’s an address we can follow to access
-the data stored at that address; that data is owned by some other variable.
-Unlike a pointer, a reference is guaranteed to point to a valid value of a
-particular type for the life of that reference.</p>
-<p>Here is how you would define and use a <code>calculate_length</code> function that has a
-reference to an object as a parameter instead of taking ownership of the value:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
-    let s1 = String::from(&quot;hello&quot;);
+                        <h2 id="Static-Subroutines"><a class="header" href="#Static-Subroutines">Static Subroutines</a></h2>
+                        <p>
+                            Every subroutine in Java must be defined inside
+                            some class. This makes Java rather unusual among programming languages, since
+                            most languages allow free-floating, independent subroutines. One purpose of a
+                            class is to group together related subroutines and variables. Perhaps the
+                            designers of Java felt that everything must be related to something. As a less
+                            philosophical motivation, Java's designers wanted to place firm controls on the
+                            ways things are named, since a Java program potentially has access to a huge
+                            number of subroutines created by many different programmers. The fact that those
+                            subroutines are grouped into named classes (and classes are grouped into named
+                            "packages," as we will see later) helps control the confusion that might result from so many
+                            different names.</p>
 
-    let len = calculate_length(&amp;s1);
 
-    println!(&quot;The length of '{}' is {}.&quot;, s1, len);
-}
+                        <p>There is a basic distinction in Java between <span class="newword">static</span> and
+                            <span class="newword">non-static</span> subroutines.  A class definition can contain the
+                            source code for both types of subroutine, but what's done with them when the
+                            program runs is very different.  Static subroutines are easier to understand:
+                            In a running program, a static subroutine is a member of the class itself.
+                            Non-static subroutine definitions, on the other hand, are only there to be used
+                            when objects are created, and the subroutines themselves become members of the
+                            objects.  Non-static subroutines only become relevant when you are working
+                            with objects.  The distinction between static and non-static also applies to variables
+                            and to other things that can occur in class definitions.  This chapter will
+                            deal with static subroutines and static variables almost exclusively. We'll turn to non-static
+                            stuff and to object-oriented programming in the <a href="ch05-00-ObjectsClasses.html">next chapter</a>.</p>
 
-fn calculate_length(s: &amp;String) -&gt; usize {
-    s.len()
-}</code></pre></pre>
-<p>First, notice that all the tuple code in the variable declaration and the
-function return value is gone. Second, note that we pass <code>&amp;s1</code> into
-<code>calculate_length</code> and, in its definition, we take <code>&amp;String</code> rather than
-<code>String</code>. These ampersands represent <em>references</em>, and they allow you to refer
-to some value without taking ownership of it. Figure 4-5 depicts this concept.</p>
-<p><img alt="Three tables: the table for s contains only a pointer to the table
-for s1. The table for s1 contains the stack data for s1 and points to the
-string data on the heap." src="img/trpl04-05.svg" class="center" /></p>
-<p><span class="caption">Figure 4-5: A diagram of <code>&amp;String s</code> pointing at <code>String s1</code></span></p>
-<blockquote>
-<p>Note: The opposite of referencing by using <code>&amp;</code> is <em>dereferencing</em>, which is
-accomplished with the dereference operator, <code>*</code>. We’ll see some uses of the
-dereference operator in Chapter 8 and discuss details of dereferencing in
-Chapter 15.</p>
-</blockquote>
-<p>Let’s take a closer look at the function call here:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
-</span>    let s1 = String::from(&quot;hello&quot;);
 
-    let len = calculate_length(&amp;s1);
-<span class="boring">
-</span><span class="boring">    println!(&quot;The length of '{}' is {}.&quot;, s1, len);
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">fn calculate_length(s: &amp;String) -&gt; usize {
-</span><span class="boring">    s.len()
-</span><span class="boring">}</span></code></pre></pre>
-<p>The <code>&amp;s1</code> syntax lets us create a reference that <em>refers</em> to the value of <code>s1</code>
-but does not own it. Because it does not own it, the value it points to will
-not be dropped when the reference stops being used.</p>
-<p>Likewise, the signature of the function uses <code>&amp;</code> to indicate that the type of
-the parameter <code>s</code> is a reference. Let’s add some explanatory annotations:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
-</span><span class="boring">    let s1 = String::from(&quot;hello&quot;);
-</span><span class="boring">
-</span><span class="boring">    let len = calculate_length(&amp;s1);
-</span><span class="boring">
-</span><span class="boring">    println!(&quot;The length of '{}' is {}.&quot;, s1, len);
-</span><span class="boring">}
-</span><span class="boring">
-</span>fn calculate_length(s: &amp;String) -&gt; usize { // s is a reference to a String
-    s.len()
-} // Here, s goes out of scope. But because it does not have ownership of what
-  // it refers to, it is not dropped.</code></pre></pre>
-<p>The scope in which the variable <code>s</code> is valid is the same as any function
-parameter’s scope, but the value pointed to by the reference is not dropped
-when <code>s</code> stops being used, because <code>s</code> doesn’t have ownership. When functions
-have references as parameters instead of the actual values, we won’t need to
-return the values in order to give back ownership, because we never had
-ownership.</p>
-<p>We call the action of creating a reference <em>borrowing</em>. As in real life, if a
-person owns something, you can borrow it from them. When you’re done, you have
-to give it back. You don’t own it.</p>
-<p>So, what happens if we try to modify something we’re borrowing? Try the code in
-Listing 4-6. Spoiler alert: it doesn’t work!</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore does_not_compile">fn main() {
-    let s = String::from(&quot;hello&quot;);
+                        <p>A subroutine that is in a class or object is often called a <span class="newword">method</span>,
+                            and "method" is the term that most people prefer for
+                            subroutines in Java. I will start using the term "method" occasionally,
+                            but I will continue to prefer the more general term "subroutine"
+                            in this chapter, at least for static subroutines.  However, you should start
+                            thinking of the terms "method" and "subroutine" as being essentially
+                            synonymous as far as Java is concerned.  Other terms that you might see used to
+                            refer to subroutines are "procedures" and "functions."  (I generally use the term
+                            "function" only for subroutines that compute and return a value, but in some programming
+                            languages, it is used to refer to subroutines in general.)</p>
 
-    change(&amp;s);
-}
+                        
+                        <h3 id="Subroutine Definitions"><a class="header" href="#Subroutine Definitions">Subroutine Definitions</a></h3>
 
-fn change(some_string: &amp;String) {
-    some_string.push_str(&quot;, world&quot;);
+                        <p>A subroutine must be defined somewhere.  The definition has to include the name of the subroutine,
+                            enough information to make it possible to call the subroutine, and the code that will be executed
+                            each time the subroutine is called.  A subroutine definition in Java takes the form:</p>
+
+
+                        <pre><code class="java">
+<span class="bnf">modifiers</span>  <span class="bnf">return-type</span>  <span class="bnf">subroutine-name</span>  ( <span class="bnf">parameter-list</span> ) {
+    <span class="bnf">statements</span>
 }</code></pre>
-<p><span class="caption">Listing 4-6: Attempting to modify a borrowed value</span></p>
-<p>Here’s the error:</p>
-<pre><code class="language-console">$ cargo run
-   Compiling ownership v0.1.0 (file:///projects/ownership)
-error[E0596]: cannot borrow `*some_string` as mutable, as it is behind a `&amp;` reference
- --&gt; src/main.rs:8:5
-  |
-7 | fn change(some_string: &amp;String) {
-  |                        ------- help: consider changing this to be a mutable reference: `&amp;mut String`
-8 |     some_string.push_str(&quot;, world&quot;);
-  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `some_string` is a `&amp;` reference, so the data it refers to cannot be borrowed as mutable
 
-For more information about this error, try `rustc --explain E0596`.
-error: could not compile `ownership` due to previous error
-</code></pre>
-<p>Just as variables are immutable by default, so are references. We’re not
-allowed to modify something we have a reference to.</p>
-<h3 id="mutable-references"><a class="header" href="#mutable-references">Mutable References</a></h3>
-<p>We can fix the code from Listing 4-6 to allow us to modify a borrowed value
-with just a few small tweaks that use, instead, a <em>mutable reference</em>:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
-    let mut s = String::from(&quot;hello&quot;);
 
-    change(&amp;mut s);
+                        <p>It will take us a while&mdash;most of the chapter&mdash;to get through what all
+                            this means in detail. Of course, you've already seen examples of subroutines in
+                            previous chapters, such as the <span class="code">main()</span> routine of a program and the
+                            <span class="code">drawFrame()</span> routine of the animation programs in <a href="ch03-09-GUI.html">Section&nbsp;3.9</a>.
+                            So you are familiar with the general format.</p>
+
+
+                        <p>The <span class="bnf">statements</span> between the braces, { and }, in a subroutine definition
+                            make up the <span class="newword">body</span> of the subroutine. These
+                            statements are the inside, or implementation part, of the "black box," as
+                            discussed in the <a href="ch04-01-BlackBoxes.html">previous section</a>. They are the
+                            instructions that the computer executes when the method is called. Subroutines
+                            can contain any of the statements discussed in <a href="ch02-00-NameAndThings.html">Chapter&nbsp;2</a> and
+                            <a href="ch03-00-Control.html">Chapter&nbsp;3</a>.</p>
+
+
+                        <p>The <span class="bnf">modifiers</span> that can occur at the
+                            beginning of a subroutine definition are words that set certain characteristics
+                            of the subroutine, such as whether it is static or not. The modifiers that you've
+                            seen so far are "<span class="code">static</span>" and "<span class="code">public</span>". There are only about a
+                            half-dozen possible modifiers altogether.</p>
+
+
+                        <p>If the subroutine is a function, whose job is to compute some value, then
+                            the <span class="bnf">return-type</span> is used to specify the type of
+                            value that is returned by the function.  It can be a type name such as
+                            <span class="classname">String</span> or <span class="ptype">int</span> or even an array type
+                            such as <span class="atype">double[]</span>.  We'll be looking at functions and
+                            return types in some detail in <a href="ch04-04-ReturnValues.html">Section&nbsp;4.4</a>. If the
+                            subroutine is not a function, then the <span class="bnf">return-type</span> is replaced
+                            by the special value <span class="code">void</span>,
+                            which indicates that no value is returned. The term "void" is meant to indicate
+                            that the return value is empty or non-existent.</p>
+
+
+                        <p>Finally, we come to the <span class="bnf">parameter-list</span> of
+                            the method. Parameters are part of the interface of a subroutine. They
+                            represent information that is passed into the subroutine from outside, to be
+                            used by the subroutine's internal computations. For a concrete example, imagine
+                            a class named <span class="classname">Television</span> that includes a method named
+                            <span class="code">changeChannel()</span>. The immediate question is: What channel should it
+                            change to? A parameter can be used to answer this question. If a channel
+                            number is an integer, the type of the parameter would be <span class="ptype">int</span>, and the
+                            declaration of the <span class="code">changeChannel()</span> method might look like</p>
+
+
+                        <pre><code class="java">public void changeChannel(int channelNum) { ... }</code></pre>
+
+
+                        <p>This declaration specifies that <span class="code">changeChannel()</span> has a parameter
+                            named <span class="code">channelNum</span> of type <span class="ptype">int</span>. However, <span class="code">channelNum</span>
+                            does not yet have any particular value. A value for <span class="code">channelNum</span> is
+                            provided when the subroutine is called; for example:
+                            <span class="code">changeChannel(17);</span>
+                        </p>
+
+
+                        <p>The parameter list in a subroutine can be empty, or it can consist of one or
+                            more parameter declarations of the form <span class="bnf">type</span>&nbsp;<span class="bnf">parameter-name</span>. If there are several
+                            declarations, they are separated by commas. Note that each declaration can name
+                            only one parameter. For example, if you want two parameters of type
+                            <span class="ptype">double</span>, you have to say "<span class="code">double&nbsp;x,&nbsp;double&nbsp;y</span>", rather than
+                            "<span class="code">double&nbsp;x,&nbsp;y</span>".</p>
+
+
+                        <p>Parameters are covered in more detail in the <a href="ch04-03-Parameters.html">next section</a>.</p>
+
+
+                        <p>Here are a few examples of subroutine definitions, leaving out the
+                            statements that define what the subroutines do:</p>
+
+
+                        <pre><code class="java">public static void playGame() {
+    // "public" and "static" are modifiers; "void" is the 
+    // return-type; "playGame" is the subroutine-name; 
+    // the parameter-list is empty.
+    . . .  // Statements that define what playGame does go here.
 }
 
-fn change(some_string: &amp;mut String) {
-    some_string.push_str(&quot;, world&quot;);
-}</code></pre></pre>
-<p>First we change <code>s</code> to be <code>mut</code>. Then we create a mutable reference with <code>&amp;mut s</code> where we call the <code>change</code> function, and update the function signature to
-accept a mutable reference with <code>some_string: &amp;mut String</code>. This makes it very
-clear that the <code>change</code> function will mutate the value it borrows.</p>
-<p>Mutable references have one big restriction: if you have a mutable reference to
-a value, you can have no other references to that value. This code that
-attempts to create two mutable references to <code>s</code> will fail:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore does_not_compile"><span class="boring">fn main() {
-</span>    let mut s = String::from(&quot;hello&quot;);
-
-    let r1 = &amp;mut s;
-    let r2 = &amp;mut s;
-
-    println!(&quot;{}, {}&quot;, r1, r2);
-<span class="boring">}</span></code></pre>
-<p>Here’s the error:</p>
-<pre><code class="language-console">$ cargo run
-   Compiling ownership v0.1.0 (file:///projects/ownership)
-error[E0499]: cannot borrow `s` as mutable more than once at a time
- --&gt; src/main.rs:5:14
-  |
-4 |     let r1 = &amp;mut s;
-  |              ------ first mutable borrow occurs here
-5 |     let r2 = &amp;mut s;
-  |              ^^^^^^ second mutable borrow occurs here
-6 |
-7 |     println!(&quot;{}, {}&quot;, r1, r2);
-  |                        -- first borrow later used here
-
-For more information about this error, try `rustc --explain E0499`.
-error: could not compile `ownership` due to previous error
-</code></pre>
-<p>This error says that this code is invalid because we cannot borrow <code>s</code> as
-mutable more than once at a time. The first mutable borrow is in <code>r1</code> and must
-last until it’s used in the <code>println!</code>, but between the creation of that
-mutable reference and its usage, we tried to create another mutable reference
-in <code>r2</code> that borrows the same data as <code>r1</code>.</p>
-<p>The restriction preventing multiple mutable references to the same data at the
-same time allows for mutation but in a very controlled fashion. It’s something
-that new Rustaceans struggle with because most languages let you mutate
-whenever you’d like. The benefit of having this restriction is that Rust can
-prevent data races at compile time. A <em>data race</em> is similar to a race
-condition and happens when these three behaviors occur:</p>
-<ul>
-<li>Two or more pointers access the same data at the same time.</li>
-<li>At least one of the pointers is being used to write to the data.</li>
-<li>There’s no mechanism being used to synchronize access to the data.</li>
-</ul>
-<p>Data races cause undefined behavior and can be difficult to diagnose and fix
-when you’re trying to track them down at runtime; Rust prevents this problem by
-refusing to compile code with data races!</p>
-<p>As always, we can use curly brackets to create a new scope, allowing for
-multiple mutable references, just not <em>simultaneous</em> ones:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
-</span>    let mut s = String::from(&quot;hello&quot;);
-
-    {
-        let r1 = &amp;mut s;
-    } // r1 goes out of scope here, so we can make a new reference with no problems.
-
-    let r2 = &amp;mut s;
-<span class="boring">}</span></code></pre></pre>
-<p>Rust enforces a similar rule for combining mutable and immutable references.
-This code results in an error:</p>
-<pre><code class="language-rust ignore does_not_compile"><span class="boring">fn main() {
-</span>    let mut s = String::from(&quot;hello&quot;);
-
-    let r1 = &amp;s; // no problem
-    let r2 = &amp;s; // no problem
-    let r3 = &amp;mut s; // BIG PROBLEM
-
-    println!(&quot;{}, {}, and {}&quot;, r1, r2, r3);
-<span class="boring">}</span></code></pre>
-<p>Here’s the error:</p>
-<pre><code class="language-console">$ cargo run
-   Compiling ownership v0.1.0 (file:///projects/ownership)
-error[E0502]: cannot borrow `s` as mutable because it is also borrowed as immutable
- --&gt; src/main.rs:6:14
-  |
-4 |     let r1 = &amp;s; // no problem
-  |              -- immutable borrow occurs here
-5 |     let r2 = &amp;s; // no problem
-6 |     let r3 = &amp;mut s; // BIG PROBLEM
-  |              ^^^^^^ mutable borrow occurs here
-7 |
-8 |     println!(&quot;{}, {}, and {}&quot;, r1, r2, r3);
-  |                                -- immutable borrow later used here
-
-For more information about this error, try `rustc --explain E0502`.
-error: could not compile `ownership` due to previous error
-</code></pre>
-<p>Whew! We <em>also</em> cannot have a mutable reference while we have an immutable one
-to the same value.</p>
-<p>Users of an immutable reference don’t expect the value to suddenly change out
-from under them! However, multiple immutable references are allowed because no
-one who is just reading the data has the ability to affect anyone else’s
-reading of the data.</p>
-<p>Note that a reference’s scope starts from where it is introduced and continues
-through the last time that reference is used. For instance, this code will
-compile because the last usage of the immutable references, the <code>println!</code>,
-occurs before the mutable reference is introduced:</p>
-<pre><pre class="playground"><code class="language-rust edition2021"><span class="boring">fn main() {
-</span>    let mut s = String::from(&quot;hello&quot;);
-
-    let r1 = &amp;s; // no problem
-    let r2 = &amp;s; // no problem
-    println!(&quot;{} and {}&quot;, r1, r2);
-    // variables r1 and r2 will not be used after this point
-
-    let r3 = &amp;mut s; // no problem
-    println!(&quot;{}&quot;, r3);
-<span class="boring">}</span></code></pre></pre>
-<p>The scopes of the immutable references <code>r1</code> and <code>r2</code> end after the <code>println!</code>
-where they are last used, which is before the mutable reference <code>r3</code> is
-created. These scopes don’t overlap, so this code is allowed: the compiler can
-tell that the reference is no longer being used at a point before the end of
-the scope.</p>
-<p>Even though borrowing errors may be frustrating at times, remember that it’s
-the Rust compiler pointing out a potential bug early (at compile time rather
-than at runtime) and showing you exactly where the problem is. Then you don’t
-have to track down why your data isn’t what you thought it was.</p>
-<h3 id="dangling-references"><a class="header" href="#dangling-references">Dangling References</a></h3>
-<p>In languages with pointers, it’s easy to erroneously create a <em>dangling
-pointer</em>—a pointer that references a location in memory that may have been
-given to someone else—by freeing some memory while preserving a pointer to that
-memory. In Rust, by contrast, the compiler guarantees that references will
-never be dangling references: if you have a reference to some data, the
-compiler will ensure that the data will not go out of scope before the
-reference to the data does.</p>
-<p>Let’s try to create a dangling reference to see how Rust prevents them with a
-compile-time error:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore does_not_compile">fn main() {
-    let reference_to_nothing = dangle();
+int getNextN(int N) {
+    // There are no modifiers; "int" is the return-type;
+    // "getNextN" is the subroutine-name; the parameter-list 
+    // includes one parameter whose name is "N" and whose 
+    // type is "int".
+    . . .  // Statements that define what getNextN does go here.
 }
 
-fn dangle() -&gt; &amp;String {
-    let s = String::from(&quot;hello&quot;);
-
-    &amp;s
+static boolean lessThan(double x, double y) {
+    // "static" is a modifier; "boolean" is the
+    // return-type; "lessThan" is the subroutine-name; 
+    // the parameter-list includes two parameters whose names are 
+    // "x" and "y", and the type of each of these parameters 
+    // is "double".
+    . . .  // Statements that define what lessThan does go here.
 }</code></pre>
-<p>Here’s the error:</p>
-<pre><code class="language-console">$ cargo run
-   Compiling ownership v0.1.0 (file:///projects/ownership)
-error[E0106]: missing lifetime specifier
- --&gt; src/main.rs:5:16
-  |
-5 | fn dangle() -&gt; &amp;String {
-  |                ^ expected named lifetime parameter
-  |
-  = help: this function's return type contains a borrowed value, but there is no value for it to be borrowed from
-help: consider using the `'static` lifetime
-  |
-5 | fn dangle() -&gt; &amp;'static String {
-  |                 +++++++
 
-For more information about this error, try `rustc --explain E0106`.
-error: could not compile `ownership` due to previous error
-</code></pre>
-<p>This error message refers to a feature we haven’t covered yet: lifetimes. We’ll
-discuss lifetimes in detail in Chapter 10. But, if you disregard the parts
-about lifetimes, the message does contain the key to why this code is a problem:</p>
-<pre><code class="language-text">this function's return type contains a borrowed value, but there is no value
-for it to be borrowed from
-</code></pre>
-<p>Let’s take a closer look at exactly what’s happening at each stage of our
-<code>dangle</code> code:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore does_not_compile"><span class="boring">fn main() {
-</span><span class="boring">    let reference_to_nothing = dangle();
-</span><span class="boring">}
-</span><span class="boring">
-</span>fn dangle() -&gt; &amp;String { // dangle returns a reference to a String
 
-    let s = String::from(&quot;hello&quot;); // s is a new String
+                        <p>In the second example given here, <span class="code">getNextN</span> is a non-static method,
+                            since its definition does not include the modifier "<span class="code">static</span>"&mdash;and so
+                            it's not an example that we should be looking at in this chapter! The other
+                            modifier shown in the examples is "<span class="code">public</span>". This modifier indicates
+                            that the method can be called from anywhere in a program, even from outside the
+                            class where the method is defined. There is another modifier,
+                            "<span class="code">private</span>", which indicates that the method can be called
+                            <b>only</b> from inside the same class. The modifiers <span class="code">public</span>
+                            and <span class="code">private</span> are called <span class="newword">access specifiers</span>.
+                            If no access specifier is given for a method, then by default, that method can
+                            be called from anywhere in the package that contains the class, but not from
+                            outside that package. (You will learn more about packages later in this
+                            chapter, in <a href="ch04-06-APIPackagesModulesJavadoc.html">Section&nbsp;4.6</a>.)  There is one other access
+                            modifier, <span class="code">protected</span>, which will only become relevant when we turn to
+                            object-oriented programming in <a href="ch05-00-ObjectsClasses.html">Chapter&nbsp;5</a>.</p>
 
-    &amp;s // we return a reference to the String, s
-} // Here, s goes out of scope, and is dropped. Its memory goes away.
-  // Danger!</code></pre>
-<p>Because <code>s</code> is created inside <code>dangle</code>, when the code of <code>dangle</code> is finished,
-<code>s</code> will be deallocated. But we tried to return a reference to it. That means
-this reference would be pointing to an invalid <code>String</code>. That’s no good! Rust
-won’t let us do this.</p>
-<p>The solution here is to return the <code>String</code> directly:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
-</span><span class="boring">    let string = no_dangle();
-</span><span class="boring">}
-</span><span class="boring">
-</span>fn no_dangle() -&gt; String {
-    let s = String::from(&quot;hello&quot;);
 
-    s
-}</code></pre></pre>
-<p>This works without any problems. Ownership is moved out, and nothing is
-deallocated.</p>
-<h3 id="the-rules-of-references"><a class="header" href="#the-rules-of-references">The Rules of References</a></h3>
-<p>Let’s recap what we’ve discussed about references:</p>
-<ul>
-<li>At any given time, you can have <em>either</em> one mutable reference <em>or</em> any
-number of immutable references.</li>
-<li>References must always be valid.</li>
-</ul>
-<p>Next, we’ll look at a different kind of reference: slices.</p>
+                        <p>Note, by the way, that the <span class="code">main()</span> routine of a program follows the
+                            usual syntax rules for a subroutine. In</p>
+
+
+                        <pre><code class="java">public static void main(String[] args) { ... }</code></pre>
+
+
+                        <p>the modifiers are <span class="code">public</span> and <span class="code">static</span>, the return type is
+                            <span class="code">void</span>, the subroutine name is <span class="code">main</span>, and the parameter list is
+                            "<span class="code">String[]&nbsp;args</span>".  In this case, the type for the parameter is
+                            the array type <span class="atype">String[]</span>.</p>
+
+
+                        <p>You've already had some experience with filling in the implementation of a
+                            subroutine. In this chapter, you'll learn all about writing your own complete
+                            subroutine definitions, including the interface part.</p>
+
+                        
+                        <h3 id="Calling Subroutines"><a class="header" href="#Calling Subroutines">Calling Subroutines</a></h3>
+
+
+                        <p>When you define a subroutine, all you are doing is telling the computer that
+                            the subroutine exists and what it does. The subroutine doesn't actually get
+                            executed until it is called. (This is true even for the <span class="code">main()</span> routine
+                            in a class&mdash;even though <b>you</b> don't call it, it is called by
+                            the system when the system runs your program.) For example, the
+                            <span class="code">playGame()</span> method given as an example above could be called using the following
+                            subroutine call statement:</p>
+
+
+                        <pre><code class="java">playGame();</code></pre>
+
+
+                        <p>This statement could occur anywhere in the same class that includes the
+                            definition of <span class="code">playGame()</span>, whether in a <span class="code">main()</span> method or in
+                            some other subroutine. Since <span class="code">playGame()</span> is a <span class="code">public</span> method,
+                            it can also be called from other classes, but in that case, you have to tell
+                            the computer which class it comes from.  Since <span class="code">playGame()</span> is a <span class="code">static</span> method,
+                            its full name includes the name of the class in which it is defined.  Let's say, for example, that
+                            <span class="code">playGame()</span> is defined in a class named <span class="code">Poker</span>. Then to call
+                            <span class="code">playGame()</span> from <b>outside</b> the <span class="code">Poker</span> class, you would
+                            have to say</p>
+
+
+                        <pre><code class="java">Poker.playGame();</code></pre>
+
+
+                        <p>The use of the class name here tells the computer which class to look in to
+                            find the method.  It also lets you distinguish between <span class="code">Poker.playGame()</span>
+                            and other potential <span class="code">playGame()</span> methods defined in other classes, such
+                            as <span class="code">Roulette.playGame()</span> or <span class="code">Blackjack.playGame()</span>.</p>
+
+
+                        <p>More generally, a <span class="newword">subroutine call statement</span> for a <span class="code">static</span>
+                            subroutine takes the form</p>
+
+
+                        <pre><code class="java">
+<span class="bnf">subroutine-name</span>(<span class="bnf">parameters</span>);</code></pre>
+
+
+                        <p>if the subroutine that is being called is in the same class, or</p>
+
+
+                        <pre><code class="java">
+<span class="bnf">class-name</span>.<span class="bnf">subroutine-name</span>(<span class="bnf">parameters</span>);</code></pre>
+
+
+                        <p>if the subroutine is defined elsewhere, in a different
+                            class. (Non-static methods belong to objects rather than classes, and they are
+                            called using objects instead of class names. More on that later.) Note
+                            that the parameter list can be empty, as in the <span class="code">playGame()</span> example,
+                            but the parentheses must be there even if there is nothing between them.
+                            The number of parameters that you provide when you call a subroutine must
+                            match the number specified in the parameter list in the subroutine definition,
+                            and the types of the parameters in the call statement must match the types
+                            in the subroutine definition.</p>
+
+                        <h3 id="Subroutines in Programs"><a class="header" href="#Subroutines in Programs">Subroutines in Programs</a></h3>
+
+                        <p>It's time to give an example of what a complete program looks like, when it
+                            includes other subroutines in addition to the <span class="code">main()</span> routine. Let's
+                            write a program that plays a guessing game with the user. The computer will
+                            choose a random number between 1 and 100, and the user will try to guess it.
+                            The computer tells the user whether the guess is high or low or correct. If the
+                            user gets the number after six guesses or fewer, the user wins the game. After
+                            each game, the user has the option of continuing with another game.</p>
+
+
+                        <p>Since playing one game can be thought of as a single, coherent task, it
+                            makes sense to write a subroutine that will play one guessing game with the
+                            user. The <span class="code">main()</span> routine will use a loop to call the
+                            <span class="code">playGame()</span> subroutine over and over, as many times as the user wants
+                            to play. We approach the problem of designing the <span class="code">playGame()</span>
+                            subroutine the same way we write a <span class="code">main()</span> routine: Start with an
+                            outline of the algorithm and apply stepwise refinement. Here is a short
+                            pseudocode algorithm for a guessing game routine:</p>
+
+
+                        <pre><code class="plain-text">Pick a random number
+while the game is not over:
+    Get the user's guess
+    Tell the user whether the guess is high, low, or correct.</code></pre>
+
+
+                        <p>The test for whether the game is over is complicated, since the game ends if
+                            either the user makes a correct guess or the number of guesses is six. As in
+                            many cases, the easiest thing to do is to use a "<span class="code">while&nbsp;(true)</span>" loop
+                            and use <span class="code">break</span> to end the loop whenever we find a reason to do so.
+                            Also, if we are going to end the game after six guesses, we'll have to keep
+                            track of the number of guesses that the user has made. Filling out the
+                            algorithm gives:</p>
+
+
+                        <pre><code class="plain-text">Let computersNumber be a random number between 1 and 100
+Let guessCount = 0
+while (true):
+    Get the user's guess
+    Count the guess by adding 1 to guess count
+    if the user's guess equals computersNumber:
+        Tell the user he won
+        break out of the loop
+    if the number of guesses is 6:
+        Tell the user he lost
+        break out of the loop
+    if the user's guess is less than computersNumber:
+        Tell the user the guess was low
+    else if the user's guess is higher than computersNumber:
+        Tell the user the guess was high</code></pre>
+
+
+                        <p>With variable declarations added and translated into Java, this becomes the
+                            definition of the <span class="code">playGame()</span> routine. A random integer between 1 and
+                            100 can be computed as <span class="code">(int)(100&nbsp;* Math.random())&nbsp;+&nbsp;1</span>. I've cleaned up
+                            the interaction with the user to make it flow better.</p>
+
+
+                        <pre><code class="java">static void playGame() {
+    int computersNumber; // A random number picked by the computer.
+    int usersGuess;      // A number entered by user as a guess.
+    int guessCount;      // Number of guesses the user has made.
+    computersNumber = (int)(100 * Math.random()) + 1;
+             // The value assigned to computersNumber is a randomly
+             //    chosen integer between 1 and 100, inclusive.
+    guessCount = 0;
+    System.out.println();
+    System.out.print("What is your first guess? ");
+    while (true) {
+       usersGuess = TextIO.getInt();  // Get the user's guess.
+       guessCount++;
+       if (usersGuess == computersNumber) {
+          System.out.println("You got it in " + guessCount
+                  + " guesses!  My number was " + computersNumber);
+          break;  // The game is over; the user has won.
+       }
+       if (guessCount == 6) {
+          System.out.println("You didn't get the number in 6 guesses.");
+          System.out.println("You lose.  My number was " + computersNumber);
+          break;  // The game is over; the user has lost.
+       }
+       // If we get to this point, the game continues.
+       // Tell the user if the guess was too high or too low.
+       if (usersGuess &lt; computersNumber)
+          System.out.print("That's too low.  Try again: ");
+       else if (usersGuess &gt; computersNumber)
+          System.out.print("That's too high.  Try again: ");
+    }
+    System.out.println();
+} // end of playGame()</code></pre>
+
+
+                        <p>Now, where exactly should you put this? It should be part of the same class
+                            as the <span class="code">main()</span> routine, but <b>not</b> inside the main routine. It is not
+                            legal to have one subroutine physically nested inside another. The
+                            <span class="code">main()</span> routine will <b>call</b> <span class="code">playGame()</span>; it will
+                            <b>not</b> contain the definition of <span class="code">playGame</span>.
+                            You can put the definition of <span class="code">playGame()</span> either before
+                            or after the <span class="code">main()</span> routine. Java is not very picky about having the
+                            subroutine definitions in a class in any particular order.</p>
+
+
+                        <p>It's pretty easy to write the main routine. You've done things like this
+                            before. Here's what the complete program looks like (except that a serious
+                            program needs more comments than I've included here).</p>
+
+
+                        <pre><code class="java">import textio.TextIO;
+
+public class GuessingGame {
+
+   public static void main(String[] args) {
+      System.out.println("Let's play a game.  I'll pick a number between");
+      System.out.println("1 and 100, and you try to guess it.");
+      boolean playAgain;
+      do {
+         playGame();  // call subroutine to play one game
+         System.out.print("Would you like to play again? ");
+         playAgain = TextIO.getlnBoolean();
+      } while (playAgain);
+      System.out.println("Thanks for playing.  Goodbye.");
+   } // end of main()            
+   
+   static void playGame() {
+       int computersNumber; // A random number picked by the computer.
+       int usersGuess;      // A number entered by user as a guess.
+       int guessCount;      // Number of guesses the user has made.
+       computersNumber = (int)(100 * Math.random()) + 1;
+                // The value assigned to computersNumber is a randomly
+                //    chosen integer between 1 and 100, inclusive.
+       guessCount = 0;
+       System.out.println();
+       System.out.print("What is your first guess? ");
+       while (true) {
+          usersGuess = TextIO.getInt();  // Get the user's guess.
+          guessCount++;
+          if (usersGuess == computersNumber) {
+             System.out.println("You got it in " + guessCount
+                     + " guesses!  My number was " + computersNumber);
+             break;  // The game is over; the user has won.
+          }
+          if (guessCount == 6) {
+             System.out.println("You didn't get the number in 6 guesses.");
+             System.out.println("You lose.  My number was " + computersNumber);
+             break;  // The game is over; the user has lost.
+          }
+          // If we get to this point, the game continues.
+          // Tell the user if the guess was too high or too low.
+          if (usersGuess &lt; computersNumber)
+             System.out.print("That's too low.  Try again: ");
+          else if (usersGuess &gt; computersNumber)
+             System.out.print("That's too high.  Try again: ");
+       }
+       System.out.println();
+   } // end of playGame()
+               
+} // end of class GuessingGame</code></pre>
+
+
+                        <p>Take some time to read the program carefully and figure out how it works.
+                            And try to convince yourself that even in this relatively simple case, breaking
+                            up the program into two methods makes the program easier to understand and
+                            probably made it easier to write each piece.</p>
+                        
+                        <h3 id="Member Variables"><a class="header" href="#Member Variables">Member Variables</a></h3>
+
+                        <p>A class can include other things besides subroutines. In particular, it can
+                            also include variable declarations. Of course, you can declare variables
+                            <b>inside</b> subroutines.  Those are called <span class="newword">local variables.</span>
+                            However, you can also have variables that are
+                            not part of any subroutine. To distinguish such variables from local variables,
+                            we call them <span class="newword">member variables</span>, since they are
+                            members of a class.  Another term for them is <span class="newword">global variable</span>.</p>
+
+
+                        <p>Just as with subroutines, member variables can be either static or
+                            non-static. In this chapter, we'll stick to static variables. A static member
+                            variable belongs to the class as a whole, and it exists as long as the class
+                            exists. Memory is allocated for the variable when the class is first loaded by
+                            the Java interpreter. Any assignment statement that assigns a value to the
+                            variable changes the content of that memory, no matter where that assignment
+                            statement is located in the program. Any time the variable is used in an
+                            expression, the value is fetched from that same memory, no matter where the
+                            expression is located in the program. This means that the value of a static
+                            member variable can be set in one subroutine and used in another subroutine.
+                            Static member variables are "shared" by all the static subroutines in the
+                            class. A local variable in a subroutine, on the other hand, exists only while
+                            that subroutine is being executed, and is completely inaccessible from outside
+                            that one subroutine.</p>
+
+
+                        <p>The declaration of a member variable looks just like the declaration of a
+                            local variable except for two things: The member variable is declared outside
+                            any subroutine (although it still has to be inside a class), and the
+                            declaration can be marked with modifiers such as <span class="code">static</span>,
+                            <span class="code">public</span>, and <span class="code">private</span>. Since we are only working with static
+                            member variables for now, every declaration of a member variable in this
+                            chapter will include the modifier <span class="code">static</span>.  They might also
+                            be marked as <span class="code">public</span> or <span class="code">private</span>.  For example:</p>
+
+
+                        <pre><code class="java">static String usersName;
+public static int numberOfPlayers;
+private static double velocity, time;</code></pre>
+
+
+                        <p>A static member variable that is not declared to be <span class="code">private</span> can be
+                            accessed from outside the class where it is defined, as well as inside. When it
+                            is used in some other class, it must be referred to with a compound identifier
+                            of the form <span class="bnf">class-name</span>.<span class="bnf">variable-name</span>. For example, the <span class="classname">System</span> class
+                            contains the public static member variable named <span class="code">out</span>, and you use this
+                            variable in your own classes by referring to <span class="code">System.out</span>.   Similarly,
+                            <span class="code">Math.PI</span> is a public static member variable in the <span class="classname">Math</span> class.  If
+                            <span class="code">numberOfPlayers</span> is a public static member variable in a class named
+                            <span class="code">Poker</span>, then code in the <span class="code">Poker</span> class would refer to it
+                            simply as <span class="code">numberOfPlayers</span>, while code in another class would refer to
+                            it as <span class="code">Poker.numberOfPlayers</span>.</p>
+
+
+                        <p>As an example, let's add a couple of static member variables to the
+                            <span class="code">GuessingGame</span> class that we wrote earlier in this section.
+                            We add a variable named <span class="code">gamesPlayed</span> to keep track of how
+                            many games the user has played and another variable named <span class="code">gamesWon</span>
+                            to keep track of the number of games that the user has won.  The variables
+                            are declared as static member variables:</p>
+
+
+                        <pre><code class="java">static int gamesPlayed;
+static int gamesWon;</code></pre>
+
+
+                        <p>In the <span class="code">playGame()</span> routine, we always add 1 to <span class="code">gamesPlayed</span>,
+                            and we add 1 to  <span class="code">gamesWon</span> if the user wins the game.
+                            At the end of the <span class="code">main()</span> routine, we print out the values of both variables.
+                            It would be impossible to
+                            do the same thing with local variables, since both subroutines need to access the variables,
+                            and local variables exist in only one subroutine.  Furthermore, global variables keep
+                            their values between one subroutine call and the next. Local variables do not; a local
+                            variable gets a new value each time that the subroutine that contains it is called.</p>
+
+
+                        <p>When you declare a local variable in a subroutine, you have to assign a
+                            value to that variable before you can do anything with it. Member variables, on
+                            the other hand are automatically initialized with a default value.  The default
+                            values are the same as those that are used when initializing the elements of an array:
+                            For numeric variables, the default value is zero; for <span class="ptype">boolean</span> variables, the
+                            default is <span class="code">false</span>; for <span class="ptype">char</span> variables, it's the
+                            character that has Unicode code number zero; and for objects, such as
+                            <span class="classname">Strings</span>, the default initial value is the special value
+                            <span class="code">null</span>.</p>
+
+
+                        <p>Since they are of type <span class="ptype">int</span>, the static member variables <span class="code">gamesPlayed</span>
+                            and <span class="code">gamesWon</span> automatically get zero as their initial value. This
+                            happens to be the correct initial value for a variable that is being used as a
+                            counter. You can, of course, assign a value to a variable at the
+                            beginning of the <span class="code">main()</span> routine if you are not satisfied with the
+                            default initial value, or if you want to make the initial value more explicit.</p>
+
+
+                        <p>Here's the revised version of <span class="code">GuessingGame.java</span>.
+                            The changes from the above version are shown in red:</p>
+
+
+                        <pre><code class="java">import textio.TextIO;
+
+public class GuessingGame2 {
+ 
+    <span class="newcode">static int gamesPlayed;   // The number of games played.
+    static int gamesWon;      // The number of games won.</span>
+ 
+    public static void main(String[] args) {
+       <span class="newcode">gamesPlayed = 0;
+       gamesWon = 0;  // This is actually redundant, since 0 is 
+                      //                 the default initial value.</span>
+       System.out.println("Let's play a game.  I'll pick a number between");
+       System.out.println("1 and 100, and you try to guess it.");
+       boolean playAgain;
+       do {
+          playGame();  // call subroutine to play one game
+          System.out.print("Would you like to play again? ");
+          playAgain = TextIO.getlnBoolean();
+       } while (playAgain);
+       <span class="newcode">System.out.println();
+       System.out.println("You played " + gamesPlayed + " games,");
+       System.out.println("and you won " + gamesWon + " of those games.");</span>
+       System.out.println("Thanks for playing.  Goodbye.");
+    } // end of main()            
+    
+    static void playGame() {
+        int computersNumber; // A random number picked by the computer.
+        int usersGuess;      // A number entered by user as a guess.
+        int guessCount;      // Number of guesses the user has made.
+        <span class="newcode">gamesPlayed++;  // Count this game.</span>
+        computersNumber = (int)(100 * Math.random()) + 1;
+                 // The value assigned to computersNumber is a randomly
+                 //    chosen integer between 1 and 100, inclusive.
+        guessCount = 0;
+        System.out.println();
+        System.out.print("What is your first guess? ");
+        while (true) {
+           usersGuess = TextIO.getInt();  // Get the user's guess.
+           guessCount++;
+           if (usersGuess == computersNumber) {
+              System.out.println("You got it in " + guessCount
+                      + " guesses!  My number was " + computersNumber);
+              <span class="newcode">gamesWon++;  // Count this win.</span>
+              break;       // The game is over; the user has won.
+           }
+           if (guessCount == 6) {
+              System.out.println("You didn't get the number in 6 guesses.");
+              System.out.println("You lose.  My number was " + computersNumber);
+              break;  // The game is over; the user has lost.
+           }
+           // If we get to this point, the game continues.
+           // Tell the user if the guess was too high or too low.
+           if (usersGuess &lt; computersNumber)
+              System.out.print("That's too low.  Try again: ");
+           else if (usersGuess &gt; computersNumber)
+              System.out.print("That's too high.  Try again: ");
+        }
+        System.out.println();
+    } // end of playGame()
+                
+} // end of class GuessingGame2</code></pre>
+
+
+                        
+
+                        <blockquote>
+                        <p>I didn't mark the static subroutines
+                            or variables as being <span class="code">public</span> or <span class="code">private</span>.  Recall that global variables and subroutines
+                            with no access modifier
+                            can be used anywhere in the same package as the class where they are defined, but not in
+                            other packages. Classes that
+                            don't declare a package are in the default package.  So, any class in the default package
+                            would have access to <span class="code">gamesPlayed</span>, <span class="code">gamesWon</span>, and
+                            <span class="code">playGame()</span>&mdash;and that includes most of the classes in this book.  In fact,
+                            it is considered to be good practice
+                            to make member variables and subroutines <span class="code">private</span>, unless
+                            there is a reason for doing otherwise.</p>
+                        </blockquote>
 
                     </main>
 

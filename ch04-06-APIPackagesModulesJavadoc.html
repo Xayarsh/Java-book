@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>The Slice Type - Introduction to Programming Using Java</title>
+        <title>API, Packages, Modules and Javadoc - Introduction to Programming Using Java</title>
 
 
         <!-- Custom HTML head -->
@@ -31,6 +31,8 @@
         <!-- Custom theme stylesheets -->
         <link rel="stylesheet" href="ferris.css">
         <link rel="stylesheet" href="theme/2018-edition.css">
+
+        <link rel="stylesheet" href="code-class.css">
 
     </head>
     <body>
@@ -146,408 +148,591 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h2 id="the-slice-type"><a class="header" href="#the-slice-type">The Slice Type</a></h2>
-<p><em>Slices</em> let you reference a contiguous sequence of elements in a collection
-rather than the whole collection. A slice is a kind of reference, so it does
-not have ownership.</p>
-<p>Here’s a small programming problem: write a function that takes a string of
-words separated by spaces and returns the first word it finds in that string.
-If the function doesn’t find a space in the string, the whole string must be
-one word, so the entire string should be returned.</p>
-<p>Let’s work through how we’d write the signature of this function without using
-slices, to understand the problem that slices will solve:</p>
-<pre><code class="language-rust ignore">fn first_word(s: &amp;String) -&gt; ?</code></pre>
-<p>The <code>first_word</code> function has a <code>&amp;String</code> as a parameter. We don’t want
-ownership, so this is fine. But what should we return? We don’t really have a
-way to talk about <em>part</em> of a string. However, we could return the index of the
-end of the word, indicated by a space. Let’s try that, as shown in Listing 4-7.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn first_word(s: &amp;String) -&gt; usize {
-    let bytes = s.as_bytes();
+                        <h2 id="API, Packages, Modules and Javadoc"><a class="header" href="#API, Packages, Modules and Javadoc">API, Packages, Modules and Javadoc</a></h2>
+                        <p>
+                            As computers and their user interfaces have become
+                            easier to use, they have also become more complex for programmers to deal with.
+                            You can write programs for a simple console-style user interface using just a
+                            few subroutines that write output to the console and read the user's typed
+                            replies. A modern graphical user interface, with windows, buttons, scroll bars,
+                            menus, text-input boxes, and so on, might make things easier for the user, but
+                            it forces the programmer to cope with a hugely expanded array of possibilities.
+                            The programmer sees this increased complexity in the form of great numbers of
+                            subroutines that are provided for managing the user interface, as well as for
+                            other purposes.</p>
 
-    for (i, &amp;item) in bytes.iter().enumerate() {
-        if item == b' ' {
-            return i;
-        }
-    }
 
-    s.len()
-}
-<span class="boring">
-</span><span class="boring">fn main() {}</span></code></pre></pre>
-<p><span class="caption">Listing 4-7: The <code>first_word</code> function that returns a
-byte index value into the <code>String</code> parameter</span></p>
-<p>Because we need to go through the <code>String</code> element by element and check whether
-a value is a space, we’ll convert our <code>String</code> to an array of bytes using the
-<code>as_bytes</code> method.</p>
-<pre><code class="language-rust ignore"><span class="boring">fn first_word(s: &amp;String) -&gt; usize {
-</span>    let bytes = s.as_bytes();
-<span class="boring">
-</span><span class="boring">    for (i, &amp;item) in bytes.iter().enumerate() {
-</span><span class="boring">        if item == b' ' {
-</span><span class="boring">            return i;
-</span><span class="boring">        }
-</span><span class="boring">    }
-</span><span class="boring">
-</span><span class="boring">    s.len()
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">fn main() {}</span></code></pre>
-<p>Next, we create an iterator over the array of bytes using the <code>iter</code> method:</p>
-<pre><code class="language-rust ignore"><span class="boring">fn first_word(s: &amp;String) -&gt; usize {
-</span><span class="boring">    let bytes = s.as_bytes();
-</span><span class="boring">
-</span>    for (i, &amp;item) in bytes.iter().enumerate() {
-<span class="boring">        if item == b' ' {
-</span><span class="boring">            return i;
-</span><span class="boring">        }
-</span><span class="boring">    }
-</span><span class="boring">
-</span><span class="boring">    s.len()
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">fn main() {}</span></code></pre>
-<p>We’ll discuss iterators in more detail in <a href="ch13-02-FancierGraphics.html">Chapter 13</a><!-- ignore -->.
-For now, know that <code>iter</code> is a method that returns each element in a collection
-and that <code>enumerate</code> wraps the result of <code>iter</code> and returns each element as
-part of a tuple instead. The first element of the tuple returned from
-<code>enumerate</code> is the index, and the second element is a reference to the element.
-This is a bit more convenient than calculating the index ourselves.</p>
-<p>Because the <code>enumerate</code> method returns a tuple, we can use patterns to
-destructure that tuple. We’ll be discussing patterns more in <a href="ch06-02-BasicClasses.html#patterns-that-bind-to-values">Chapter
-6</a><!-- ignore -->. In the <code>for</code> loop, we specify a pattern that has <code>i</code>
-for the index in the tuple and <code>&amp;item</code> for the single byte in the tuple.
-Because we get a reference to the element from <code>.iter().enumerate()</code>, we use
-<code>&amp;</code> in the pattern.</p>
-<p>Inside the <code>for</code> loop, we search for the byte that represents the space by
-using the byte literal syntax. If we find a space, we return the position.
-Otherwise, we return the length of the string by using <code>s.len()</code>.</p>
-<pre><code class="language-rust ignore"><span class="boring">fn first_word(s: &amp;String) -&gt; usize {
-</span><span class="boring">    let bytes = s.as_bytes();
-</span><span class="boring">
-</span><span class="boring">    for (i, &amp;item) in bytes.iter().enumerate() {
-</span>        if item == b' ' {
-            return i;
-        }
-    }
+                        <h3 id="Toolboxes"><a class="header" href="#Toolboxes">Toolboxes</a></h3>
 
-    s.len()
-<span class="boring">}
-</span><span class="boring">
-</span><span class="boring">fn main() {}</span></code></pre>
-<p>We now have a way to find out the index of the end of the first word in the
-string, but there’s a problem. We’re returning a <code>usize</code> on its own, but it’s
-only a meaningful number in the context of the <code>&amp;String</code>. In other words,
-because it’s a separate value from the <code>String</code>, there’s no guarantee that it
-will still be valid in the future. Consider the program in Listing 4-8 that
-uses the <code>first_word</code> function from Listing 4-7.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn first_word(s: &amp;String) -&gt; usize {
-</span><span class="boring">    let bytes = s.as_bytes();
-</span><span class="boring">
-</span><span class="boring">    for (i, &amp;item) in bytes.iter().enumerate() {
-</span><span class="boring">        if item == b' ' {
-</span><span class="boring">            return i;
-</span><span class="boring">        }
-</span><span class="boring">    }
-</span><span class="boring">
-</span><span class="boring">    s.len()
-</span><span class="boring">}
-</span><span class="boring">
-</span>fn main() {
-    let mut s = String::from(&quot;hello world&quot;);
+                        <p>Someone who wanted to program for the original Macintosh computers&mdash;and to produce
+                            programs that look and behave the way users expected them to&mdash;had to deal with
+                            the "Macintosh Toolbox," a collection of well over a thousand different
+                            subroutines. There were routines for opening and closing windows, for drawing
+                            geometric figures and text to windows, for adding buttons to windows, and for
+                            responding to mouse clicks on the window. There were other routines for creating
+                            menus and for reacting to user selections from menus. Aside from the user
+                            interface, there were routines for opening files and reading data from them, for
+                            communicating over a network, for sending output to a printer, for handling
+                            communication between programs, and in general for doing all the standard
+                            things that a computer has to do.  Microsoft Windows provides its own
+                            set of subroutines for programmers to use, and they are quite a bit different
+                            from the subroutines used on the Mac.  Linux has several different GUI toolboxes
+                            for the programmer to choose from.</p>
 
-    let word = first_word(&amp;s); // word will get the value 5
 
-    s.clear(); // this empties the String, making it equal to &quot;&quot;
+                        <p>The analogy of a "toolbox" is a good one to keep in mind. Every programming
+                            project involves a mixture of innovation and reuse of existing tools. A
+                            programmer is given a set of tools to work with, starting with the set of basic
+                            tools that are built into the language: things like variables, assignment
+                            statements, if statements, and loops. To these, the programmer can add existing
+                            toolboxes full of routines that have already been written for performing
+                            certain tasks. These tools, if they are well-designed, can be used as true
+                            black boxes: They can be called to perform their assigned tasks without
+                            worrying about the particular steps they go through to accomplish those tasks.
+                            The innovative part of programming is to take all these tools and apply them to
+                            some particular project or problem (word-processing, keeping track of bank
+                            accounts, processing image data from a space probe, Web browsing, computer
+                            games,&nbsp;...). This is called <span class="newword">applications programming</span>.</p>
 
-    // word still has the value 5 here, but there's no more string that
-    // we could meaningfully use the value 5 with. word is now totally invalid!
-}</code></pre></pre>
-<p><span class="caption">Listing 4-8: Storing the result from calling the
-<code>first_word</code> function and then changing the <code>String</code> contents</span></p>
-<p>This program compiles without any errors and would also do so if we used <code>word</code>
-after calling <code>s.clear()</code>. Because <code>word</code> isn’t connected to the state of <code>s</code>
-at all, <code>word</code> still contains the value <code>5</code>. We could use that value <code>5</code> with
-the variable <code>s</code> to try to extract the first word out, but this would be a bug
-because the contents of <code>s</code> have changed since we saved <code>5</code> in <code>word</code>.</p>
-<p>Having to worry about the index in <code>word</code> getting out of sync with the data in
-<code>s</code> is tedious and error prone! Managing these indices is even more brittle if
-we write a <code>second_word</code> function. Its signature would have to look like this:</p>
-<pre><code class="language-rust ignore">fn second_word(s: &amp;String) -&gt; (usize, usize) {</code></pre>
-<p>Now we’re tracking a starting <em>and</em> an ending index, and we have even more
-values that were calculated from data in a particular state but aren’t tied to
-that state at all. We have three unrelated variables floating around that need
-to be kept in sync.</p>
-<p>Luckily, Rust has a solution to this problem: string slices.</p>
-<h3 id="string-slices"><a class="header" href="#string-slices">String Slices</a></h3>
-<p>A <em>string slice</em> is a reference to part of a <code>String</code>, and it looks like this:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
-</span>    let s = String::from(&quot;hello world&quot;);
 
-    let hello = &amp;s[0..5];
-    let world = &amp;s[6..11];
-<span class="boring">}</span></code></pre></pre>
-<p>Rather than a reference to the entire <code>String</code>, <code>hello</code> is a reference to a
-portion of the <code>String</code>, specified in the extra <code>[0..5]</code> bit. We create slices
-using a range within brackets by specifying <code>[starting_index..ending_index]</code>,
-where <code>starting_index</code> is the first position in the slice and <code>ending_index</code> is
-one more than the last position in the slice. Internally, the slice data
-structure stores the starting position and the length of the slice, which
-corresponds to <code>ending_index</code> minus <code>starting_index</code>. So, in the case of <code>let world = &amp;s[6..11];</code>, <code>world</code> would be a slice that contains a pointer to the
-byte at index 6 of <code>s</code> with a length value of <code>5</code>.</p>
-<p>Figure 4-6 shows this in a diagram.</p>
-<p><img alt="Three tables: a table representing the stack data of s, which points
-to the byte at index 0 in a table of the string data &quot;hello world&quot; on
-the heap. The third table rep-resents the stack data of the slice world, which
-has a length value of 5 and points to byte 6 of the heap data table."
-src="img/trpl04-06.svg" class="center" style="width: 50%;" /></p>
-<p><span class="caption">Figure 4-6: String slice referring to part of a
-<code>String</code></span></p>
-<p>With Rust’s <code>..</code> range syntax, if you want to start at index 0, you can drop
-the value before the two periods. In other words, these are equal:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>let s = String::from(&quot;hello&quot;);
+                        <p>A software toolbox is a kind of black box, and it presents a certain
+                            interface to the programmer. This interface is a specification of what routines
+                            are in the toolbox, what parameters they use, and what tasks they perform. This
+                            information constitutes the <span class="newword">API</span>, or <span class="newword">Application Programming Interface</span>,
+                            associated with the toolbox.  The API is the abstraction through which you access
+                            the functionality of the software in the toolbox.  The Macintosh API is
+                            a specification of all the routines available in the Macintosh Toolbox. A
+                            company that makes some hardware device&mdash;say a card for connecting a computer
+                            to a network&mdash;might publish an API for that device consisting of a list of
+                            routines that programmers can call in order to communicate with and control the
+                            device. Scientists who write a set of routines for doing some kind of complex
+                            computation&mdash;such as solving "differential equations," say&mdash;would provide
+                            an API to allow others to use those routines without understanding the details
+                            of the computations they perform.</p>
 
-let slice = &amp;s[0..2];
-let slice = &amp;s[..2];
-<span class="boring">}</span></code></pre></pre>
-<p>By the same token, if your slice includes the last byte of the <code>String</code>, you
-can drop the trailing number. That means these are equal:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>let s = String::from(&quot;hello&quot;);
 
-let len = s.len();
 
-let slice = &amp;s[3..len];
-let slice = &amp;s[3..];
-<span class="boring">}</span></code></pre></pre>
-<p>You can also drop both values to take a slice of the entire string. So these
-are equal:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>let s = String::from(&quot;hello&quot;);
 
-let len = s.len();
+                        <p>The Java programming language is supplemented by a large, standard API.
+                            You've seen part of this API already, in the form of mathematical subroutines
+                            such as <span class="code">Math.sqrt()</span>, the <span class="classname">String</span> data type and its associated
+                            routines, and the <span class="code">System.out.print()</span> routines. The standard Java API
+                            includes routines for working with graphical user interfaces, for network
+                            communication, for reading and writing files, and more. It's tempting to think
+                            of these routines as being part of the Java language, but they are
+                            technically subroutines that have been written and made available for use in
+                            Java programs.</p>
 
-let slice = &amp;s[0..len];
-let slice = &amp;s[..];
-<span class="boring">}</span></code></pre></pre>
-<blockquote>
-<p>Note: String slice range indices must occur at valid UTF-8 character
-boundaries. If you attempt to create a string slice in the middle of a
-multibyte character, your program will exit with an error. For the purposes
-of introducing string slices, we are assuming ASCII only in this section; a
-more thorough discussion of UTF-8 handling is in the <a href="ch08-02-WritingCorrectPrograms.html#storing-utf-8-encoded-text-with-strings">“Storing UTF-8 Encoded
-Text with Strings”</a><!-- ignore --> section of Chapter 8.</p>
-</blockquote>
-<p>With all this information in mind, let’s rewrite <code>first_word</code> to return a
-slice. The type that signifies “string slice” is written as <code>&amp;str</code>:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn first_word(s: &amp;String) -&gt; &amp;str {
-    let bytes = s.as_bytes();
 
-    for (i, &amp;item) in bytes.iter().enumerate() {
-        if item == b' ' {
-            return &amp;s[0..i];
-        }
-    }
+                        <p>Java is platform-independent. That is, the same program can run on platforms
+                            as diverse as MacOS, Windows, Linux, and others. The same Java API must work
+                            on all these platforms. But notice that it is the <b>interface</b>
+                            that is platform-independent; the <b>implementation</b> of some parts of the API varies from
+                            one platform to another. A Java system on a particular computer includes
+                            implementations of all the standard API routines. A Java program includes only
+                            <b>calls</b> to those routines. When the Java interpreter executes a
+                            program and encounters a call to one of the standard routines, it will pull up
+                            and execute the implementation of that routine which is appropriate for the
+                            particular platform on which it is running. This is a very powerful idea.
+                            It is the power of abstraction.  It
+                            means that you only need to learn one API to program for a wide variety of
+                            platforms.</p>
 
-    &amp;s[..]
-}
-<span class="boring">
-</span><span class="boring">fn main() {}</span></code></pre></pre>
-<p>We get the index for the end of the word the same way we did in Listing 4-7, by
-looking for the first occurrence of a space. When we find a space, we return a
-string slice using the start of the string and the index of the space as the
-starting and ending indices.</p>
-<p>Now when we call <code>first_word</code>, we get back a single value that is tied to the
-underlying data. The value is made up of a reference to the starting point of
-the slice and the number of elements in the slice.</p>
-<p>Returning a slice would also work for a <code>second_word</code> function:</p>
-<pre><code class="language-rust ignore">fn second_word(s: &amp;String) -&gt; &amp;str {</code></pre>
-<p>We now have a straightforward API that’s much harder to mess up because the
-compiler will ensure the references into the <code>String</code> remain valid. Remember
-the bug in the program in Listing 4-8, when we got the index to the end of the
-first word but then cleared the string so our index was invalid? That code was
-logically incorrect but didn’t show any immediate errors. The problems would
-show up later if we kept trying to use the first word index with an emptied
-string. Slices make this bug impossible and let us know we have a problem with
-our code much sooner. Using the slice version of <code>first_word</code> will throw a
-compile-time error:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore does_not_compile"><span class="boring">fn first_word(s: &amp;String) -&gt; &amp;str {
-</span><span class="boring">    let bytes = s.as_bytes();
-</span><span class="boring">
-</span><span class="boring">    for (i, &amp;item) in bytes.iter().enumerate() {
-</span><span class="boring">        if item == b' ' {
-</span><span class="boring">            return &amp;s[0..i];
-</span><span class="boring">        }
-</span><span class="boring">    }
-</span><span class="boring">
-</span><span class="boring">    &amp;s[..]
-</span><span class="boring">}
-</span><span class="boring">
-</span>fn main() {
-    let mut s = String::from(&quot;hello world&quot;);
 
-    let word = first_word(&amp;s);
 
-    s.clear(); // error!
 
-    println!(&quot;the first word is: {}&quot;, word);
-}</code></pre>
-<p>Here’s the compiler error:</p>
-<pre><code class="language-console">$ cargo run
-   Compiling ownership v0.1.0 (file:///projects/ownership)
-error[E0502]: cannot borrow `s` as mutable because it is also borrowed as immutable
-  --&gt; src/main.rs:18:5
-   |
-16 |     let word = first_word(&amp;s);
-   |                           -- immutable borrow occurs here
-17 |
-18 |     s.clear(); // error!
-   |     ^^^^^^^^^ mutable borrow occurs here
-19 |
-20 |     println!(&quot;the first word is: {}&quot;, word);
-   |                                       ---- immutable borrow later used here
+                        <h3 id="Java's Standard Packages"><a class="header" href="#Java's Standard Packages">Java's Standard Packages</a></h3>
 
-For more information about this error, try `rustc --explain E0502`.
-error: could not compile `ownership` due to previous error
+                        <p>Like all subroutines in Java, the routines in the standard API are grouped
+                            into classes. To provide larger-scale organization, classes in Java can be
+                            grouped into <span class="newword">packages</span>, which were introduced briefly in
+                            <a href="ch02-06-ProgrammingEnvironments.html">Subsection&nbsp;2.6.5</a>.  You can have even higher
+                            levels of grouping, since packages can also contain other packages. In fact,
+                            the entire standard Java API is implemented in several packages. One of these,
+                            which is named "<span class="code">java</span>", contains several non-GUI packages as well as the
+                            original AWT graphical user interface classes. Another package,
+                            "<span class="code">javax</span>", contains the classes used by the Swing graphical user interface, as well as many other classes.
+                            And "<span class="code">javafx</span>," which is not a standard part of Java,
+                            contains the  JavaFX API that is used for GUI programming in this textbook.</p>
+
+
+                        <p>A package can contain both classes and other packages. A package that is
+                            contained in another package is sometimes called a "subpackage." The
+                            <span class="code">java</span> and <span class="code">javafx</span> packages both contain subpackages.
+                            One of the subpackages of <span class="code">java</span>, for example, is named "<span class="code">util</span>".
+                            Since <span class="code">util</span> is contained within <span class="code">java</span>, its full name is actually
+                            <span class="code">java.util</span>.  This package contains a variety of utility classes, including
+                            the <span class="classname">Scanner</span> class that was discussed in <a href="ch02-04-TextInputAndOutput.html">Subsection&nbsp;2.4.6</a>.
+                            The <span class="code">java</span> package includes several other subpackages, such as
+                            <span class="code">java.io</span>, which provides facilities for input/output, and
+                            <span class="code">java.net</span>, which deals with network communication. The
+                            most basic package is called <span class="code">java.lang</span>. This package contains
+                            fundamental classes such as <span class="classname">String</span>, <span class="classname">Math</span>,
+                            <span class="classname">Integer</span>, and <span class="classname">Double</span>.</p>
+
+
+
+                        <p>It might be helpful to look at a graphical representation of the levels of
+                            nesting in the <span class="code">java</span> package, its subpackages, the classes in those
+                            subpackages, and the subroutines in those classes. This is not a complete
+                            picture, since it shows only a very few of the many items in each element:</p>
+
+
+
+                        <p align="center">
+                            <img src="./images/package-class-subroutine.png" width="524" height="350" alt="(Diagram of subroutine/class/package nesting)"></p>
+
+
+
+                        <p>Similarly, the package <span class="code">javafx</span> contains a package <span class="code">javafx.scene</span>,
+                            which in turn contains <span class="code">javafx.scene.control</span>.
+                            This package contains classes that represent GUI components
+                            such as buttons and input boxes.  Another subpackage, <span class="code">javafx.scene.paint</span>,
+                            contains class <span class="classname">Color</span> and other classes that define ways to
+                            fill and stroke a shape.</p>
+
+
+
+
+                        <p>The standard Java API includes thousands of classes in hundreds of packages.  Many of
+                            the classes are rather obscure or
+                            very specialized, but you might want to browse through the documentation to see
+                            what is available. As I write this, the
+                            documentation for the complete basic API for Java&nbsp;8 can be found at</p>
+
+                        <pre><code class="java">
+<a href="https://docs.oracle.com/javase/8/docs/api/">https://docs.oracle.com/javase/8/docs/api/</a>
 </code></pre>
-<p>Recall from the borrowing rules that if we have an immutable reference to
-something, we cannot also take a mutable reference. Because <code>clear</code> needs to
-truncate the <code>String</code>, it needs to get a mutable reference. The <code>println!</code>
-after the call to <code>clear</code> uses the reference in <code>word</code>, so the immutable
-reference must still be active at that point. Rust disallows the mutable
-reference in <code>clear</code> and the immutable reference in <code>word</code> from existing at the
-same time, and compilation fails. Not only has Rust made our API easier to use,
-but it has also eliminated an entire class of errors at compile time!</p>
-<!-- Old heading. Do not remove or links may break. -->
-<p><a id="string-literals-are-slices"></a></p>
-<h4 id="string-literals-as-slices"><a class="header" href="#string-literals-as-slices">String Literals as Slices</a></h4>
-<p>Recall that we talked about string literals being stored inside the binary. Now
-that we know about slices, we can properly understand string literals:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>let s = &quot;Hello, world!&quot;;
-<span class="boring">}</span></code></pre></pre>
-<p>The type of <code>s</code> here is <code>&amp;str</code>: it’s a slice pointing to that specific point of
-the binary. This is also why string literals are immutable; <code>&amp;str</code> is an
-immutable reference.</p>
-<h4 id="string-slices-as-parameters"><a class="header" href="#string-slices-as-parameters">String Slices as Parameters</a></h4>
-<p>Knowing that you can take slices of literals and <code>String</code> values leads us to
-one more improvement on <code>first_word</code>, and that’s its signature:</p>
-<pre><code class="language-rust ignore">fn first_word(s: &amp;String) -&gt; &amp;str {</code></pre>
-<p>A more experienced Rustacean would write the signature shown in Listing 4-9
-instead because it allows us to use the same function on both <code>&amp;String</code> values
-and <code>&amp;str</code> values.</p>
-<pre><code class="language-rust ignore">fn first_word(s: &amp;str) -&gt; &amp;str {
-<span class="boring">    let bytes = s.as_bytes();
-</span><span class="boring">
-</span><span class="boring">    for (i, &amp;item) in bytes.iter().enumerate() {
-</span><span class="boring">        if item == b' ' {
-</span><span class="boring">            return &amp;s[0..i];
-</span><span class="boring">        }
-</span><span class="boring">    }
-</span><span class="boring">
-</span><span class="boring">    &amp;s[..]
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">fn main() {
-</span><span class="boring">    let my_string = String::from(&quot;hello world&quot;);
-</span><span class="boring">
-</span><span class="boring">    // `first_word` works on slices of `String`s, whether partial or whole
-</span><span class="boring">    let word = first_word(&amp;my_string[0..6]);
-</span><span class="boring">    let word = first_word(&amp;my_string[..]);
-</span><span class="boring">    // `first_word` also works on references to `String`s, which are equivalent
-</span><span class="boring">    // to whole slices of `String`s
-</span><span class="boring">    let word = first_word(&amp;my_string);
-</span><span class="boring">
-</span><span class="boring">    let my_string_literal = &quot;hello world&quot;;
-</span><span class="boring">
-</span><span class="boring">    // `first_word` works on slices of string literals, whether partial or whole
-</span><span class="boring">    let word = first_word(&amp;my_string_literal[0..6]);
-</span><span class="boring">    let word = first_word(&amp;my_string_literal[..]);
-</span><span class="boring">
-</span><span class="boring">    // Because string literals *are* string slices already,
-</span><span class="boring">    // this works too, without the slice syntax!
-</span><span class="boring">    let word = first_word(my_string_literal);
-</span><span class="boring">}</span></code></pre>
-<p><span class="caption">Listing 4-9: Improving the <code>first_word</code> function by using
-a string slice for the type of the <code>s</code> parameter</span></p>
-<p>If we have a string slice, we can pass that directly. If we have a <code>String</code>, we
-can pass a slice of the <code>String</code> or a reference to the <code>String</code>. This
-flexibility takes advantage of <em>deref coercions</em>, a feature we will cover in
-<a href="ch15-02-deref.html#implicit-deref-coercions-with-functions-and-methods">“Implicit Deref Coercions with Functions and
-Methods”</a><!--ignore--> section of Chapter 15.</p>
-<p>Defining a function to take a string slice instead of a reference to a <code>String</code>
-makes our API more general and useful without losing any functionality:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn first_word(s: &amp;str) -&gt; &amp;str {
-</span><span class="boring">    let bytes = s.as_bytes();
-</span><span class="boring">
-</span><span class="boring">    for (i, &amp;item) in bytes.iter().enumerate() {
-</span><span class="boring">        if item == b' ' {
-</span><span class="boring">            return &amp;s[0..i];
-</span><span class="boring">        }
-</span><span class="boring">    }
-</span><span class="boring">
-</span><span class="boring">    &amp;s[..]
-</span><span class="boring">}
-</span><span class="boring">
-</span>fn main() {
-    let my_string = String::from(&quot;hello world&quot;);
 
-    // `first_word` works on slices of `String`s, whether partial or whole
-    let word = first_word(&amp;my_string[0..6]);
-    let word = first_word(&amp;my_string[..]);
-    // `first_word` also works on references to `String`s, which are equivalent
-    // to whole slices of `String`s
-    let word = first_word(&amp;my_string);
 
-    let my_string_literal = &quot;hello world&quot;;
+                        <p>and for JavaFX 8 at</p>
 
-    // `first_word` works on slices of string literals, whether partial or whole
-    let word = first_word(&amp;my_string_literal[0..6]);
-    let word = first_word(&amp;my_string_literal[..]);
+                        <pre><code class="java">
+<a href="https://docs.oracle.com/javase/8/javafx/api/toc.htm">https://docs.oracle.com/javase/8/javafx/api/toc.htm</a>
+</code></pre>
 
-    // Because string literals *are* string slices already,
-    // this works too, without the slice syntax!
-    let word = first_word(my_string_literal);
-}</code></pre></pre>
-<h3 id="other-slices"><a class="header" href="#other-slices">Other Slices</a></h3>
-<p>String slices, as you might imagine, are specific to strings. But there’s a
-more general slice type too. Consider this array:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>let a = [1, 2, 3, 4, 5];
-<span class="boring">}</span></code></pre></pre>
-<p>Just as we might want to refer to part of a string, we might want to refer to
-part of an array. We’d do so like this:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>let a = [1, 2, 3, 4, 5];
 
-let slice = &amp;a[1..3];
 
-assert_eq!(slice, &amp;[2, 3]);
-<span class="boring">}</span></code></pre></pre>
-<p>This slice has the type <code>&amp;[i32]</code>. It works the same way as string slices do, by
-storing a reference to the first element and a length. You’ll use this kind of
-slice for all sorts of other collections. We’ll discuss these collections in
-detail when we talk about vectors in Chapter 8.</p>
-<h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
-<p>The concepts of ownership, borrowing, and slices ensure memory safety in Rust
-programs at compile time. The Rust language gives you control over your memory
-usage in the same way as other systems programming languages, but having the
-owner of data automatically clean up that data when the owner goes out of scope
-means you don’t have to write and debug extra code to get this control.</p>
-<p>Ownership affects how lots of other parts of Rust work, so we’ll talk about
-these concepts further throughout the rest of the book. Let’s move on to
-Chapter 5 and look at grouping pieces of data together in a <code>struct</code>.</p>
+                        <p>See the subsection about "modules," below, for a discussion of changes
+                            that were made the language after Java&nbsp;8 and for links to the documentation for Java&nbsp;17.
+                            However, for the purposes of this textbook, you will probably find that the
+                            Java&nbsp;8 documentation is easier to use, and the information that it provides is still relevant.</p>
+
+
+                        <p>Even an expert programmer won't be familiar with the entire Java API,
+                            or even a majority of it.  In this book, you'll only encounter
+                            several dozen classes, and those will be sufficient for writing a
+                            wide variety of programs.</p>
+
+
+                        <h3 id="Using Classes from Packages"><a class="header" href="#Using Classes from Packages">Using Classes from Packages</a></h3>
+
+                        <p>Let's say that you want to use the class
+                            <span class="code">javafx.scene.paint.Color</span> in a
+                            program that you are writing.  This is the full name of class <span class="classname">Color</span>
+                            in package <span class="code">javafx.scene.paint</span>.
+                            Like any class, <span class="code">javafx.scene.paint.Color</span> is
+                            a type, which means that you can use it to declare variables and parameters and
+                            to specify the return type of a function. One way to do this is to use the
+                            full name of the class as the name of the type. For example, suppose that you
+                            want to declare a variable named <span class="code">rectColor</span> of type <span class="classname">Color</span>.
+                            You could say:</p>
+
+
+                        <pre><code class="java">javafx.scene.paint.Color rectColor;</code></pre>
+
+
+                        <p>This is just an ordinary variable declaration of the form
+                            "<span class="bnf">type-name</span>&nbsp;<span class="bnf">variable-name</span>;".
+                            Of course, using the full name of every class can get tiresome, and you will hardly
+                            ever see full names like this used in a program.
+                            Java makes it possible to avoid using the full name of a class by <span class="newword">importing</span>
+                            the class. If you put</p>
+
+
+                        <pre><code class="java">import javafx.scene.paint.Color;</code></pre>
+
+
+                        <p>at the beginning of a Java source code file, then, in the rest of the file,
+                            you can abbreviate the full name <span class="code">javafx.scene.paint.Color</span> to just the simple name of
+                            the class, which is <span class="code">Color</span>.  Note that the <span class="code">import</span> line comes at the start of
+                            a file (after the <span class="code">package</span> statement, if there is one)
+                            and is not inside any class.  Although it is sometimes referred to
+                            as a statement, it is more properly called an <span class="newword">import&nbsp;directive</span>
+                            since it is not a statement in the usual sense.  The <span class="code">import</span>
+                            directive "<span class="code">import&nbsp;javafx.scene.paint.Color</span>" would allow you to say</p>
+
+
+                        <pre><code class="java">Color  rectColor;</code></pre>
+
+
+                        <p>to declare the variable.  Note that the only effect of the
+                            <span class="code">import</span> directive is to allow you to use simple class names instead of
+                            full "package.class" names. You aren't really importing anything substantial;
+                            if you leave out the <span class="code">import</span> directive, you can still access the class&mdash;you
+                            just have to use its full name.  There is a shortcut for importing all
+                            the classes from a given package. For example, you can import all the classes from
+                            <span class="code">java.util</span> by saying</p>
+
+
+                        <pre><code class="java">import java.util.*;</code></pre>
+
+
+                        <p>The "<span class="code">*</span>" is a <span class="newword">wildcard</span> that matches every class in the package.
+                            (However, it does not match subpackages; for example, you <b>cannot</b> import the entire
+                            contents of all the subpackages of the <span class="code">java</span> package by saying
+                            <span class="code">import&nbsp;java.*</span>.)</p>
+
+
+                        <p>Some programmers think that using a wildcard in an <span class="code">import</span> statement
+                            is bad style, since it can make a large number of class names available that you are
+                            not going to use and might not even know about.  They think it is better to explicitly
+                            import each individual class that you want to use.  In my own programming, I often
+                            use wildcards to import all the classes from the most relevant packages, and use
+                            individual imports when I am using just one or two classes from a given package.</p>
+
+
+
+                        <p>A program that works with networking might include the line
+                            "<span class="code">import&nbsp;java.net.*;</span>", while one that reads or writes files might
+                            use "<span class="code">import&nbsp;java.io.*;</span>".  But when you start importing lots
+                            of packages in this way, you have to be careful about one thing: It's possible
+                            for two classes that are in different packages to have the same name. For
+                            example, both the <span class="code">java.awt</span> package and the <span class="code">java.util</span> package
+                            contain a class named <span class="code">List</span>. If you import both <span class="code">java.awt.*</span> and
+                            <span class="code">java.util.*</span>, the simple name <span class="code">List</span> will be ambiguous. If you
+                            try to declare a variable of type <span class="code">List</span>, you will get a compiler error
+                            message about an ambiguous class name.  You can still use both classes in your program: Use the full
+                            name of the class, either <span class="code">java.awt.List</span> or <span class="code">java.util.List</span>.
+                            Another solution, of course, is to use <span class="code">import</span> to import the individual classes you
+                            need, instead of importing entire packages.</p>
+
+
+                        <p>Because the package <span class="code">java.lang</span> is so fundamental, all the classes in
+                            <span class="code">java.lang</span> are <b>automatically</b> imported into every
+                            program. It's as if every program began with the statement "<span class="code">import&nbsp;java.lang.*;</span>".
+                            This is why we have been able to use the class name
+                            <span class="classname">String</span> instead of <span class="code">java.lang.String</span>, and <span class="code">Math.sqrt()</span>
+                            instead of <span class="code">java.lang.Math.sqrt()</span>. It would still, however, be
+                            perfectly legal to use the longer forms of the names.</p>
+
+
+                        <p>Programmers can create new packages. Suppose that you want some classes that
+                            you are writing to be in a package named <span class="code">utilities</span>. Then the source
+                            code files that defines those classes must begin with the line</p>
+
+
+                        <pre><code class="java">package utilities;</code></pre>
+
+
+                        <p>This would come even before any <span class="code">import</span> directive in that file.
+                            Furthermore, the source code file
+                            would be placed in a folder with the same name as the package, "utilities" in this example.
+                            And a class that is in a subpackage must be in a subfolder.  For example, a class in
+                            a package named <span class="code">utilities.net</span> would be in folder named "net" inside a
+                            folder named "utilities".  A class that is
+                            in a package automatically has access to other classes in the same package; that is,
+                            a class doesn't have to import classes from the package in which it is defined.</p>
+
+
+                        <p>In projects that define large numbers of classes, it makes sense to organize
+                            those classes into packages. It also makes sense for programmers to
+                            create new packages as toolboxes that provide functionality and APIs for
+                            dealing with areas not covered in the standard Java API. (And in fact such
+                            "toolmaking" programmers often have more prestige than the applications
+                            programmers who use their tools.)</p>
+
+
+                        <p>However, with just a couple of exceptions such as class <span class="classname">TextIO</span>
+                            in package <span class="code">textio</span>, the classes written for this book are not in packages. For the purposes of this
+                            book, you need to know about packages mainly so that you will be able to import <span class="classname">TextIO</span>
+                            and classes from the standard
+                            packages. The standard packages are always available to the programs that you write.
+                            You might wonder where the standard classes are actually located.  Again, that can
+                            depend to some extent on the version of Java that you are using, but they will be
+                            part of the installed JDK.</p>
+
+
+                        <p>Although we won't be creating packages explicitly, <b>every</b>
+                            class is actually part of a package. If a class is not specifically placed in a
+                            package, then it is put in something called the <span class="newword">default package</span>,
+                            which has no name.  Almost all the examples that you see in this book
+                            are in the default package.</p>
+
+                        <h3 id="About Modules"><a class="header" href="#About Modules">About Modules</a></h3>
+
+                        <p>Starting with Java&nbsp;9, a major change was made to the large-scale structure
+                            of Java with the introduction of <span class="newword">modules</span>.  A module is a collection
+                            of packages, so it represents yet another level of containment:  Modules contain
+                            packages which contain classes which contain variables and methods.  A package
+                            does not have to be in a module to be used, but all of the standard classes in
+                            Java and in JavaFX have been divided into a set of modules.</p>
+
+
+                        <p>Modules were introduced for several reasons.  A major reason is to provide
+                            better access control.  Before modules, a class that is declared <span class="code">public</span>
+                            can be used anywhere, from any class in any package, as can its public variables
+                            and methods.  For a class that is defined in a module, on the other hand, "public" only automatically means
+                            public within the module where it is defined.  However, a module can explicitly
+                            <span class="newword">export</span> a package.  Exporting a package from a module makes the
+                            public classes in the package accessible from anywhere, including from other
+                            modules and from classes that are not part of any module. (It is even possible
+                            to export a package just to certain specified modules, providing an even
+                            finer level of access control.)  The upshot is that it is now possible to have
+                            entire packages that are essentially private: They provide services to other
+                            packages in the same module, but are invisible from outside that module.  So
+                            a module is another kind of black box, and a non-exported package is part of
+                            its hidden implementation.  Of course, modularity on this scale is really only
+                            important for very large-scale applications.</p>
+
+
+                        <p>Another motivation for modules is the sheer size of the standard JRE (Java Runtime
+                            Environment), which includes all of the standard classes.  A given application will
+                            use only a small part of the standard runtime.  Modularization makes it possible
+                            to construct smaller, custom JREs that contain only the modules that are required
+                            by an application.  The JDK includes a <i>jlink</i> command for making custom
+                            runtimes, which can include modules that define an application as well as the
+                            standard modules that are required to run that application.  That runtime
+                            can then be distributed as a standalone application that can be executed even
+                            by people who have not installed a JDK on their computer.  But just as for
+                            the JDK itself, different versions of the custom runtime will be needed for Windows,
+                            for MacOS, and for Linux.  Furthermore, when security updates are made
+                            to the JDK, they are not automatically applied to custom runtimes, so the
+                            application developer takes on the responsibility of updating custom
+                            runtimes.  Once again, this is really only useful for fairly large applications.</p>
+
+
+                        <p>In a JDK for Java&nbsp;9 or later, compiled class files from the standard modules
+                            are stored together in a file named <i>modules</i> inside a directory named
+                            <i>lib</i> in the main JDK directory.  This is a so-called "jimage file,"
+                            and there is a command-line tool named <i>jimage</i> for working with such files.
+                            If you use the <i>jlink</i> tool to create a custom runtime, part of what it does
+                            is to create a custom <i>modules</i> file containing just the modules that are
+                            needed by the runtime.  In the JDK&nbsp;17 on my Linux computer, <i>modules</i>
+                            is a 127 megabyte file containing 26401 classes in 835 packages in 70 modules.
+                            The JDK directory also has a subdirectory named <i>jmods</i> that contains the
+                            modules in another form.  However, it is not required for compiling and running
+                            programs and, as far as I can tell, is meant mostly for use by <i>jlink</i>.</p>
+
+
+                        <p>Modules in the JDK include, for example, <i>java.base</i> (which contains the basic modules
+                            such as <span class="code">java.lang</span> and <span class="code">java.util</span>) and <span class="code">java.desktop</span>
+                            (which include packages for the Swing GUI toolkit).  JavaFX packages include
+                            <i>javafx.base</i>, <i>javafx.control</i>, <i>javafx.graphics</i>, and a few that are less
+                            generally useful. The API documentation for modular versions of Java is divided into
+                            modules, then into packages, and finally into classes.  This makes the documentation harder to browse
+                            than in older versions of Java.  However, the documentation web site does have an effective
+                            search feature.  As I write this, the documentation for Java&nbsp;17 and for
+                            JavaFX&nbsp;17 is available at:</p>
+
+
+                        <p align="center">
+                            <a href="https://docs.oracle.com/en/java/javase/17/docs/api/index.html">https://docs.oracle.com/en/java/javase/17/docs/api/index.html</a>
+                        </p>
+
+
+
+                        <p align="center">
+                            <a href="https://openjfx.io/javadoc/17/">https://openjfx.io/javadoc/17/</a>
+                        </p>
+
+
+
+                        <p>A class can be defined outside of any module, and it is possible for that class
+                            to use packages from modules, provided that those packages are exported by the
+                            modules where they are defined.  In particular, a programmer can use classes from
+                            the JDK without ever thinking about modules or knowing that they exist.  This
+                            applies to all the command-line programs in this book.  However, when using
+                            Java&nbsp;9 or later, things are different for GUI programs that use JavaFX,
+                            which has been removed from the JDK and is distributed as a separate set of
+                            modules.  As we saw in <a href="ch02-06-ProgrammingEnvironments.html">Section&nbsp;2.6</a>, when you compile or run
+                            a JavaFX program, you need to specify a module path that includes the JavaFX
+                            modules, and you need to provide an <span class="code">--add-modules</span> option.
+                            (In <a href="ch02-06-ProgrammingEnvironments.html">Section&nbsp;2.6</a>, the value for
+                            <span class="code">--add-modules</span> was given as <span class="code">ALL-MODULE-PATH</span>, which
+                            lets the program access any modules that are found on the module path.
+                            An alternative is to specify a list of names of just those modules that
+                            are actually used by the program.)</p>
+
+
+                        <p>Aside from using modules with JavaFX and
+                            the basic background information in this section, this textbook does not
+                            cover modules.</p>
+
+
+                        <h3 id="Javadoc"><a class="header" href="#Javadoc">Javadoc</a></h3>
+
+
+                        <p>To use an API effectively, you need good documentation for it.  The documentation for
+                            most Java APIs is prepared using a system called <span class="newword">Javadoc</span>.  For example,
+                            this system is used to prepare the documentation for Java's standard packages.  And almost
+                            everyone who creates a toolbox in Java publishes Javadoc documentation for it.</p>
+
+
+                        <p>Javadoc documentation is prepared from special comments that are placed in the Java
+                            source code file.  Recall that one type of Java comment begins with <span class="code">/*</span> and ends with&nbsp;<span class="code">*/</span>.
+                            A Javadoc comment takes the same form, but it begins with <span class="code">/**</span> rather than simply&nbsp;<span class="code">/*</span>.
+                            You have already seen comments of this form in many of the examples in this book.</p>
+
+
+                        <p>Note that a Javadoc comment must be placed just <b>before</b> the subroutine that
+                            it is commenting on.  This rule is always followed.  You can have Javadoc
+                            comments for subroutines, for member variables, and for classes.  The Javadoc
+                            comment always <b>immediately precedes</b> the thing it is commenting on.</p>
+
+
+                        <p>Like any comment, a Javadoc comment is ignored by the computer when the file is compiled.
+                            But there is a tool called <span class="code">javadoc</span> that reads Java source code files, extracts
+                            any Javadoc comments that it finds, and creates a set of Web pages containing the comments
+                            in a nicely formatted, interlinked form.  By default, <span class="code">javadoc</span> will only collect
+                            information about <span class="code">public</span> classes, subroutines, and member variables, but
+                            it allows the option of creating documentation for non-public things as well.  If
+                            <span class="code">javadoc</span> doesn't find any Javadoc comment for something, it will construct
+                            one, but the comment will contain only basic information such as the name and type
+                            of a member variable or the name, return type, and parameter list of a subroutine.
+                            This is <b>syntactic</b> information.  To add information about semantics and pragmatics,
+                            you have to write a Javadoc comment.</p>
+
+
+                        <p>As an example, you can look at the documentation Web page for <span class="classname">TextIO</span> by
+                            following this link: <a href="./TextIO_Javadoc/index.html">TextIO&nbsp;Javadoc&nbsp;documentation</a>.
+                            The documentation page was created by applying the <span class="code">javadoc</span> tool
+                            to the source code file, <span class="sourceref"><a href="./source/chapter4/textio/TextIO.java">TextIO.java</a></span>.  If you have downloaded the on-line
+                            version of this book, the documentation can be found in the <span class="code">TextIO_Javadoc</span>
+                            directory.</p>
+
+
+                        <p>In a Javadoc comment, the <span class="code">*</span>'s at the start of each line are optional.
+                            The <span class="code">javadoc</span> tool will remove them.  In addition to normal text, the comment
+                            can contain certain special codes.  For one thing, the comment can contain
+                            <span class="newword">HTML mark-up</span> commands.  HTML is the language that is used to
+                            create web pages, and Javadoc comments are meant to be shown on web pages.  The
+                            <span class="code">javadoc</span> tool will copy any HTML commands in the comments to the web
+                            pages that it creates.  The book will not teach you HTML, but as
+                            an example, you can add <span class="code">&lt;p&gt;</span> to indicate the start of
+                            a new paragraph.  (Generally, in the absence of HTML commands, blank lines and
+                            extra spaces in the comment are ignored.  Furthermore, the characters &amp; and
+                            &lt; have special meaning in HTML and should not be used in Javadoc comments except
+                            with those meanings; they can be written as <span class="code">&amp;amp;</span> and&nbsp;<span class="code">&amp;lt;</span>.)</p>
+
+
+                        <p>In addition to HTML commands, Javadoc comments can include <span class="newword">doc tags</span>,
+                            which are processed as commands by the <span class="code">javadoc</span> tool.  A doc tag has a
+                            name that begins with the character&nbsp;<span class="code">@</span>.  I will only discuss four
+                            tags:  <span class="code">@author</span>, <span class="code">@param</span>, <span class="code">@return</span>, and <span class="code">@throws</span>.
+                            The <span class="code">@author</span> tag can be used only for a class, and should be followed by the
+                            name of the author.  The other three
+                            tags are used in Javadoc comments for a subroutine to provide information about its
+                            parameters, its return value, and the exceptions that it might throw. These tags
+                            <b>must</b> be placed at the end of the comment, after any description of the subroutine
+                            itself.  The syntax for using them is:
+                        </p>
+
+
+                        <pre><code class="java">@param  <span class="bnf">parameter-name</span>   <span class="bnf">description-of-parameter</span>
+
+@return  <span class="bnf">description-of-return-value</span>
+
+@throws  <span class="bnf">exception-class-name</span>   <span class="bnf">description-of-exception</span>
+</code></pre>
+
+
+                        <p>The <span class="bnf">descriptions</span> can extend over several lines.  The description ends at
+                            the next doc tag or at the end of the comment.  You can include a <span class="code">@param</span> tag for
+                            every parameter of the subroutine and a <span class="code">@throws</span> for as many types of exception
+                            as you want to document.  You should have a <span class="code">@return</span> tag only for a
+                            non-void subroutine.  These tags do not have to be given in any particular order.</p>
+
+
+                        <p>Here is an example that doesn't do anything
+                            exciting but that does use all three types of doc tag:</p>
+
+
+                        <pre><code class="java">/**
+ * This subroutine computes the area of a rectangle, given its width
+ * and its height.  The length and the width should be positive numbers.
+ * @param width the length of one side of the rectangle
+ * @param height the length the second side of the rectangle
+ * @return the area of the rectangle
+ * @throws IllegalArgumentException if either the width or the height
+ *    is a negative number.
+ */
+public static double areaOfRectangle( double length, double width ) {
+    if ( width &lt; 0  ||  height &lt; 0 )
+       throw new IllegalArgumentException("Sides must have positive length.");
+    double area;
+    area = width * height;
+    return area;
+}</code></pre>
+
+
+                        <p>I use Javadoc comments for many of my examples.  I encourage you to use
+                            them in your own code, even if you don't plan to generate Web page documentation
+                            of your work, since it's a standard format that other Java programmers will be
+                            familiar with.</p>
+
+
+                        <p>If you do want to create Web-page documentation, you need to run the
+                            <span class="code">javadoc</span> tool.  This tool is available as a command in the Java Development
+                            Kit that was discussed in <a href="ch02-06-ProgrammingEnvironments.html">Section&nbsp;2.6</a>.  You can use the <span class="code">javadoc</span> tool
+                            in a command line interface similarly to the way that the <span class="code">javac</span> and
+                            <span class="code">java</span> commands are used.  Javadoc can also be applied in the
+                            integrated development environments that were also discussed in
+                            <a href="ch02-06-ProgrammingEnvironments.html">Section&nbsp;2.6</a>.  I won't go into any of the details here; consult the
+                            documentation for your programming environment.</p>
+
+                        <h3 id="Static Import"><a class="header" href="#Static Import">Static Import</a></h3>
+
+                        <p>Before ending this section, I will mention an extension of the <span class="code">import</span> directive.
+                            We have seen that <span class="code">import</span> makes it possible to refer to a class
+                            such as <span class="code">java.util.Scanner</span> using its simple name, <span class="classname">Scanner</span>.
+                            But you still have to use compound names to refer to static member variables such
+                            as <span class="code">System.out</span> and to static methods such as <span class="code">Math.sqrt</span>.</p>
+
+
+                        <p>There is another form of the <span class="code">import</span> directive that can
+                            be used to import <span class="code">static</span> members of a class in the same way that
+                            the ordinary <span class="code">import</span> directive imports classes from a package.
+                            That form of the directive is called a <span class="newword">static import</span>,
+                            and it has syntax</p>
+
+
+                        <pre><code class="java">import static <span class="bnf">package-name</span>.<span class="bnf">class-name</span>.<span class="bnf">static-member-name</span>;</code></pre>
+
+
+                        <p>to import one static member name from a class, or</p>
+
+
+                        <pre><code class="java">import static <span class="bnf">package-name</span>.<span class="bnf">class-name</span>.*;</code></pre>
+
+
+                        <p>to import all the public static members from a class.  For example, if you preface
+                            a class definition with</p>
+
+
+                        <pre><code class="java">import static java.lang.System.out;</code></pre>
+
+
+                        <p>then you can use the simple name <span class="code">out</span> instead of the compound name <span class="code">System.out</span>.
+                            This means you can say <span class="code">out.println</span> instead of <span class="code">System.out.println</span>.  If you
+                            are going to work extensively with the <span class="classname">Math</span> class, you might preface
+                            your class definition with</p>
+
+
+                        <pre><code class="java">import static java.lang.Math.*;</code></pre>
+
+
+                        <p>This would allow you to say <span class="code">sqrt</span> instead of <span class="code">Math.sqrt</span>, <span class="code">log</span>
+                            instead of <span class="code">Math.log</span>, <span class="code">PI</span> instead of <span class="code">Math.PI</span>, and so on.  And you
+                            could import the <i>getlnInt</i> function from <span class="classname">TextIO</span> using</p>
+
+
+                        <pre><code class="java">import static textio.TextIO.getlnInt;</code></pre>
+
+
+                        <p>Note that the static import directive requires a <span class="bnf">package-name</span>, even for classes in
+                            the standard package <span class="code">java.lang</span>.  One consequence of this is that you can't do a
+                            static import from a class in the default package.</p>
 
                     </main>
 

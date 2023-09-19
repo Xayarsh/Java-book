@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>The Slice Type - Introduction to Programming Using Java</title>
+        <title>Parameters - Introduction to Programming Using Java</title>
 
 
         <!-- Custom HTML head -->
@@ -31,6 +31,8 @@
         <!-- Custom theme stylesheets -->
         <link rel="stylesheet" href="ferris.css">
         <link rel="stylesheet" href="theme/2018-edition.css">
+       
+        <link rel="stylesheet" href="code-class.css">
 
     </head>
     <body>
@@ -146,409 +148,661 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h2 id="the-slice-type"><a class="header" href="#the-slice-type">The Slice Type</a></h2>
-<p><em>Slices</em> let you reference a contiguous sequence of elements in a collection
-rather than the whole collection. A slice is a kind of reference, so it does
-not have ownership.</p>
-<p>Here’s a small programming problem: write a function that takes a string of
-words separated by spaces and returns the first word it finds in that string.
-If the function doesn’t find a space in the string, the whole string must be
-one word, so the entire string should be returned.</p>
-<p>Let’s work through how we’d write the signature of this function without using
-slices, to understand the problem that slices will solve:</p>
-<pre><code class="language-rust ignore">fn first_word(s: &amp;String) -&gt; ?</code></pre>
-<p>The <code>first_word</code> function has a <code>&amp;String</code> as a parameter. We don’t want
-ownership, so this is fine. But what should we return? We don’t really have a
-way to talk about <em>part</em> of a string. However, we could return the index of the
-end of the word, indicated by a space. Let’s try that, as shown in Listing 4-7.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn first_word(s: &amp;String) -&gt; usize {
-    let bytes = s.as_bytes();
+                        <h2 id="Parameters"><a class="header" href="#Parameters">Parameters</a></h2>
+                        <p>
+                            If a subroutine is a black box, then a parameter
+                            is something that
+                            provides a mechanism for passing information from the outside world into the
+                            box. Parameters are part of the interface of a subroutine. They allow you to
+                            customize the behavior of a subroutine to adapt it to a particular
+                            situation.</p>
 
-    for (i, &amp;item) in bytes.iter().enumerate() {
-        if item == b' ' {
-            return i;
-        }
-    }
 
-    s.len()
-}
-<span class="boring">
-</span><span class="boring">fn main() {}</span></code></pre></pre>
-<p><span class="caption">Listing 4-7: The <code>first_word</code> function that returns a
-byte index value into the <code>String</code> parameter</span></p>
-<p>Because we need to go through the <code>String</code> element by element and check whether
-a value is a space, we’ll convert our <code>String</code> to an array of bytes using the
-<code>as_bytes</code> method.</p>
-<pre><code class="language-rust ignore"><span class="boring">fn first_word(s: &amp;String) -&gt; usize {
-</span>    let bytes = s.as_bytes();
-<span class="boring">
-</span><span class="boring">    for (i, &amp;item) in bytes.iter().enumerate() {
-</span><span class="boring">        if item == b' ' {
-</span><span class="boring">            return i;
-</span><span class="boring">        }
-</span><span class="boring">    }
-</span><span class="boring">
-</span><span class="boring">    s.len()
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">fn main() {}</span></code></pre>
-<p>Next, we create an iterator over the array of bytes using the <code>iter</code> method:</p>
-<pre><code class="language-rust ignore"><span class="boring">fn first_word(s: &amp;String) -&gt; usize {
-</span><span class="boring">    let bytes = s.as_bytes();
-</span><span class="boring">
-</span>    for (i, &amp;item) in bytes.iter().enumerate() {
-<span class="boring">        if item == b' ' {
-</span><span class="boring">            return i;
-</span><span class="boring">        }
-</span><span class="boring">    }
-</span><span class="boring">
-</span><span class="boring">    s.len()
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">fn main() {}</span></code></pre>
-<p>We’ll discuss iterators in more detail in <a href="ch13-02-FancierGraphics.html">Chapter 13</a><!-- ignore -->.
-For now, know that <code>iter</code> is a method that returns each element in a collection
-and that <code>enumerate</code> wraps the result of <code>iter</code> and returns each element as
-part of a tuple instead. The first element of the tuple returned from
-<code>enumerate</code> is the index, and the second element is a reference to the element.
-This is a bit more convenient than calculating the index ourselves.</p>
-<p>Because the <code>enumerate</code> method returns a tuple, we can use patterns to
-destructure that tuple. We’ll be discussing patterns more in <a href="ch06-02-BasicClasses.html#patterns-that-bind-to-values">Chapter
-6</a><!-- ignore -->. In the <code>for</code> loop, we specify a pattern that has <code>i</code>
-for the index in the tuple and <code>&amp;item</code> for the single byte in the tuple.
-Because we get a reference to the element from <code>.iter().enumerate()</code>, we use
-<code>&amp;</code> in the pattern.</p>
-<p>Inside the <code>for</code> loop, we search for the byte that represents the space by
-using the byte literal syntax. If we find a space, we return the position.
-Otherwise, we return the length of the string by using <code>s.len()</code>.</p>
-<pre><code class="language-rust ignore"><span class="boring">fn first_word(s: &amp;String) -&gt; usize {
-</span><span class="boring">    let bytes = s.as_bytes();
-</span><span class="boring">
-</span><span class="boring">    for (i, &amp;item) in bytes.iter().enumerate() {
-</span>        if item == b' ' {
-            return i;
-        }
-    }
+                        <p>As an analogy, consider a thermostat&mdash;a black box whose task it is to keep
+                            your house at a certain temperature. The thermostat has a parameter, namely the
+                            dial that is used to set the desired temperature. The thermostat always
+                            performs the same task: maintaining a constant temperature. However, the exact
+                            task that it performs&mdash;that is, <b>which</b> temperature it
+                            maintains&mdash;is customized by the setting on its dial.</p>
 
-    s.len()
-<span class="boring">}
-</span><span class="boring">
-</span><span class="boring">fn main() {}</span></code></pre>
-<p>We now have a way to find out the index of the end of the first word in the
-string, but there’s a problem. We’re returning a <code>usize</code> on its own, but it’s
-only a meaningful number in the context of the <code>&amp;String</code>. In other words,
-because it’s a separate value from the <code>String</code>, there’s no guarantee that it
-will still be valid in the future. Consider the program in Listing 4-8 that
-uses the <code>first_word</code> function from Listing 4-7.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn first_word(s: &amp;String) -&gt; usize {
-</span><span class="boring">    let bytes = s.as_bytes();
-</span><span class="boring">
-</span><span class="boring">    for (i, &amp;item) in bytes.iter().enumerate() {
-</span><span class="boring">        if item == b' ' {
-</span><span class="boring">            return i;
-</span><span class="boring">        }
-</span><span class="boring">    }
-</span><span class="boring">
-</span><span class="boring">    s.len()
-</span><span class="boring">}
-</span><span class="boring">
-</span>fn main() {
-    let mut s = String::from(&quot;hello world&quot;);
+                       <h3 id="Using Parameters"><a class="header" href="#Using Parameters">Using Parameters</a></h3>
 
-    let word = first_word(&amp;s); // word will get the value 5
+                        <p>As an example, let's go back to the "3N+1" problem that was discussed in
+                            <a href="ch03-02-AlgorithmDevelopment.html">Subsection&nbsp;3.2.2</a>. (Recall that a 3N+1 sequence is
+                            computed according to the rule, "if N is odd, multiply it by 3 and add 1; if N is
+                            even, divide it by 2; continue until N is equal to 1." For example, starting from
+                            N=3 we get the sequence: 3, 10, 5, 16, 8, 4, 2, 1.) Suppose that we want to
+                            write a subroutine to print out such sequences. The subroutine will always
+                            perform the same task: Print out a 3N+1 sequence. But the exact sequence it
+                            prints out depends on the starting value of N. So, the starting value of N
+                            would be a parameter to the subroutine. The subroutine can be written like
+                            this:</p>
 
-    s.clear(); // this empties the String, making it equal to &quot;&quot;
 
-    // word still has the value 5 here, but there's no more string that
-    // we could meaningfully use the value 5 with. word is now totally invalid!
-}</code></pre></pre>
-<p><span class="caption">Listing 4-8: Storing the result from calling the
-<code>first_word</code> function and then changing the <code>String</code> contents</span></p>
-<p>This program compiles without any errors and would also do so if we used <code>word</code>
-after calling <code>s.clear()</code>. Because <code>word</code> isn’t connected to the state of <code>s</code>
-at all, <code>word</code> still contains the value <code>5</code>. We could use that value <code>5</code> with
-the variable <code>s</code> to try to extract the first word out, but this would be a bug
-because the contents of <code>s</code> have changed since we saved <code>5</code> in <code>word</code>.</p>
-<p>Having to worry about the index in <code>word</code> getting out of sync with the data in
-<code>s</code> is tedious and error prone! Managing these indices is even more brittle if
-we write a <code>second_word</code> function. Its signature would have to look like this:</p>
-<pre><code class="language-rust ignore">fn second_word(s: &amp;String) -&gt; (usize, usize) {</code></pre>
-<p>Now we’re tracking a starting <em>and</em> an ending index, and we have even more
-values that were calculated from data in a particular state but aren’t tied to
-that state at all. We have three unrelated variables floating around that need
-to be kept in sync.</p>
-<p>Luckily, Rust has a solution to this problem: string slices.</p>
-<h3 id="string-slices"><a class="header" href="#string-slices">String Slices</a></h3>
-<p>A <em>string slice</em> is a reference to part of a <code>String</code>, and it looks like this:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
-</span>    let s = String::from(&quot;hello world&quot;);
+                        <pre><code class="java">/**
+ * This subroutine prints a 3N+1 sequence to standard output, using
+ * startingValue as the initial value of N.  It also prints the number 
+ * of terms in the sequence. The value of the parameter, startingValue, 
+ * must  be a positive integer.
+ */
+static void print3NSequence(int startingValue) {
+      
+   int N;      // One of the terms in the sequence.
+   int count;  // The number of terms.
+  
+   N = startingValue;  // The first term is whatever value
+                       //    is passed to the subroutine as 
+                       //    a parameter.
+   
+   count = 1; // We have one term, the starting value, so far.
+   
+   System.out.println("The 3N+1 sequence starting from " + N);
+   System.out.println();
+   System.out.println(N);  // print initial term of sequence
+ 
+   while (N &gt; 1) {
+       if (N % 2 == 1)     // is N odd?
+          N = 3 * N + 1;
+       else
+          N = N / 2;
+       count++;   // count this term
+       System.out.println(N);  // print this term
+   }
+   
+   System.out.println();
+   System.out.println("There were " + count + " terms in the sequence.");
 
-    let hello = &amp;s[0..5];
-    let world = &amp;s[6..11];
-<span class="boring">}</span></code></pre></pre>
-<p>Rather than a reference to the entire <code>String</code>, <code>hello</code> is a reference to a
-portion of the <code>String</code>, specified in the extra <code>[0..5]</code> bit. We create slices
-using a range within brackets by specifying <code>[starting_index..ending_index]</code>,
-where <code>starting_index</code> is the first position in the slice and <code>ending_index</code> is
-one more than the last position in the slice. Internally, the slice data
-structure stores the starting position and the length of the slice, which
-corresponds to <code>ending_index</code> minus <code>starting_index</code>. So, in the case of <code>let world = &amp;s[6..11];</code>, <code>world</code> would be a slice that contains a pointer to the
-byte at index 6 of <code>s</code> with a length value of <code>5</code>.</p>
-<p>Figure 4-6 shows this in a diagram.</p>
-<p><img alt="Three tables: a table representing the stack data of s, which points
-to the byte at index 0 in a table of the string data &quot;hello world&quot; on
-the heap. The third table rep-resents the stack data of the slice world, which
-has a length value of 5 and points to byte 6 of the heap data table."
-src="img/trpl04-06.svg" class="center" style="width: 50%;" /></p>
-<p><span class="caption">Figure 4-6: String slice referring to part of a
-<code>String</code></span></p>
-<p>With Rust’s <code>..</code> range syntax, if you want to start at index 0, you can drop
-the value before the two periods. In other words, these are equal:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>let s = String::from(&quot;hello&quot;);
+}  // end print3NSequence</code></pre>
 
-let slice = &amp;s[0..2];
-let slice = &amp;s[..2];
-<span class="boring">}</span></code></pre></pre>
-<p>By the same token, if your slice includes the last byte of the <code>String</code>, you
-can drop the trailing number. That means these are equal:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>let s = String::from(&quot;hello&quot;);
 
-let len = s.len();
+                        <p>The parameter list of this subroutine, "<span class="code">(int&nbsp;startingValue)</span>",
+                            specifies that the subroutine has one parameter, of type <span class="ptype">int</span>.   Within
+                            the body of the subroutine, the parameter name can be used in the same way as a
+                            variable name.  But notice that there is nothing in the subroutine definition that
+                            gives a value to the parameter!
+                            The parameter gets its initial value from <b>outside</b> the subroutine.  When the
+                            subroutine is called, a value must be provided for the parameter in the subroutine call
+                            statement.  This value
+                            will be assigned to <span class="code">startingValue</span> before the body of the
+                            subroutine is executed.  For example, the subroutine could be called using the
+                            subroutine call statement "<span class="code">print3NSequence(17);</span>". When the computer
+                            executes this statement, the computer first assigns the value 17 to
+                            <span class="code">startingValue</span> and then executes the statements in the subroutine. This
+                            prints the 3N+1 sequence starting from 17. If <span class="code">K</span> is a variable of type
+                            <span class="ptype">int</span>, then the subroutine can be called by saying "<span class="code">print3NSequence(K);</span>".
+                            When the computer executes this subroutine call statement, it takes the value of the variable
+                            <span class="code">K</span>, assigns that value to <span class="code">startingValue</span>, and then executes the body
+                            of the subroutine.</p>
 
-let slice = &amp;s[3..len];
-let slice = &amp;s[3..];
-<span class="boring">}</span></code></pre></pre>
-<p>You can also drop both values to take a slice of the entire string. So these
-are equal:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>let s = String::from(&quot;hello&quot;);
 
-let len = s.len();
+                        <p>The class that contains <span class="code">print3NSequence</span> can contain a
+                            <span class="code">main()</span> routine (or other subroutines) that call
+                            <span class="code">print3NSequence</span>. For example, here is a <span class="code">main()</span> program that
+                            prints out 3N+1 sequences for various starting values specified by the
+                            user:</p>
 
-let slice = &amp;s[0..len];
-let slice = &amp;s[..];
-<span class="boring">}</span></code></pre></pre>
-<blockquote>
-<p>Note: String slice range indices must occur at valid UTF-8 character
-boundaries. If you attempt to create a string slice in the middle of a
-multibyte character, your program will exit with an error. For the purposes
-of introducing string slices, we are assuming ASCII only in this section; a
-more thorough discussion of UTF-8 handling is in the <a href="ch08-02-WritingCorrectPrograms.html#storing-utf-8-encoded-text-with-strings">“Storing UTF-8 Encoded
-Text with Strings”</a><!-- ignore --> section of Chapter 8.</p>
-</blockquote>
-<p>With all this information in mind, let’s rewrite <code>first_word</code> to return a
-slice. The type that signifies “string slice” is written as <code>&amp;str</code>:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn first_word(s: &amp;String) -&gt; &amp;str {
-    let bytes = s.as_bytes();
 
-    for (i, &amp;item) in bytes.iter().enumerate() {
-        if item == b' ' {
-            return &amp;s[0..i];
-        }
-    }
+                        <pre><code class="java">public static void main(String[] args) {
+   System.out.println("This program will print out 3N+1 sequences");
+   System.out.println("for starting values that you specify.");
+   System.out.println();
+   int K;  // Input from user; loop ends when K &lt; 0.
+   do {
+      System.out.println("Enter a starting value.");
+      System.out.print("To end the program, enter 0: ");
+      K = TextIO.getInt();  // Get starting value from user.
+      if (K &gt; 0)   // Print sequence, but only if K is &gt; 0.
+         print3NSequence(K);
+   } while (K &gt; 0);   // Continue only if K &gt; 0.
+} // end main</code></pre>
 
-    &amp;s[..]
-}
-<span class="boring">
-</span><span class="boring">fn main() {}</span></code></pre></pre>
-<p>We get the index for the end of the word the same way we did in Listing 4-7, by
-looking for the first occurrence of a space. When we find a space, we return a
-string slice using the start of the string and the index of the space as the
-starting and ending indices.</p>
-<p>Now when we call <code>first_word</code>, we get back a single value that is tied to the
-underlying data. The value is made up of a reference to the starting point of
-the slice and the number of elements in the slice.</p>
-<p>Returning a slice would also work for a <code>second_word</code> function:</p>
-<pre><code class="language-rust ignore">fn second_word(s: &amp;String) -&gt; &amp;str {</code></pre>
-<p>We now have a straightforward API that’s much harder to mess up because the
-compiler will ensure the references into the <code>String</code> remain valid. Remember
-the bug in the program in Listing 4-8, when we got the index to the end of the
-first word but then cleared the string so our index was invalid? That code was
-logically incorrect but didn’t show any immediate errors. The problems would
-show up later if we kept trying to use the first word index with an emptied
-string. Slices make this bug impossible and let us know we have a problem with
-our code much sooner. Using the slice version of <code>first_word</code> will throw a
-compile-time error:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore does_not_compile"><span class="boring">fn first_word(s: &amp;String) -&gt; &amp;str {
-</span><span class="boring">    let bytes = s.as_bytes();
-</span><span class="boring">
-</span><span class="boring">    for (i, &amp;item) in bytes.iter().enumerate() {
-</span><span class="boring">        if item == b' ' {
-</span><span class="boring">            return &amp;s[0..i];
-</span><span class="boring">        }
-</span><span class="boring">    }
-</span><span class="boring">
-</span><span class="boring">    &amp;s[..]
-</span><span class="boring">}
-</span><span class="boring">
-</span>fn main() {
-    let mut s = String::from(&quot;hello world&quot;);
 
-    let word = first_word(&amp;s);
+                        <p>Remember that before you can use this program, the definitions of
+                            <span class="code">main</span> and of <span class="code">print3NSequence</span> must both be
+                            wrapped inside a class definition.</p>
 
-    s.clear(); // error!
+                        
+                       <h3 id="Formal and Actual Parameters"><a class="header" href="#Formal and Actual Parameters">Formal and Actual Parameters</a></h3>
 
-    println!(&quot;the first word is: {}&quot;, word);
+                        <p>Note that the term "parameter" is used to refer to two different, but
+                            related, concepts. There are parameters that are used in the definitions of
+                            subroutines, such as <span class="code">startingValue</span> in the above example. And there are
+                            parameters that are used in subroutine call statements, such as the <span class="code">K</span>
+                            in the statement "<span class="code">print3NSequence(K);</span>". Parameters in a subroutine
+                            definition are called <span class="newword">formal parameters</span> or
+                            <span class="newword">dummy parameters</span>. The parameters that are passed
+                            to a subroutine when it is called are called <span class="newword">actual parameters</span>
+                            or <span class="newword">arguments</span>.
+                            When a subroutine is called, the actual parameters in the
+                            subroutine call statement are evaluated and the values are assigned to the
+                            formal parameters in the subroutine's definition. Then the body of the
+                            subroutine is executed.</p>
+
+
+                        <p>A formal parameter must be a <b>name</b>, that is, a simple identifier.
+                            A formal parameter is very much like a variable, and&mdash;like a variable&mdash;it
+                            has a specified type such as <span class="ptype">int</span>, <span class="ptype">boolean</span>,
+                            <span class="classname">String</span>, or <span class="atype">double[]</span>.
+                            An actual parameter is a <b>value</b>, and so it can
+                            be specified by any expression, provided that the expression computes a value
+                            of the correct type. The type of the actual parameter must be one that could
+                            legally be assigned to the formal parameter with an assignment statement. For
+                            example, if the formal parameter is of type <span class="ptype">double</span>, then it would be
+                            legal to pass an <span class="ptype">int</span> as the actual parameter since <span class="ptype">ints</span> can
+                            legally be assigned to <span class="ptype">doubles</span>.  When you call a subroutine, you must
+                            provide one actual parameter for each formal parameter in the subroutine's
+                            definition. Consider, for example, a subroutine</p>
+
+
+                        <pre><code class="java">static void doTask(int N, double x, boolean test) {
+    // statements to perform the task go here
 }</code></pre>
-<p>Here’s the compiler error:</p>
-<pre><code class="language-console">$ cargo run
-   Compiling ownership v0.1.0 (file:///projects/ownership)
-error[E0502]: cannot borrow `s` as mutable because it is also borrowed as immutable
-  --&gt; src/main.rs:18:5
-   |
-16 |     let word = first_word(&amp;s);
-   |                           -- immutable borrow occurs here
-17 |
-18 |     s.clear(); // error!
-   |     ^^^^^^^^^ mutable borrow occurs here
-19 |
-20 |     println!(&quot;the first word is: {}&quot;, word);
-   |                                       ---- immutable borrow later used here
 
-For more information about this error, try `rustc --explain E0502`.
-error: could not compile `ownership` due to previous error
-</code></pre>
-<p>Recall from the borrowing rules that if we have an immutable reference to
-something, we cannot also take a mutable reference. Because <code>clear</code> needs to
-truncate the <code>String</code>, it needs to get a mutable reference. The <code>println!</code>
-after the call to <code>clear</code> uses the reference in <code>word</code>, so the immutable
-reference must still be active at that point. Rust disallows the mutable
-reference in <code>clear</code> and the immutable reference in <code>word</code> from existing at the
-same time, and compilation fails. Not only has Rust made our API easier to use,
-but it has also eliminated an entire class of errors at compile time!</p>
-<!-- Old heading. Do not remove or links may break. -->
-<p><a id="string-literals-are-slices"></a></p>
-<h4 id="string-literals-as-slices"><a class="header" href="#string-literals-as-slices">String Literals as Slices</a></h4>
-<p>Recall that we talked about string literals being stored inside the binary. Now
-that we know about slices, we can properly understand string literals:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>let s = &quot;Hello, world!&quot;;
-<span class="boring">}</span></code></pre></pre>
-<p>The type of <code>s</code> here is <code>&amp;str</code>: it’s a slice pointing to that specific point of
-the binary. This is also why string literals are immutable; <code>&amp;str</code> is an
-immutable reference.</p>
-<h4 id="string-slices-as-parameters"><a class="header" href="#string-slices-as-parameters">String Slices as Parameters</a></h4>
-<p>Knowing that you can take slices of literals and <code>String</code> values leads us to
-one more improvement on <code>first_word</code>, and that’s its signature:</p>
-<pre><code class="language-rust ignore">fn first_word(s: &amp;String) -&gt; &amp;str {</code></pre>
-<p>A more experienced Rustacean would write the signature shown in Listing 4-9
-instead because it allows us to use the same function on both <code>&amp;String</code> values
-and <code>&amp;str</code> values.</p>
-<pre><code class="language-rust ignore">fn first_word(s: &amp;str) -&gt; &amp;str {
-<span class="boring">    let bytes = s.as_bytes();
-</span><span class="boring">
-</span><span class="boring">    for (i, &amp;item) in bytes.iter().enumerate() {
-</span><span class="boring">        if item == b' ' {
-</span><span class="boring">            return &amp;s[0..i];
-</span><span class="boring">        }
-</span><span class="boring">    }
-</span><span class="boring">
-</span><span class="boring">    &amp;s[..]
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">fn main() {
-</span><span class="boring">    let my_string = String::from(&quot;hello world&quot;);
-</span><span class="boring">
-</span><span class="boring">    // `first_word` works on slices of `String`s, whether partial or whole
-</span><span class="boring">    let word = first_word(&amp;my_string[0..6]);
-</span><span class="boring">    let word = first_word(&amp;my_string[..]);
-</span><span class="boring">    // `first_word` also works on references to `String`s, which are equivalent
-</span><span class="boring">    // to whole slices of `String`s
-</span><span class="boring">    let word = first_word(&amp;my_string);
-</span><span class="boring">
-</span><span class="boring">    let my_string_literal = &quot;hello world&quot;;
-</span><span class="boring">
-</span><span class="boring">    // `first_word` works on slices of string literals, whether partial or whole
-</span><span class="boring">    let word = first_word(&amp;my_string_literal[0..6]);
-</span><span class="boring">    let word = first_word(&amp;my_string_literal[..]);
-</span><span class="boring">
-</span><span class="boring">    // Because string literals *are* string slices already,
-</span><span class="boring">    // this works too, without the slice syntax!
-</span><span class="boring">    let word = first_word(my_string_literal);
-</span><span class="boring">}</span></code></pre>
-<p><span class="caption">Listing 4-9: Improving the <code>first_word</code> function by using
-a string slice for the type of the <code>s</code> parameter</span></p>
-<p>If we have a string slice, we can pass that directly. If we have a <code>String</code>, we
-can pass a slice of the <code>String</code> or a reference to the <code>String</code>. This
-flexibility takes advantage of <em>deref coercions</em>, a feature we will cover in
-<a href="ch15-02-deref.html#implicit-deref-coercions-with-functions-and-methods">“Implicit Deref Coercions with Functions and
-Methods”</a><!--ignore--> section of Chapter 15.</p>
-<p>Defining a function to take a string slice instead of a reference to a <code>String</code>
-makes our API more general and useful without losing any functionality:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn first_word(s: &amp;str) -&gt; &amp;str {
-</span><span class="boring">    let bytes = s.as_bytes();
-</span><span class="boring">
-</span><span class="boring">    for (i, &amp;item) in bytes.iter().enumerate() {
-</span><span class="boring">        if item == b' ' {
-</span><span class="boring">            return &amp;s[0..i];
-</span><span class="boring">        }
-</span><span class="boring">    }
-</span><span class="boring">
-</span><span class="boring">    &amp;s[..]
-</span><span class="boring">}
-</span><span class="boring">
-</span>fn main() {
-    let my_string = String::from(&quot;hello world&quot;);
 
-    // `first_word` works on slices of `String`s, whether partial or whole
-    let word = first_word(&amp;my_string[0..6]);
-    let word = first_word(&amp;my_string[..]);
-    // `first_word` also works on references to `String`s, which are equivalent
-    // to whole slices of `String`s
-    let word = first_word(&amp;my_string);
+                        <p>This subroutine might be called with the statement</p>
 
-    let my_string_literal = &quot;hello world&quot;;
 
-    // `first_word` works on slices of string literals, whether partial or whole
-    let word = first_word(&amp;my_string_literal[0..6]);
-    let word = first_word(&amp;my_string_literal[..]);
+                        <pre><code class="java">doTask(17, Math.sqrt(z+1), z &gt;= 10);</code></pre>
 
-    // Because string literals *are* string slices already,
-    // this works too, without the slice syntax!
-    let word = first_word(my_string_literal);
-}</code></pre></pre>
-<h3 id="other-slices"><a class="header" href="#other-slices">Other Slices</a></h3>
-<p>String slices, as you might imagine, are specific to strings. But there’s a
-more general slice type too. Consider this array:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>let a = [1, 2, 3, 4, 5];
-<span class="boring">}</span></code></pre></pre>
-<p>Just as we might want to refer to part of a string, we might want to refer to
-part of an array. We’d do so like this:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>let a = [1, 2, 3, 4, 5];
 
-let slice = &amp;a[1..3];
+                        <p>When the computer executes this statement, it has essentially the same
+                            effect as the block of statements:</p>
 
-assert_eq!(slice, &amp;[2, 3]);
-<span class="boring">}</span></code></pre></pre>
-<p>This slice has the type <code>&amp;[i32]</code>. It works the same way as string slices do, by
-storing a reference to the first element and a length. You’ll use this kind of
-slice for all sorts of other collections. We’ll discuss these collections in
-detail when we talk about vectors in Chapter 8.</p>
-<h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
-<p>The concepts of ownership, borrowing, and slices ensure memory safety in Rust
-programs at compile time. The Rust language gives you control over your memory
-usage in the same way as other systems programming languages, but having the
-owner of data automatically clean up that data when the owner goes out of scope
-means you don’t have to write and debug extra code to get this control.</p>
-<p>Ownership affects how lots of other parts of Rust work, so we’ll talk about
-these concepts further throughout the rest of the book. Let’s move on to
-Chapter 5 and look at grouping pieces of data together in a <code>struct</code>.</p>
 
+                        <pre><code class="java">{
+  int N;       // Allocate memory locations for the formal parameters.
+  double x;
+  boolean test;
+  N = 17;              // Assign 17 to the first formal parameter, N.
+  x = Math.sqrt(z+1);  // Compute Math.sqrt(z+1), and assign it to
+                       //    the second formal parameter, x.
+  test = (z &gt;= 10);    // Evaluate "z &gt;= 10" and assign the resulting
+                       //     true/false value to the third formal 
+                       //     parameter, test.
+   // statements to perform the task go here
+}</code></pre>
+
+
+                        <p>(There are a few technical differences between this and
+                            "<span class="code">doTask(17,Math.sqrt(z+1),z&gt;=10);</span>" &mdash;besides the amount of typing&mdash;because
+                            of questions about scope of variables and what happens when several
+                            variables or parameters have the same name.)</p>
+
+
+                        <p>Beginning programming students often find parameters to be surprisingly
+                            confusing. Calling a subroutine that already exists is not a problem&mdash;the
+                            idea of providing information to the subroutine in a parameter is clear enough.
+                            Writing the subroutine definition is another matter. A common beginner's mistake is to
+                            assign values to the formal parameters at the beginning of the subroutine, or
+                            to ask the user to input their values. <b>This represents a fundamental
+                                misunderstanding.</b> By the time the computer starts executing the statements in the subroutine, the
+                            formal parameters have <b>already</b> been assigned initial values!  The computer automatically
+                            assigns values to the formal parameters before it starts executing the code inside the
+                            subroutine. The values come from the actual parameters in the subroutine
+                            call statement. Remember that a subroutine is not independent. It is called by
+                            some other routine, and it is the subroutine call statement's responsibility to provide
+                            appropriate values for the parameters.</p>
+
+                        
+                       <h3 id="Overloading"><a class="header" href="#Overloading">Overloading</a></h3>
+
+                        <p>In order to call a subroutine legally, you need to know its name, you need
+                            to know how many formal parameters it has, and you need to know the type of
+                            each parameter. This information is called the subroutine's <span class="newword">signature</span>.
+                            The signature of the subroutine <span class="code">doTask</span>, used as an example above, can
+                            be expressed as: <span class="code">doTask(int,double,boolean)</span>. Note that the signature does
+                            <b>not</b> include the names of the parameters; in fact, if you just
+                            want to <b>use</b> the subroutine, you don't even need to know what
+                            the formal parameter names are, so the names are not part of the interface.</p>
+
+
+                        <p>Java is somewhat unusual in that it allows two different subroutines in the
+                            same class to have the same name, provided that their signatures are different.
+                            When this happens, we say that
+                            the name of the subroutine is <span class="newword">overloaded</span> because
+                            it has several different meanings. The computer doesn't get the subroutines
+                            mixed up. It can tell which one you want to call by the number and types of the
+                            actual parameters that you provide in the subroutine call statement. You have
+                            already seen overloading used with <span class="classname">System.out</span>. This object includes
+                            many different methods named <span class="code">println</span>, for example. These methods all
+                            have different signatures, such as:</p>
+
+
+                        <pre><code class="java">
+println(int)                   println(double)
+println(char)                  println(boolean)
+println()</code></pre>
+
+
+                        <p>The computer knows which of these subroutines you want to use based on
+                            the type of the actual parameter that you provide.  <span class="code">System.out.println(17)</span>
+                            calls the subroutine with signature <span class="code">println(int)</span>, while
+                            <span class="code">System.out.println('A')</span> calls the subroutine with signature <span class="code">println(char)</span>.
+                            Of course all these different subroutines are semantically related, which is
+                            why it is acceptable programming style to use the same name for them all. But
+                            as far as the computer is concerned, printing out an <span class="ptype">int</span> is very
+                            different from printing out a <span class="ptype">char</span>, which is different from printing
+                            out a <span class="ptype">boolean</span>, and so forth&mdash;so that each of these operations
+                            requires a different subroutine.</p>
+
+
+                        <p>Note, by the way, that the signature does <b>not</b> include the
+                            subroutine's return type. It is illegal to have two subroutines in the same
+                            class that have the same signature but that have different return types. For
+                            example, it would be a syntax error for a class to contain two subroutines defined
+                            as:</p>
+
+
+                        <pre><code class="java">int    getln() { ... }
+double getln() { ... }</code></pre>
+
+
+                        <p>This is why in the <span class="classname">TextIO</span> class, the subroutines
+                            for reading different types are not all named <span class="code">getln()</span>. In a given
+                            class, there can only be one routine that has the name <span class="code">getln</span> with
+                            no parameters. So, the input routines in <span class="classname">TextIO</span> are distinguished by
+                            having different names, such as <span class="code">getlnInt()</span> and
+                            <span class="code">getlnDouble()</span>.</p>
+
+                        
+                       <h3 id="Subroutine Examples"><a class="header" href="#Subroutine Examples">Subroutine Examples</a></h3>
+
+                        <p>Let's do a few examples of writing small subroutines to perform assigned
+                            tasks. Of course, this is only one side of programming with subroutines. The
+                            task performed by a subroutine is always a subtask in a larger program. The art
+                            of designing those programs&mdash;of deciding how to break them up into subtasks&mdash;is
+                            the other side of programming with subroutines. We'll return to the
+                            question of program design in <a href="ch04-07-MoreOnProgramDesign.html">Section&nbsp;4.7</a>.</p>
+
+
+                        <p>As a first example, let's write a subroutine to compute and print out all
+                            the divisors of a given positive integer. The integer will be a parameter to
+                            the subroutine. Remember that the syntax of any subroutine is:</p>
+
+
+                        <pre><code class="java">
+<span class="bnf">modifiers</span>  <span class="bnf">return-type</span>  <span class="bnf">subroutine-name</span>  ( <span class="bnf">parameter-list</span> ) {
+    <span class="bnf">statements</span>
+}</code></pre>
+
+
+                        <p>Writing a subroutine always means filling out this format. In this case,
+                            the statement of the problem implies that there is one parameter,
+                            of type <span class="ptype">int</span>, that represents the "given integer" whose
+                            divisors are to be printed.  And it tells us
+                            what the statements in the body of the subroutine should do. Since we are only
+                            working with static subroutines for now, we'll need to use <span class="code">static</span> as a
+                            modifier. We could add an access modifier (<span class="code">public</span> or
+                            <span class="code">private</span>), but in the absence of any instructions, I'll leave it out.
+                            Since we are not told to return a value, the return type is <span class="code">void</span>.
+                            Since no names are specified, we'll have to make up names for the formal
+                            parameter and for the subroutine itself. I'll use <span class="code">N</span> for the parameter
+                            and <span class="code">printDivisors</span> for the subroutine name. The subroutine will look
+                            like</p>
+
+
+                        <pre><code class="java">static void printDivisors( int N ) {
+    <span class="bnf">statements</span>
+}</code></pre>
+
+
+                        <p>and all we have left to do is to write the statements that make up the body
+                            of the routine. This is not difficult. Just remember that you have to write the
+                            body assuming that <span class="code">N</span> already has a value! The algorithm is: "For each
+                            possible divisor <span class="code">D</span> in the range from <span class="code">1</span> to <span class="code">N</span>, if
+                            <span class="code">D</span> evenly divides <span class="code">N</span>, then print <span class="code">D</span>." Written in Java,
+                            this becomes:</p>
+
+
+                        <pre><code class="java">/**
+ * Print all the divisors of N.
+ * We assume that N is a positive integer.
+ */
+static void printDivisors( int N ) {
+    int D;   // One of the possible divisors of N.
+    System.out.println("The divisors of " + N + " are:");
+    for ( D = 1; D &lt;= N; D++ ) {
+       if ( N % D == 0 )  // Does D evenly divide N?
+          System.out.println(D);
+    }
+}</code></pre>
+
+
+                        <p>I've added a comment before the subroutine definition
+                            indicating the contract of the subroutine&mdash;that is,
+                            what it does and what assumptions it makes. The contract includes the
+                            assumption that <span class="code">N</span> is a positive integer.   It is up to the caller of the
+                            subroutine to make sure that this assumption is satisfied.</p>
+
+
+                        <p>As a second short example, consider the problem: Write a <span class="code">private </span>subroutine named
+                            <span class="code">printRow</span>. It should have a parameter <span class="code">ch</span> of type <span class="ptype">char</span>
+                            and a parameter <span class="code">N</span> of type <span class="ptype">int</span>. The subroutine should print
+                            out a line of text containing <span class="code">N</span> copies of the character
+                            <span class="code">ch</span>.</p>
+
+
+                        <p>Here, we are told the name of the subroutine and the names of the two
+                            parameters, and we are told that the subroutine is <span class="code">private</span>,
+                            so we don't have much choice about the first line of the subroutine
+                            definition. The task in this case is pretty simple, so the body of the
+                            subroutine is easy to write. The complete subroutine is given by</p>
+
+
+                        <pre><code class="java">/**
+ * Write one line of output containing N copies of the
+ * character ch.  If N &lt;= 0, an empty line is output.
+ */
+private static void printRow( char ch, int N ) {
+    int i;  // Loop-control variable for counting off the copies.
+    for ( i = 1; i &lt;= N; i++ ) {
+        System.out.print( ch );
+    }
+    System.out.println();
+}</code></pre>
+
+
+                        <p>Note that in this case, the contract makes no assumption about <span class="code">N</span>,
+                            but it makes it clear what will happen in all cases, including the unexpected
+                            case that <span class="code">N&nbsp;&lt;=&nbsp;0</span>.</p>
+
+
+                        <p>Finally, let's do an example that shows how one subroutine can build on
+                            another. Let's write a subroutine that takes a <span class="classname">String</span> as a parameter.
+                            For each character in the string, it should print a line of output containing 25
+                            copies of that character. It should use the <span class="code">printRow()</span> subroutine defined above to
+                            produce the output.</p>
+
+
+                        <p>Again, we get to choose a name for the subroutine and a name for the
+                            parameter. I'll call the subroutine <span class="code">printRowsFromString</span> and the
+                            parameter <span class="code">str</span>. The algorithm is pretty clear: For each position
+                            <span class="code">i</span> in the string <span class="code">str</span>, call <span class="code">printRow(str.charAt(i),25)</span>
+                            to print one line of the output that contains 25 copies of character number <span class="code">i</span>
+                            from the string. So, we get:</p>
+
+
+                        <pre><code class="java">/**
+ * For each character in str, write a line of output
+ * containing 25 copies of that character.
+ */
+private static void printRowsFromString( String str ) {
+    int i;  // Loop-control variable for counting off the chars.
+    for ( i = 0; i &lt; str.length(); i++ ) {
+        printRow( str.charAt(i), 25 );
+    }
+}</code></pre>
+
+
+                        <p>We could then use <span class="code">printRowsFromString</span> in a <span class="code">main()</span> routine such
+                            as</p>
+
+
+                        <pre><code class="java">public static void main(String[] args) {
+    String inputLine;  // Line of text input by user.
+    System.out.print("Enter a line of text: ");
+    inputLine = TextIO.getln();
+    System.out.println();
+    printRowsFromString( inputLine );
+}</code></pre>
+
+
+                        <p>Of course, the three routines, <span class="code">main()</span>,
+                            <span class="code">printRowsFromString()</span>, and <span class="code">printRow()</span>, would have to be
+                            collected together inside the same class. The program is rather useless, but it
+                            does demonstrate the use of subroutines. You'll find the program in the file
+                            <span class="sourceref"><a href="./source/chapter4/RowsOfChars.java">RowsOfChars.java</a></span>, if you want to take a
+                            look.</p>
+
+                       <h3 id="Array Parameters"><a class="header" href="#Array Parameters">Array Parameters</a></h3>
+
+                        <p>It's possible for the type of a parameter to be an array type.  This means that
+                            an entire array of values can be passed to the subroutine as a single parameter.
+                            For example, we might want a subroutine to print all the values in an integer array
+                            in a neat format, separated by commas and enclosed in a pair of square brackets.
+                            To tell it which array to print, the subroutine would have a parameter of
+                            type <span class="atype">int[]</span>:</p>
+
+
+                        <pre><code class="java">static void printValuesInList( int[] list ) {
+    System.out.print('[');
+    int i;
+    for ( i = 0; i &lt; list.length; i++ ) {
+        if ( i &gt; 0 )
+            System.out.print(','); // No comma in front of list[0]
+        System.out.print(list[i]);
+    }
+    System.out.println(']');
+}</code></pre>
+
+
+                        <p>To use this subroutine, you need an actual array.  Here is a legal, though not very
+                            realistic, code segment that creates an array just to pass it as an argument to
+                            the subroutine:</p>
+
+
+                        <pre><code class="java">int[] numbers;
+numbers = new int[3];
+numbers[0] = 42;
+numbers[1] = 17;
+numbers[2] = 256;
+printValuesInList( numbers );</code></pre>
+
+
+                        <p>The output produced by the last statement would be <span class="code">[42,17,256]</span>.</p>
+
+                       <h3 id="Command-line Arguments"><a class="header" href="#Command-line Arguments">Command-line Arguments</a></h3>
+
+                        <p>The <span class="code">main</span> routine of a program has a parameter of type
+                            <span class="atype">String[]</span>.  When the main routine is called, some actual array
+                            of <span class="classname">String</span> must be passed to <span class="code">main()</span> as the value
+                            of the parameter.  The system provides the actual parameter when it calls <span class="code">main()</span>,
+                            so the values come from outside the program.  Where do the strings in the array
+                            come from, and what do they mean?  The
+                            strings in the array are <span class="newword">command-line arguments</span> from the
+                            command that was used to run the program.
+                            When using a command-line interface, the user types a
+                            command to tell the system to execute a program. The user can include extra
+                            input in this command, beyond the name of the program. This extra input becomes
+                            the command-line arguments.   The system takes the command-line arguments,
+                            puts them into an array of strings, and passes that array to <span class="code">main()</span>.</p>
+
+
+                        <p>For example, if the name of the program is <span class="code">myProg</span>, then the user can type
+                            "<span class="code">java&nbsp;myProg</span>" to execute the program. In this case, there are no
+                            command-line arguments. But if the user types the command</p>
+
+
+                        <pre><code class="console">$ java myProg one two three</code></pre>
+
+
+                        <p>then the command-line arguments are the strings "one", "two",
+                            and "three". The system puts these strings into an array of <span class="classname">Strings</span>
+                            and passes that array as a parameter to the <span class="code">main()</span> routine. Here, for
+                            example, is a short program that simply prints out any command line arguments
+                            entered by the user:</p>
+
+
+                        <pre><code class="java">public class CLDemo {
+   
+   public static void main(String[] args) {
+      System.out.println("You entered " + args.length
+                                  + " command-line arguments");
+      if (args.length &gt; 0) {
+         System.out.println("They were:");
+         int i;
+         for ( i = 0; i &lt; args.length; i++ )
+            System.out.println("   " + args[i]);
+      }
+   } // end main()
+   
+} // end class CLDemo</code></pre>
+
+
+                        <p>Note that the parameter, <span class="code">args</span>, can be an array of length
+                            zero.  This just means that the user did not include any command-line arguments
+                            when running the program. </p>
+
+
+                        <p>In practice, command-line arguments are often used to pass the names of
+                            files to a program.  For example, consider the following program for making
+                            a copy of a text file.  It does this by copying one line at a time from
+                            the original file to the copy, using TextIO.  The function
+                            <span class="code">TextIO.eof()</span> is a <span class="ptype">boolean</span>-valued function that
+                            is <span class="code">true</span> if the end of the input file has been reached.</p>
+
+
+                        <pre><code class="java">input textio.TextIO;
+
+/**
+ *  Requires two command line arguments, which must be file names.  The
+ *  first must be the name of an existing file.  The second is the name
+ *  of a file to be created by the program.  The contents of the first file
+ *  are copied into the second.  WARNING:  If the second file already 
+ *  exists when the program is run, its previous contents will be lost!
+ *  This program only works for plain text files.
+ */
+public class CopyTextFile {
+
+    public static void main( String[] args ) {
+        if (args.length &lt; 2 ) {
+            System.out.println("Two command-line arguments are required!");
+            System.exit(1);
+        }
+        TextIO.readFile( args[0] );   // Open the original file for reading.
+        TextIO.writeFile( args[1] );  // Open the copy file for writing.
+        int lineCount;  // Number of lines copied
+        lineCount = 0;
+        while ( TextIO.eof() == false ) {
+            // Read one line from the original file and write it to the copy.
+            String line;
+            line = TextIO.getln();
+            TextIO.putln(line);
+            lineCount++;
+        }
+        System.out.printf( "%d lines copied from %s to %s%n",
+                                lineCount, args[0], args[1] );
+    }
+
+}</code></pre>
+
+
+                        <p>Since most programs are run in a GUI environment these days, command-line arguments
+                            aren't as important as they used to be.  But at least they provide a nice example
+                            of how array parameters can be used.</p>
+                        
+                       <h3 id="Throwing Exceptions"><a class="header" href="#Throwing Exceptions">Throwing Exceptions</a></h3>
+
+
+                        <p>I have been talking about the "contract" of a subroutine.  The contract says
+                            what the subroutine will do, provided that the caller of the subroutine
+                            provides acceptable values for the subroutine's parameters.  The question
+                            arises, though, what should the subroutine do when the caller violates
+                            the contract by providing bad parameter values?</p>
+
+
+                        <p>We've already seen that some subroutines respond to bad parameter
+                            values by throwing exceptions.  (See <a href="ch03-07-ExceptionsTryCatch.html">Section&nbsp;3.7</a>.)
+                            For example, the contract of the built-in subroutine
+                            <span class="code">Double.parseDouble</span> says that the parameter should be
+                            a string representation of a number of type <span class="ptype">double</span>;
+                            if this is true, then the subroutine will convert the string into the
+                            equivalent numeric value.  If the caller violates the contract by
+                            passing an invalid string as the actual parameter, the subroutine responds by
+                            throwing an exception of type <span class="classname">NumberFormatException</span>.</p>
+
+
+                        <p>Many subroutines throw <span class="classname">IllegalArgumentExceptions</span>
+                            in response to bad parameter values.  You might want to do the same
+                            in your own subroutines.  This can be done with a <span class="newword">throw statement</span>.
+                            An exception is an object, and in order to throw an exception, you must
+                            create an exception object.  You won't officially learn how to do this until <a href="ch05-00-ObjectsClasses.html">Chapter&nbsp;5</a>,
+                            but for now, you can use the following syntax for a <span class="code">throw</span>
+                            statement that throws an <span class="classname">IllegalArgumentException</span>:</p>
+
+
+                        <pre><code class="java">throw  new  IllegalArgumentException( <span class="bnf">error-message</span> );</code></pre>
+
+
+                        <p>where <span class="bnf">error-message</span> is a string that describes the error that
+                            has been detected.   (The word "new" in this statement is what creates the object.)
+                            To use this statement in a subroutine, you would check whether the values
+                            of the parameters are legal.  If not, you would throw the exception. For
+                            example, consider the <span class="code">print3NSequence</span> subroutine from
+                            the beginning of this section.  The parameter of <span class="code">print3NSequence</span>
+                            is supposed to be a positive integer.  We can modify the subroutine definition
+                            to make it throw an exception when this condition is violated:</p>
+
+
+                        <pre><code class="java">static void print3NSequence(int startingValue) {
+   
+   <span class="newcode">if (startingValue &lt;= 0)  // The contract is violated!
+      throw new IllegalArgumentException( "Starting value must be positive." );</span>
+   .
+   .  // (The rest of the subroutine is the same as before.)
+   .</code></pre>
+
+
+                        <p>If the start value is bad, the computer executes the <span class="code">throw</span> statement.
+                            This will immediately terminate the subroutine, without executing the rest of the
+                            body of the subroutine.  Furthermore, the program as a whole will crash unless
+                            the exception is "caught" and handled elsewhere in the program by a
+                            <span class="code">try..catch</span> statement, as discussed in <a href="ch03-07-ExceptionsTryCatch.html">Section&nbsp;3.7</a>.
+                            For this to work, the subroutine call would have to be in the "try" part of
+                            the statement.</p>
+                        
+                       <h3 id="Global and Local Variables"><a class="header" href="#Global and Local Variables">Global and Local Variables</a></h3>
+
+                        <p>I'll finish this section on parameters by noting that we now have three
+                            different sorts of variables that can be used inside a subroutine: local
+                            variables declared in the subroutine, formal parameter names, and static member
+                            variables that are declared outside the subroutine.</p>
+
+
+                        <p>Local variables have no connection to the outside world; they are purely
+                            part of the internal working of the subroutine.</p>
+
+
+                        <p>Parameters are used to "drop"
+                            values into the subroutine when it is called, but once the subroutine starts
+                            executing, parameters act much like local variables. Changes made inside a
+                            subroutine to a formal parameter have no effect on the rest of the program (at
+                            least if the type of the parameter is one of the primitive types&mdash;things are
+                            more complicated in the case of arrays and objects, as we'll see later).</p>
+
+
+                        <p>Things are different when a subroutine uses a variable that is defined
+                            outside the subroutine. That variable exists independently of the subroutine,
+                            and it is accessible to other parts of the program as well.
+                            Such a variable is said to be <span class="newword">global</span>
+                            to the subroutine, as opposed to the local variables defined inside the
+                            subroutine. A global variable can be used in the entire class in which
+                            it is defined and, if it is not <span class="code">private</span>, in other classes as well.
+                            Changes made to a global variable can have effects that extend
+                            outside the subroutine where the changes are made. You've seen how this works
+                            in the last example in the <a href="ch04-02-StaticSubroutines.html">previous section</a>, where the
+                            values of the global variables, <span class="code">gamesPlayed</span>
+                            and <span class="code">gamesWon</span>, are computed inside a
+                            subroutine and are used in the <span class="code">main()</span> routine.</p>
+
+
+                        <p>It's not always bad to use global variables in subroutines, but you should
+                            realize that the global variable then has to be considered part of the
+                            subroutine's interface. The subroutine uses the global variable to communicate
+                            with the rest of the program. This is a kind of sneaky, back-door communication
+                            that is less visible than communication done through parameters, and it risks
+                            violating the rule that the interface of a black box should be straightforward
+                            and easy to understand. So before you use a global variable in a subroutine,
+                            you should consider whether it's really necessary.</p>
+
+
+                        <p>I don't advise you to take an absolute stand against using global variables
+                            inside subroutines. There is at least one good reason to do it: If you think of
+                            the class as a whole as being a kind of black box, it can be very reasonable to
+                            let the subroutines inside that box be a little sneaky about communicating with
+                            each other, if that will make the class as a whole look simpler from the
+                            outside.</p>
+                        
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">

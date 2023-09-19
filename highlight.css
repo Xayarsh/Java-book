@@ -9,7 +9,7 @@
 /* Comment */
 .hljs-comment,
 .hljs-quote {
-  color: #575757;
+  color: #707070;
 }
 
 /* Red */
@@ -41,19 +41,19 @@
 .hljs-string,
 .hljs-symbol,
 .hljs-bullet {
-  color: #cddc39;
+  color: #4ac396;
 }
 
 /* Blue */
 .hljs-title,
 .hljs-section {
-  color: #c9291d;
+  color: #ffeb3b;
 }
 
 /* Purple */
 .hljs-keyword,
 .hljs-selector-tag {
-  color: #5d8cbd;
+  color: #ff9800;
 }
 
 .hljs {
