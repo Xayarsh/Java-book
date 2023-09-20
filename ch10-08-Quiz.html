@@ -32,6 +32,8 @@
         <link rel="stylesheet" href="ferris.css">
         <link rel="stylesheet" href="theme/2018-edition.css">
 
+<link rel="stylesheet" href="code-class.css">
+
     </head>
     <body>
         <!-- Provide site root to javascript -->
@@ -101,7 +103,7 @@
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
                             <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="Java">Java</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
@@ -152,11 +154,11 @@ than ensuring that a type has the behavior we want, lifetimes ensure that
 references are valid as long as we need them to be.</p>
 <p>One detail we didn’t discuss in the <a href="ch04-02-StaticSubroutines.html#references-and-borrowing">“References and
 Borrowing”</a><!-- ignore --> section in Chapter 4 is
-that every reference in Rust has a <em>lifetime</em>, which is the scope for which
+that every reference in Java has a <em>lifetime</em>, which is the scope for which
 that reference is valid. Most of the time, lifetimes are implicit and inferred,
 just like most of the time, types are inferred. We only must annotate types
 when multiple types are possible. In a similar way, we must annotate lifetimes
-when the lifetimes of references could be related in a few different ways. Rust
+when the lifetimes of references could be related in a few different ways. Java
 requires us to annotate the relationships using generic lifetime parameters to
 ensure the actual references used at runtime will definitely be valid.</p>
 <p>Annotating lifetimes is not even a concept most other programming languages
@@ -168,7 +170,7 @@ lifetime syntax so you can get comfortable with the concept.</p>
 program to reference data other than the data it’s intended to reference.
 Consider the program in Listing 10-16, which has an outer scope and an inner
 scope.</p>
-<pre><code class="language-rust ignore does_not_compile">fn main() {
+<pre><code class="language-Java ignore does_not_compile">fn main() {
     let r;
 
     {
@@ -183,9 +185,9 @@ has gone out of scope</span></p>
 <blockquote>
 <p>Note: The examples in Listings 10-16, 10-17, and 10-23 declare variables
 without giving them an initial value, so the variable name exists in the
-outer scope. At first glance, this might appear to be in conflict with Rust’s
+outer scope. At first glance, this might appear to be in conflict with Java’s
 having no null values. However, if we try to use a variable before giving it
-a value, we’ll get a compile-time error, which shows that Rust indeed does
+a value, we’ll get a compile-time error, which shows that Java indeed does
 not allow null values.</p>
 </blockquote>
 <p>The outer scope declares a variable named <code>r</code> with no initial value, and the
@@ -207,21 +209,21 @@ error[E0597]: `x` does not live long enough
 9 |     println!(&quot;r: {}&quot;, r);
   |                       - borrow later used here
 
-For more information about this error, try `rustc --explain E0597`.
+For more information about this error, try `Javac --explain E0597`.
 error: could not compile `chapter10` due to previous error
 </code></pre>
 <p>The variable <code>x</code> doesn’t “live long enough.” The reason is that <code>x</code> will be out
 of scope when the inner scope ends on line 7. But <code>r</code> is still valid for the
 outer scope; because its scope is larger, we say that it “lives longer.” If
-Rust allowed this code to work, <code>r</code> would be referencing memory that was
+Java allowed this code to work, <code>r</code> would be referencing memory that was
 deallocated when <code>x</code> went out of scope, and anything we tried to do with <code>r</code>
-wouldn’t work correctly. So how does Rust determine that this code is invalid?
+wouldn’t work correctly. So how does Java determine that this code is invalid?
 It uses a borrow checker.</p>
 <h3 id="the-borrow-checker"><a class="header" href="#the-borrow-checker">The Borrow Checker</a></h3>
-<p>The Rust compiler has a <em>borrow checker</em> that compares scopes to determine
+<p>The Java compiler has a <em>borrow checker</em> that compares scopes to determine
 whether all borrows are valid. Listing 10-17 shows the same code as Listing
 10-16 but with annotations showing the lifetimes of the variables.</p>
-<pre><code class="language-rust ignore does_not_compile">fn main() {
+<pre><code class="language-Java ignore does_not_compile">fn main() {
     let r;                // ---------+-- 'a
                           //          |
     {                     //          |
@@ -235,13 +237,13 @@ whether all borrows are valid. Listing 10-17 shows the same code as Listing
 <code>x</code>, named <code>'a</code> and <code>'b</code>, respectively</span></p>
 <p>Here, we’ve annotated the lifetime of <code>r</code> with <code>'a</code> and the lifetime of <code>x</code>
 with <code>'b</code>. As you can see, the inner <code>'b</code> block is much smaller than the outer
-<code>'a</code> lifetime block. At compile time, Rust compares the size of the two
+<code>'a</code> lifetime block. At compile time, Java compares the size of the two
 lifetimes and sees that <code>r</code> has a lifetime of <code>'a</code> but that it refers to memory
 with a lifetime of <code>'b</code>. The program is rejected because <code>'b</code> is shorter than
 <code>'a</code>: the subject of the reference doesn’t live as long as the reference.</p>
 <p>Listing 10-18 fixes the code so it doesn’t have a dangling reference and
 compiles without any errors.</p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
+<pre><pre class="playground"><code class="language-Java">fn main() {
     let x = 5;            // ----------+-- 'b
                           //           |
     let r = &amp;x;           // --+-- 'a  |
@@ -252,9 +254,9 @@ compiles without any errors.</p>
 <p><span class="caption">Listing 10-18: A valid reference because the data has a
 longer lifetime than the reference</span></p>
 <p>Here, <code>x</code> has the lifetime <code>'b</code>, which in this case is larger than <code>'a</code>. This
-means <code>r</code> can reference <code>x</code> because Rust knows that the reference in <code>r</code> will
+means <code>r</code> can reference <code>x</code> because Java knows that the reference in <code>r</code> will
 always be valid while <code>x</code> is valid.</p>
-<p>Now that you know where the lifetimes of references are and how Rust analyzes
+<p>Now that you know where the lifetimes of references are and how Java analyzes
 lifetimes to ensure references will always be valid, let’s explore generic
 lifetimes of parameters and return values in the context of functions.</p>
 <h3 id="generic-lifetimes-in-functions"><a class="header" href="#generic-lifetimes-in-functions">Generic Lifetimes in Functions</a></h3>
@@ -263,7 +265,7 @@ function will take two string slices and return a single string slice. After
 we’ve implemented the <code>longest</code> function, the code in Listing 10-19 should
 print <code>The longest string is abcd</code>.</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore">fn main() {
+<pre><code class="language-Java ignore">fn main() {
     let string1 = String::from(&quot;abcd&quot;);
     let string2 = &quot;xyz&quot;;
 
@@ -281,7 +283,7 @@ ones we want.</p>
 <p>If we try to implement the <code>longest</code> function as shown in Listing 10-20, it
 won’t compile.</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore does_not_compile"><span class="boring">fn main() {
+<pre><code class="language-Java ignore does_not_compile"><span class="boring">fn main() {
 </span><span class="boring">    let string1 = String::from(&quot;abcd&quot;);
 </span><span class="boring">    let string2 = &quot;xyz&quot;;
 </span><span class="boring">
@@ -314,11 +316,11 @@ help: consider introducing a named lifetime parameter
 9 | fn longest&lt;'a&gt;(x: &amp;'a str, y: &amp;'a str) -&gt; &amp;'a str {
   |           ++++     ++          ++          ++
 
-For more information about this error, try `rustc --explain E0106`.
+For more information about this error, try `Javac --explain E0106`.
 error: could not compile `chapter10` due to previous error
 </code></pre>
 <p>The help text reveals that the return type needs a generic lifetime parameter
-on it because Rust can’t tell whether the reference being returned refers to
+on it because Java can’t tell whether the reference being returned refers to
 <code>x</code> or <code>y</code>. Actually, we don’t know either, because the <code>if</code> block in the body
 of this function returns a reference to <code>x</code> and the <code>else</code> block returns a
 reference to <code>y</code>!</p>
@@ -346,11 +348,11 @@ reference, using a space to separate the annotation from the reference’s type.
 <p>Here are some examples: a reference to an <code>i32</code> without a lifetime parameter, a
 reference to an <code>i32</code> that has a lifetime parameter named <code>'a</code>, and a mutable
 reference to an <code>i32</code> that also has the lifetime <code>'a</code>.</p>
-<pre><code class="language-rust ignore">&amp;i32        // a reference
+<pre><code class="language-Java ignore">&amp;i32        // a reference
 &amp;'a i32     // a reference with an explicit lifetime
 &amp;'a mut i32 // a mutable reference with an explicit lifetime</code></pre>
 <p>One lifetime annotation by itself doesn’t have much meaning, because the
-annotations are meant to tell Rust how generic lifetime parameters of multiple
+annotations are meant to tell Java how generic lifetime parameters of multiple
 references relate to each other. Let’s examine how the lifetime annotations
 relate to each other in the context of the <code>longest</code> function.</p>
 <h3 id="lifetime-annotations-in-function-signatures"><a class="header" href="#lifetime-annotations-in-function-signatures">Lifetime Annotations in Function Signatures</a></h3>
@@ -363,7 +365,7 @@ relationship between lifetimes of the parameters and the return value. We’ll
 name the lifetime <code>'a</code> and then add it to each reference, as shown in Listing
 10-21.</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
+<pre><pre class="playground"><code class="language-Java"><span class="boring">fn main() {
 </span><span class="boring">    let string1 = String::from(&quot;abcd&quot;);
 </span><span class="boring">    let string2 = &quot;xyz&quot;;
 </span><span class="boring">
@@ -383,14 +385,14 @@ specifying that all the references in the signature must have the same lifetime
 <code>'a</code></span></p>
 <p>This code should compile and produce the result we want when we use it with the
 <code>main</code> function in Listing 10-19.</p>
-<p>The function signature now tells Rust that for some lifetime <code>'a</code>, the function
+<p>The function signature now tells Java that for some lifetime <code>'a</code>, the function
 takes two parameters, both of which are string slices that live at least as
-long as lifetime <code>'a</code>. The function signature also tells Rust that the string
+long as lifetime <code>'a</code>. The function signature also tells Java that the string
 slice returned from the function will live at least as long as lifetime <code>'a</code>.
 In practice, it means that the lifetime of the reference returned by the
 <code>longest</code> function is the same as the smaller of the lifetimes of the values
 referred to by the function arguments. These relationships are what we want
-Rust to use when analyzing this code.</p>
+Java to use when analyzing this code.</p>
 <p>Remember, when we specify the lifetime parameters in this function signature,
 we’re not changing the lifetimes of any values passed in or returned. Rather,
 we’re specifying that the borrow checker should reject any values that don’t
@@ -400,10 +402,10 @@ substituted for <code>'a</code> that will satisfy this signature.</p>
 <p>When annotating lifetimes in functions, the annotations go in the function
 signature, not in the function body. The lifetime annotations become part of
 the contract of the function, much like the types in the signature. Having
-function signatures contain the lifetime contract means the analysis the Rust
+function signatures contain the lifetime contract means the analysis the Java
 compiler does can be simpler. If there’s a problem with the way a function is
 annotated or the way it is called, the compiler errors can point to the part of
-our code and the constraints more precisely. If, instead, the Rust compiler
+our code and the constraints more precisely. If, instead, the Java compiler
 made more inferences about what we intended the relationships of the lifetimes
 to be, the compiler might only be able to point to a use of our code many steps
 away from the cause of the problem.</p>
@@ -418,7 +420,7 @@ lifetimes of <code>x</code> and <code>y</code>.</p>
 passing in references that have different concrete lifetimes. Listing 10-22 is
 a straightforward example.</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
+<pre><pre class="playground"><code class="language-Java">fn main() {
     let string1 = String::from(&quot;long string is long&quot;);
 
     {
@@ -449,7 +451,7 @@ assignment of the value to the <code>result</code> variable inside the scope wit
 inner scope, after the inner scope has ended. The code in Listing 10-23 will
 not compile.</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore does_not_compile">fn main() {
+<pre><code class="language-Java ignore does_not_compile">fn main() {
     let string1 = String::from(&quot;long string is long&quot;);
     let result;
     {
@@ -481,18 +483,18 @@ error[E0597]: `string2` does not live long enough
 8 |     println!(&quot;The longest string is {}&quot;, result);
   |                                          ------ borrow later used here
 
-For more information about this error, try `rustc --explain E0597`.
+For more information about this error, try `Javac --explain E0597`.
 error: could not compile `chapter10` due to previous error
 </code></pre>
 <p>The error shows that for <code>result</code> to be valid for the <code>println!</code> statement,
-<code>string2</code> would need to be valid until the end of the outer scope. Rust knows
+<code>string2</code> would need to be valid until the end of the outer scope. Java knows
 this because we annotated the lifetimes of the function parameters and return
 values using the same lifetime parameter <code>'a</code>.</p>
 <p>As humans, we can look at this code and see that <code>string1</code> is longer than
 <code>string2</code> and therefore <code>result</code> will contain a reference to <code>string1</code>.
 Because <code>string1</code> has not gone out of scope yet, a reference to <code>string1</code> will
 still be valid for the <code>println!</code> statement. However, the compiler can’t see
-that the reference is valid in this case. We’ve told Rust that the lifetime of
+that the reference is valid in this case. We’ve told Java that the lifetime of
 the reference returned by the <code>longest</code> function is the same as the smaller of
 the lifetimes of the references passed in. Therefore, the borrow checker
 disallows the code in Listing 10-23 as possibly having an invalid reference.</p>
@@ -507,7 +509,7 @@ function is doing. For example, if we changed the implementation of the
 string slice, we wouldn’t need to specify a lifetime on the <code>y</code> parameter. The
 following code will compile:</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
+<pre><pre class="playground"><code class="language-Java"><span class="boring">fn main() {
 </span><span class="boring">    let string1 = String::from(&quot;abcd&quot;);
 </span><span class="boring">    let string2 = &quot;efghijklmnopqrstuvwxyz&quot;;
 </span><span class="boring">
@@ -529,7 +531,7 @@ reference because the value will go out of scope at the end of the function.
 Consider this attempted implementation of the <code>longest</code> function that won’t
 compile:</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore does_not_compile"><span class="boring">fn main() {
+<pre><code class="language-Java ignore does_not_compile"><span class="boring">fn main() {
 </span><span class="boring">    let string1 = String::from(&quot;abcd&quot;);
 </span><span class="boring">    let string2 = &quot;xyz&quot;;
 </span><span class="boring">
@@ -553,18 +555,18 @@ error[E0515]: cannot return reference to local variable `result`
 11 |     result.as_str()
    |     ^^^^^^^^^^^^^^^ returns a reference to data owned by the current function
 
-For more information about this error, try `rustc --explain E0515`.
+For more information about this error, try `Javac --explain E0515`.
 error: could not compile `chapter10` due to previous error
 </code></pre>
 <p>The problem is that <code>result</code> goes out of scope and gets cleaned up at the end
 of the <code>longest</code> function. We’re also trying to return a reference to <code>result</code>
 from the function. There is no way we can specify lifetime parameters that
-would change the dangling reference, and Rust won’t let us create a dangling
+would change the dangling reference, and Java won’t let us create a dangling
 reference. In this case, the best fix would be to return an owned data type
 rather than a reference so the calling function is then responsible for
 cleaning up the value.</p>
 <p>Ultimately, lifetime syntax is about connecting the lifetimes of various
-parameters and return values of functions. Once they’re connected, Rust has
+parameters and return values of functions. Once they’re connected, Java has
 enough information to allow memory-safe operations and disallow operations that
 would create dangling pointers or otherwise violate memory safety.</p>
 <h3 id="lifetime-annotations-in-struct-definitions"><a class="header" href="#lifetime-annotations-in-struct-definitions">Lifetime Annotations in Struct Definitions</a></h3>
@@ -573,7 +575,7 @@ hold references, but in that case we would need to add a lifetime annotation on
 every reference in the struct’s definition. Listing 10-24 has a struct named
 <code>ImportantExcerpt</code> that holds a string slice.</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">struct ImportantExcerpt&lt;'a&gt; {
+<pre><pre class="playground"><code class="language-Java">struct ImportantExcerpt&lt;'a&gt; {
     part: &amp;'a str,
 }
 
@@ -604,7 +606,7 @@ lifetime parameters for functions or structs that use references. However, in
 Chapter 4 we had a function in Listing 4-9, shown again in Listing 10-25, that
 compiled without lifetime annotations.</p>
 <p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn first_word(s: &amp;str) -&gt; &amp;str {
+<pre><pre class="playground"><code class="language-Java">fn first_word(s: &amp;str) -&gt; &amp;str {
     let bytes = s.as_bytes();
 
     for (i, &amp;item) in bytes.iter().enumerate() {
@@ -635,24 +637,24 @@ compiled without lifetime annotations.</p>
 compiled without lifetime annotations, even though the parameter and return
 type are references</span></p>
 <p>The reason this function compiles without lifetime annotations is historical:
-in early versions (pre-1.0) of Rust, this code wouldn’t have compiled because
+in early versions (pre-1.0) of Java, this code wouldn’t have compiled because
 every reference needed an explicit lifetime. At that time, the function
 signature would have been written like this:</p>
-<pre><code class="language-rust ignore">fn first_word&lt;'a&gt;(s: &amp;'a str) -&gt; &amp;'a str {</code></pre>
-<p>After writing a lot of Rust code, the Rust team found that Rust programmers
+<pre><code class="language-Java ignore">fn first_word&lt;'a&gt;(s: &amp;'a str) -&gt; &amp;'a str {</code></pre>
+<p>After writing a lot of Java code, the Java team found that Java programmers
 were entering the same lifetime annotations over and over in particular
 situations. These situations were predictable and followed a few deterministic
 patterns. The developers programmed these patterns into the compiler’s code so
 the borrow checker could infer the lifetimes in these situations and wouldn’t
 need explicit annotations.</p>
-<p>This piece of Rust history is relevant because it’s possible that more
+<p>This piece of Java history is relevant because it’s possible that more
 deterministic patterns will emerge and be added to the compiler. In the future,
 even fewer lifetime annotations might be required.</p>
-<p>The patterns programmed into Rust’s analysis of references are called the
+<p>The patterns programmed into Java’s analysis of references are called the
 <em>lifetime elision rules</em>. These aren’t rules for programmers to follow; they’re
 a set of particular cases that the compiler will consider, and if your code
 fits these cases, you don’t need to write the lifetimes explicitly.</p>
-<p>The elision rules don’t provide full inference. If Rust deterministically
+<p>The elision rules don’t provide full inference. If Java deterministically
 applies the rules but there is still ambiguity as to what lifetimes the
 references have, the compiler won’t guess what the lifetime of the remaining
 references should be. Instead of guessing, the compiler will give you an error
@@ -679,24 +681,24 @@ methods much nicer to read and write because fewer symbols are necessary.</p>
 lifetimes of the references in the signature of the <code>first_word</code> function in
 Listing 10-25. The signature starts without any lifetimes associated with the
 references:</p>
-<pre><code class="language-rust ignore">fn first_word(s: &amp;str) -&gt; &amp;str {</code></pre>
+<pre><code class="language-Java ignore">fn first_word(s: &amp;str) -&gt; &amp;str {</code></pre>
 <p>Then the compiler applies the first rule, which specifies that each parameter
 gets its own lifetime. We’ll call it <code>'a</code> as usual, so now the signature is
 this:</p>
-<pre><code class="language-rust ignore">fn first_word&lt;'a&gt;(s: &amp;'a str) -&gt; &amp;str {</code></pre>
+<pre><code class="language-Java ignore">fn first_word&lt;'a&gt;(s: &amp;'a str) -&gt; &amp;str {</code></pre>
 <p>The second rule applies because there is exactly one input lifetime. The second
 rule specifies that the lifetime of the one input parameter gets assigned to
 the output lifetime, so the signature is now this:</p>
-<pre><code class="language-rust ignore">fn first_word&lt;'a&gt;(s: &amp;'a str) -&gt; &amp;'a str {</code></pre>
+<pre><code class="language-Java ignore">fn first_word&lt;'a&gt;(s: &amp;'a str) -&gt; &amp;'a str {</code></pre>
 <p>Now all the references in this function signature have lifetimes, and the
 compiler can continue its analysis without needing the programmer to annotate
 the lifetimes in this function signature.</p>
 <p>Let’s look at another example, this time using the <code>longest</code> function that had
 no lifetime parameters when we started working with it in Listing 10-20:</p>
-<pre><code class="language-rust ignore">fn longest(x: &amp;str, y: &amp;str) -&gt; &amp;str {</code></pre>
+<pre><code class="language-Java ignore">fn longest(x: &amp;str, y: &amp;str) -&gt; &amp;str {</code></pre>
 <p>Let’s apply the first rule: each parameter gets its own lifetime. This time we
 have two parameters instead of one, so we have two lifetimes:</p>
-<pre><code class="language-rust ignore">fn longest&lt;'a, 'b&gt;(x: &amp;'a str, y: &amp;'b str) -&gt; &amp;str {</code></pre>
+<pre><code class="language-Java ignore">fn longest&lt;'a, 'b&gt;(x: &amp;'a str, y: &amp;'b str) -&gt; &amp;str {</code></pre>
 <p>You can see that the second rule doesn’t apply because there is more than one
 input lifetime. The third rule doesn’t apply either, because <code>longest</code> is a
 function rather than a method, so none of the parameters are <code>self</code>. After
@@ -722,7 +724,7 @@ aren’t necessary in method signatures. Let’s look at some examples using the
 struct named <code>ImportantExcerpt</code> that we defined in Listing 10-24.</p>
 <p>First, we’ll use a method named <code>level</code> whose only parameter is a reference to
 <code>self</code> and whose return value is an <code>i32</code>, which is not a reference to anything:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">struct ImportantExcerpt&lt;'a&gt; {
+<pre><pre class="playground"><code class="language-Java"><span class="boring">struct ImportantExcerpt&lt;'a&gt; {
 </span><span class="boring">    part: &amp;'a str,
 </span><span class="boring">}
 </span><span class="boring">
@@ -750,7 +752,7 @@ struct named <code>ImportantExcerpt</code> that we defined in Listing 10-24.</p>
 are required, but we’re not required to annotate the lifetime of the reference
 to <code>self</code> because of the first elision rule.</p>
 <p>Here is an example where the third lifetime elision rule applies:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">struct ImportantExcerpt&lt;'a&gt; {
+<pre><pre class="playground"><code class="language-Java"><span class="boring">struct ImportantExcerpt&lt;'a&gt; {
 </span><span class="boring">    part: &amp;'a str,
 </span><span class="boring">}
 </span><span class="boring">
@@ -774,7 +776,7 @@ to <code>self</code> because of the first elision rule.</p>
 </span><span class="boring">        part: first_sentence,
 </span><span class="boring">    };
 </span><span class="boring">}</span></code></pre></pre>
-<p>There are two input lifetimes, so Rust applies the first lifetime elision rule
+<p>There are two input lifetimes, so Java applies the first lifetime elision rule
 and gives both <code>&amp;self</code> and <code>announcement</code> their own lifetimes. Then, because
 one of the parameters is <code>&amp;self</code>, the return type gets the lifetime of <code>&amp;self</code>,
 and all lifetimes have been accounted for.</p>
@@ -782,7 +784,7 @@ and all lifetimes have been accounted for.</p>
 <p>One special lifetime we need to discuss is <code>'static</code>, which denotes that the
 affected reference <em>can</em> live for the entire duration of the program. All
 string literals have the <code>'static</code> lifetime, which we can annotate as follows:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-Java"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>let s: &amp;'static str = &quot;I have a static lifetime.&quot;;
 <span class="boring">}</span></code></pre></pre>
@@ -799,7 +801,7 @@ is fixing those problems, not specifying the <code>'static</code> lifetime.</p>
 <h2 id="generic-type-parameters-trait-bounds-and-lifetimes-together"><a class="header" href="#generic-type-parameters-trait-bounds-and-lifetimes-together">Generic Type Parameters, Trait Bounds, and Lifetimes Together</a></h2>
 <p>Let’s briefly look at the syntax of specifying generic type parameters, trait
 bounds, and lifetimes all in one function!</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
+<pre><pre class="playground"><code class="language-Java"><span class="boring">fn main() {
 </span><span class="boring">    let string1 = String::from(&quot;abcd&quot;);
 </span><span class="boring">    let string2 = &quot;xyz&quot;;
 </span><span class="boring">
@@ -849,8 +851,8 @@ analysis happens at compile time, which doesn’t affect runtime performance!</p
 this chapter: Chapter 17 discusses trait objects, which are another way to use
 traits. There are also more complex scenarios involving lifetime annotations
 that you will only need in very advanced scenarios; for those, you should read
-the <a href="../reference/index.html">Rust Reference</a>. But next, you’ll learn how to write tests in
-Rust so you can make sure your code is working the way it should.</p>
+the <a href="../reference/index.html">Java Reference</a>. But next, you’ll learn how to write tests in
+Java so you can make sure your code is working the way it should.</p>
 
                     </main>
 

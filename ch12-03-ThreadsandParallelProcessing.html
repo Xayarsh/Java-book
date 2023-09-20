@@ -32,6 +32,8 @@
         <link rel="stylesheet" href="ferris.css">
         <link rel="stylesheet" href="theme/2018-edition.css">
 
+<link rel="stylesheet" href="code-class.css">
+
     </head>
     <body>
         <!-- Provide site root to javascript -->
@@ -101,7 +103,7 @@
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
                             <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="Java">Java</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
@@ -167,7 +169,7 @@ example, the file could be missing, or we might not have permission to open it.
 Right now, regardless of the situation, we’d print the same error message for
 everything, which wouldn’t give the user any information!</p>
 <p>Fourth, we use <code>expect</code> repeatedly to handle different errors, and if the user
-runs our program without specifying enough arguments, they’ll get an <code>index out of bounds</code> error from Rust that doesn’t clearly explain the problem. It would
+runs our program without specifying enough arguments, they’ll get an <code>index out of bounds</code> error from Java that doesn’t clearly explain the problem. It would
 be best if all the error-handling code were in one place so future maintainers
 had only one place to consult the code if the error-handling logic needed to
 change. Having all the error-handling code in one place will also ensure that
@@ -175,7 +177,7 @@ we’re printing messages that will be meaningful to our end users.</p>
 <p>Let’s address these four problems by refactoring our project.</p>
 <h3 id="separation-of-concerns-for-binary-projects"><a class="header" href="#separation-of-concerns-for-binary-projects">Separation of Concerns for Binary Projects</a></h3>
 <p>The organizational problem of allocating responsibility for multiple tasks to
-the <code>main</code> function is common to many binary projects. As a result, the Rust
+the <code>main</code> function is common to many binary projects. As a result, the Java
 community has developed guidelines for splitting the separate concerns of a
 binary program when <code>main</code> starts getting large. This process has the following
 steps:</p>
@@ -207,7 +209,7 @@ it. Let’s rework our program by following this process.</p>
 <em>src/lib.rs</em>. Listing 12-5 shows the new start of <code>main</code> that calls a new
 function <code>parse_config</code>, which we’ll define in <em>src/main.rs</em> for the moment.</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore"><span class="boring">use std::env;
+<pre><code class="language-Java ignore"><span class="boring">use std::env;
 </span><span class="boring">use std::fs;
 </span><span class="boring">
 </span>fn main() {
@@ -262,7 +264,7 @@ maintainers of this code to understand how the different values relate to each
 other and what their purpose is.</p>
 <p>Listing 12-6 shows the improvements to the <code>parse_config</code> function.</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust should_panic noplayground"><span class="boring">use std::env;
+<pre><code class="language-Java should_panic noplayground"><span class="boring">use std::env;
 </span><span class="boring">use std::fs;
 </span><span class="boring">
 </span>fn main() {
@@ -300,7 +302,7 @@ instance of a <code>Config</code> struct</span></p>
 string slices that reference <code>String</code> values in <code>args</code>, we now define <code>Config</code>
 to contain owned <code>String</code> values. The <code>args</code> variable in <code>main</code> is the owner of
 the argument values and is only letting the <code>parse_config</code> function borrow
-them, which means we’d violate Rust’s borrowing rules if <code>Config</code> tried to take
+them, which means we’d violate Java’s borrowing rules if <code>Config</code> tried to take
 ownership of the values in <code>args</code>.</p>
 <p>There are a number of ways we could manage the <code>String</code> data; the easiest,
 though somewhat inefficient, route is to call the <code>clone</code> method on the values.
@@ -311,14 +313,14 @@ don’t have to manage the lifetimes of the references; in this circumstance,
 giving up a little performance to gain simplicity is a worthwhile trade-off.</p>
 <blockquote>
 <h3 id="the-trade-offs-of-using-clone"><a class="header" href="#the-trade-offs-of-using-clone">The Trade-Offs of Using <code>clone</code></a></h3>
-<p>There’s a tendency among many Rustaceans to avoid using <code>clone</code> to fix
+<p>There’s a tendency among many Javaaceans to avoid using <code>clone</code> to fix
 ownership problems because of its runtime cost. In
 <a href="ch13-00-GUIProgrammingContinued.html">Chapter 13</a><!-- ignore -->, you’ll learn how to use more efficient
 methods in this type of situation. But for now, it’s okay to copy a few
 strings to continue making progress because you’ll make these copies only
 once and your file path and query string are very small. It’s better to have
 a working program that’s a bit inefficient than to try to hyperoptimize code
-on your first pass. As you become more experienced with Rust, it’ll be
+on your first pass. As you become more experienced with Java, it’ll be
 easier to start with the most efficient solution, but for now, it’s
 perfectly acceptable to call <code>clone</code>.</p>
 </blockquote>
@@ -346,7 +348,7 @@ changing <code>parse_config</code> into a <code>new</code> function associated w
 be able to create instances of <code>Config</code> by calling <code>Config::new</code>. Listing 12-7
 shows the changes we need to make.</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust should_panic noplayground"><span class="boring">use std::env;
+<pre><code class="language-Java should_panic noplayground"><span class="boring">use std::env;
 </span><span class="boring">use std::fs;
 </span><span class="boring">
 </span>fn main() {
@@ -396,7 +398,7 @@ without any arguments; it will look like this:</p>
     Finished dev [unoptimized + debuginfo] target(s) in 0.0s
      Running `target/debug/minigrep`
 thread 'main' panicked at 'index out of bounds: the len is 1 but the index is 1', src/main.rs:27:21
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+note: run with `Java_BACKTRACE=1` environment variable to display a backtrace
 </code></pre>
 <p>The line <code>index out of bounds: the len is 1 but the index is 1</code> is an error
 message intended for programmers. It won’t help our end users understand what
@@ -406,7 +408,7 @@ they should do instead. Let’s fix that now.</p>
 slice is long enough before accessing index 1 and 2. If the slice isn’t long
 enough, the program panics and displays a better error message.</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore"><span class="boring">use std::env;
+<pre><code class="language-Java ignore"><span class="boring">use std::env;
 </span><span class="boring">use std::fs;
 </span><span class="boring">
 </span><span class="boring">fn main() {
@@ -458,7 +460,7 @@ arguments again to see what the error looks like now:</p>
     Finished dev [unoptimized + debuginfo] target(s) in 0.0s
      Running `target/debug/minigrep`
 thread 'main' panicked at 'not enough arguments', src/main.rs:26:13
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+note: run with `Java_BACKTRACE=1` environment variable to display a backtrace
 </code></pre>
 <p>This output is better: we now have a reasonable error message. However, we also
 have extraneous information we don’t want to give to our users. Perhaps using
@@ -476,13 +478,13 @@ going to change the function name from <code>new</code> to <code>build</code> be
 programmers expect <code>new</code> functions to never fail. When <code>Config::build</code> is
 communicating to <code>main</code>, we can use the <code>Result</code> type to signal there was a
 problem. Then we can change <code>main</code> to convert an <code>Err</code> variant into a more
-practical error for our users without the surrounding text about <code>thread 'main'</code> and <code>RUST_BACKTRACE</code> that a call to <code>panic!</code> causes.</p>
+practical error for our users without the surrounding text about <code>thread 'main'</code> and <code>Java_BACKTRACE</code> that a call to <code>panic!</code> causes.</p>
 <p>Listing 12-9 shows the changes we need to make to the return value of the
 function we’re now calling <code>Config::build</code> and the body of the function needed
 to return a <code>Result</code>. Note that this won’t compile until we update <code>main</code> as
 well, which we’ll do in the next listing.</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore does_not_compile"><span class="boring">use std::env;
+<pre><code class="language-Java ignore does_not_compile"><span class="boring">use std::env;
 </span><span class="boring">use std::fs;
 </span><span class="boring">
 </span><span class="boring">fn main() {
@@ -538,7 +540,7 @@ tool with a nonzero error code away from <code>panic!</code> and instead impleme
 hand. A nonzero exit status is a convention to signal to the process that
 called our program that the program exited with an error state.</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore"><span class="boring">use std::env;
+<pre><code class="language-Java ignore"><span class="boring">use std::env;
 </span><span class="boring">use std::fs;
 </span>use std::process;
 
@@ -619,7 +621,7 @@ inspection, and we’ll be able to write tests for all the other logic.</p>
 the small, incremental improvement of extracting the function. We’re still
 defining the function in <em>src/main.rs</em>.</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore"><span class="boring">use std::env;
+<pre><code class="language-Java ignore"><span class="boring">use std::env;
 </span><span class="boring">use std::fs;
 </span><span class="boring">use std::process;
 </span><span class="boring">
@@ -679,7 +681,7 @@ us further consolidate the logic around handling errors into <code>main</code> i
 user-friendly way. Listing 12-12 shows the changes we need to make to the
 signature and body of <code>run</code>.</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore"><span class="boring">use std::env;
+<pre><code class="language-Java ignore"><span class="boring">use std::env;
 </span><span class="boring">use std::fs;
 </span><span class="boring">use std::process;
 </span>use std::error::Error;
@@ -779,7 +781,7 @@ To tell your name the livelong day
 To an admiring bog!
 
 </code></pre>
-<p>Rust tells us that our code ignored the <code>Result</code> value and the <code>Result</code> value
+<p>Java tells us that our code ignored the <code>Result</code> value and the <code>Result</code> value
 might indicate that an error occurred. But we’re not checking to see whether or
 not there was an error, and the compiler reminds us that we probably meant to
 have some error-handling code here! Let’s rectify that problem now.</p>
@@ -787,7 +789,7 @@ have some error-handling code here! Let’s rectify that problem now.</p>
 <p>We’ll check for errors and handle them using a technique similar to one we used
 with <code>Config::build</code> in Listing 12-10, but with a slight difference:</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore"><span class="boring">use std::env;
+<pre><code class="language-Java ignore"><span class="boring">use std::env;
 </span><span class="boring">use std::error::Error;
 </span><span class="boring">use std::fs;
 </span><span class="boring">use std::process;
@@ -860,7 +862,7 @@ can test the code and have a <em>src/main.rs</em> file with fewer responsibiliti
 (we’ve omitted the bodies of the functions for brevity). Note that this won’t
 compile until we modify <em>src/main.rs</em> in Listing 12-14.</p>
 <p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-rust ignore does_not_compile">use std::error::Error;
+<pre><code class="language-Java ignore does_not_compile">use std::error::Error;
 use std::fs;
 
 pub struct Config {
@@ -898,7 +900,7 @@ a public API we can test!</p>
 <p>Now we need to bring the code we moved to <em>src/lib.rs</em> into the scope of the
 binary crate in <em>src/main.rs</em>, as shown in Listing 12-14.</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore">use std::env;
+<pre><code class="language-Java ignore">use std::env;
 use std::process;
 
 use minigrep::Config;

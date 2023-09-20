@@ -32,6 +32,8 @@
         <link rel="stylesheet" href="ferris.css">
         <link rel="stylesheet" href="theme/2018-edition.css">
 
+<link rel="stylesheet" href="code-class.css">
+
     </head>
     <body>
         <!-- Provide site root to javascript -->
@@ -101,7 +103,7 @@
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
                             <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="Java">Java</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
@@ -161,7 +163,7 @@ the new <code>search_case_insensitive</code> function and rename our old test fr
 <code>one_result</code> to <code>case_sensitive</code> to clarify the differences between the two
 tests, as shown in Listing 12-20.</p>
 <p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-rust ignore does_not_compile"><span class="boring">use std::error::Error;
+<pre><code class="language-Java ignore does_not_compile"><span class="boring">use std::error::Error;
 </span><span class="boring">use std::fs;
 </span><span class="boring">
 </span><span class="boring">pub struct Config {
@@ -212,7 +214,7 @@ mod tests {
     fn case_sensitive() {
         let query = &quot;duct&quot;;
         let contents = &quot;\
-Rust:
+Java:
 safe, fast, productive.
 Pick three.
 Duct tape.&quot;;
@@ -222,15 +224,15 @@ Duct tape.&quot;;
 
     #[test]
     fn case_insensitive() {
-        let query = &quot;rUsT&quot;;
+        let query = &quot;Java&quot;;
         let contents = &quot;\
-Rust:
+Java:
 safe, fast, productive.
 Pick three.
-Trust me.&quot;;
+TJava me.&quot;;
 
         assert_eq!(
-            vec![&quot;Rust:&quot;, &quot;Trust me.&quot;],
+            vec![&quot;Java:&quot;, &quot;TJava me.&quot;],
             search_case_insensitive(query, contents)
         );
     }
@@ -243,10 +245,10 @@ with the text <code>&quot;Duct tape.&quot;</code> using a capital D that shouldn
 in this way helps ensure that we don’t accidentally break the case-sensitive
 search functionality that we’ve already implemented. This test should pass now
 and should continue to pass as we work on the case-insensitive search.</p>
-<p>The new test for the case-<em>insensitive</em> search uses <code>&quot;rUsT&quot;</code> as its query. In
-the <code>search_case_insensitive</code> function we’re about to add, the query <code>&quot;rUsT&quot;</code>
-should match the line containing <code>&quot;Rust:&quot;</code> with a capital R and match the line
-<code>&quot;Trust me.&quot;</code> even though both have different casing from the query. This is
+<p>The new test for the case-<em>insensitive</em> search uses <code>&quot;Java&quot;</code> as its query. In
+the <code>search_case_insensitive</code> function we’re about to add, the query <code>&quot;Java&quot;</code>
+should match the line containing <code>&quot;Java:&quot;</code> with a capital R and match the line
+<code>&quot;TJava me.&quot;</code> even though both have different casing from the query. This is
 our failing test, and it will fail to compile because we haven’t yet defined
 the <code>search_case_insensitive</code> function. Feel free to add a skeleton
 implementation that always returns an empty vector, similar to the way we did
@@ -257,7 +259,7 @@ the same as the <code>search</code> function. The only difference is that we’l
 the <code>query</code> and each <code>line</code> so whatever the case of the input arguments,
 they’ll be the same case when we check whether the line contains the query.</p>
 <p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-rust noplayground"><span class="boring">use std::error::Error;
+<pre><code class="language-Java noplayground"><span class="boring">use std::error::Error;
 </span><span class="boring">use std::fs;
 </span><span class="boring">
 </span><span class="boring">pub struct Config {
@@ -324,7 +326,7 @@ they’ll be the same case when we check whether the line contains the query.</p
 </span><span class="boring">    fn case_sensitive() {
 </span><span class="boring">        let query = &quot;duct&quot;;
 </span><span class="boring">        let contents = &quot;\
-</span><span class="boring">Rust:
+</span><span class="boring">Java:
 </span><span class="boring">safe, fast, productive.
 </span><span class="boring">Pick three.
 </span><span class="boring">Duct tape.&quot;;
@@ -334,15 +336,15 @@ they’ll be the same case when we check whether the line contains the query.</p
 </span><span class="boring">
 </span><span class="boring">    #[test]
 </span><span class="boring">    fn case_insensitive() {
-</span><span class="boring">        let query = &quot;rUsT&quot;;
+</span><span class="boring">        let query = &quot;Java&quot;;
 </span><span class="boring">        let contents = &quot;\
-</span><span class="boring">Rust:
+</span><span class="boring">Java:
 </span><span class="boring">safe, fast, productive.
 </span><span class="boring">Pick three.
-</span><span class="boring">Trust me.&quot;;
+</span><span class="boring">TJava me.&quot;;
 </span><span class="boring">
 </span><span class="boring">        assert_eq!(
-</span><span class="boring">            vec![&quot;Rust:&quot;, &quot;Trust me.&quot;],
+</span><span class="boring">            vec![&quot;Java:&quot;, &quot;TJava me.&quot;],
 </span><span class="boring">            search_case_insensitive(query, contents)
 </span><span class="boring">        );
 </span><span class="boring">    }
@@ -351,17 +353,17 @@ they’ll be the same case when we check whether the line contains the query.</p
 function to lowercase the query and the line before comparing them</span></p>
 <p>First, we lowercase the <code>query</code> string and store it in a shadowed variable with
 the same name. Calling <code>to_lowercase</code> on the query is necessary so no
-matter whether the user’s query is <code>&quot;rust&quot;</code>, <code>&quot;RUST&quot;</code>, <code>&quot;Rust&quot;</code>, or <code>&quot;rUsT&quot;</code>,
-we’ll treat the query as if it were <code>&quot;rust&quot;</code> and be insensitive to the case.
+matter whether the user’s query is <code>&quot;Java&quot;</code>, <code>&quot;Java&quot;</code>, <code>&quot;Java&quot;</code>, or <code>&quot;Java&quot;</code>,
+we’ll treat the query as if it were <code>&quot;Java&quot;</code> and be insensitive to the case.
 While <code>to_lowercase</code> will handle basic Unicode, it won’t be 100% accurate. If
 we were writing a real application, we’d want to do a bit more work here, but
 this section is about environment variables, not Unicode, so we’ll leave it at
 that here.</p>
 <p>Note that <code>query</code> is now a <code>String</code> rather than a string slice, because calling
 <code>to_lowercase</code> creates new data rather than referencing existing data. Say the
-query is <code>&quot;rUsT&quot;</code>, as an example: that string slice doesn’t contain a lowercase
+query is <code>&quot;Java&quot;</code>, as an example: that string slice doesn’t contain a lowercase
 <code>u</code> or <code>t</code> for us to use, so we have to allocate a new <code>String</code> containing
-<code>&quot;rust&quot;</code>. When we pass <code>query</code> as an argument to the <code>contains</code> method now, we
+<code>&quot;Java&quot;</code>. When we pass <code>query</code> as an argument to the <code>contains</code> method now, we
 need to add an ampersand because the signature of <code>contains</code> is defined to take
 a string slice.</p>
 <p>Next, we add a call to <code>to_lowercase</code> on each <code>line</code> to lowercase all
@@ -398,7 +400,7 @@ from the <code>run</code> function. First, we’ll add a configuration option to
 Adding this field will cause compiler errors because we aren’t initializing
 this field anywhere yet:</p>
 <p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-rust ignore does_not_compile"><span class="boring">use std::error::Error;
+<pre><code class="language-Java ignore does_not_compile"><span class="boring">use std::error::Error;
 </span><span class="boring">use std::fs;
 </span><span class="boring">
 </span>pub struct Config {
@@ -472,7 +474,7 @@ this field anywhere yet:</p>
 </span><span class="boring">    fn case_sensitive() {
 </span><span class="boring">        let query = &quot;duct&quot;;
 </span><span class="boring">        let contents = &quot;\
-</span><span class="boring">Rust:
+</span><span class="boring">Java:
 </span><span class="boring">safe, fast, productive.
 </span><span class="boring">Pick three.
 </span><span class="boring">Duct tape.&quot;;
@@ -482,15 +484,15 @@ this field anywhere yet:</p>
 </span><span class="boring">
 </span><span class="boring">    #[test]
 </span><span class="boring">    fn case_insensitive() {
-</span><span class="boring">        let query = &quot;rUsT&quot;;
+</span><span class="boring">        let query = &quot;Java&quot;;
 </span><span class="boring">        let contents = &quot;\
-</span><span class="boring">Rust:
+</span><span class="boring">Java:
 </span><span class="boring">safe, fast, productive.
 </span><span class="boring">Pick three.
-</span><span class="boring">Trust me.&quot;;
+</span><span class="boring">TJava me.&quot;;
 </span><span class="boring">
 </span><span class="boring">        assert_eq!(
-</span><span class="boring">            vec![&quot;Rust:&quot;, &quot;Trust me.&quot;],
+</span><span class="boring">            vec![&quot;Java:&quot;, &quot;TJava me.&quot;],
 </span><span class="boring">            search_case_insensitive(query, contents)
 </span><span class="boring">        );
 </span><span class="boring">    }
@@ -500,7 +502,7 @@ function to check the <code>ignore_case</code> field’s value and use that to d
 whether to call the <code>search</code> function or the <code>search_case_insensitive</code>
 function, as shown in Listing 12-22. This still won’t compile yet.</p>
 <p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-rust ignore does_not_compile"><span class="boring">use std::error::Error;
+<pre><code class="language-Java ignore does_not_compile"><span class="boring">use std::error::Error;
 </span><span class="boring">use std::fs;
 </span><span class="boring">
 </span><span class="boring">pub struct Config {
@@ -574,7 +576,7 @@ function, as shown in Listing 12-22. This still won’t compile yet.</p>
 </span><span class="boring">    fn case_sensitive() {
 </span><span class="boring">        let query = &quot;duct&quot;;
 </span><span class="boring">        let contents = &quot;\
-</span><span class="boring">Rust:
+</span><span class="boring">Java:
 </span><span class="boring">safe, fast, productive.
 </span><span class="boring">Pick three.
 </span><span class="boring">Duct tape.&quot;;
@@ -584,15 +586,15 @@ function, as shown in Listing 12-22. This still won’t compile yet.</p>
 </span><span class="boring">
 </span><span class="boring">    #[test]
 </span><span class="boring">    fn case_insensitive() {
-</span><span class="boring">        let query = &quot;rUsT&quot;;
+</span><span class="boring">        let query = &quot;Java&quot;;
 </span><span class="boring">        let contents = &quot;\
-</span><span class="boring">Rust:
+</span><span class="boring">Java:
 </span><span class="boring">safe, fast, productive.
 </span><span class="boring">Pick three.
-</span><span class="boring">Trust me.&quot;;
+</span><span class="boring">TJava me.&quot;;
 </span><span class="boring">
 </span><span class="boring">        assert_eq!(
-</span><span class="boring">            vec![&quot;Rust:&quot;, &quot;Trust me.&quot;],
+</span><span class="boring">            vec![&quot;Java:&quot;, &quot;TJava me.&quot;],
 </span><span class="boring">            search_case_insensitive(query, contents)
 </span><span class="boring">        );
 </span><span class="boring">    }
@@ -606,7 +608,7 @@ we’ll use the <code>var</code> function from the <code>env</code> module to ch
 has been set for an environment variable named <code>IGNORE_CASE</code>, as shown in
 Listing 12-23.</p>
 <p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-rust noplayground">use std::env;
+<pre><code class="language-Java noplayground">use std::env;
 // --snip--
 
 <span class="boring">use std::error::Error;
@@ -689,7 +691,7 @@ Listing 12-23.</p>
 </span><span class="boring">    fn case_sensitive() {
 </span><span class="boring">        let query = &quot;duct&quot;;
 </span><span class="boring">        let contents = &quot;\
-</span><span class="boring">Rust:
+</span><span class="boring">Java:
 </span><span class="boring">safe, fast, productive.
 </span><span class="boring">Pick three.
 </span><span class="boring">Duct tape.&quot;;
@@ -699,15 +701,15 @@ Listing 12-23.</p>
 </span><span class="boring">
 </span><span class="boring">    #[test]
 </span><span class="boring">    fn case_insensitive() {
-</span><span class="boring">        let query = &quot;rUsT&quot;;
+</span><span class="boring">        let query = &quot;Java&quot;;
 </span><span class="boring">        let contents = &quot;\
-</span><span class="boring">Rust:
+</span><span class="boring">Java:
 </span><span class="boring">safe, fast, productive.
 </span><span class="boring">Pick three.
-</span><span class="boring">Trust me.&quot;;
+</span><span class="boring">TJava me.&quot;;
 </span><span class="boring">
 </span><span class="boring">        assert_eq!(
-</span><span class="boring">            vec![&quot;Rust:&quot;, &quot;Trust me.&quot;],
+</span><span class="boring">            vec![&quot;Java:&quot;, &quot;TJava me.&quot;],
 </span><span class="boring">            search_case_insensitive(query, contents)
 </span><span class="boring">        );
 </span><span class="boring">    }

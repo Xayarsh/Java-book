@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Concise Control Flow with if let - Introduction to Programming Using Java</title>
+        <title>Quiz - Introduction to Programming Using Java</title>
 
 
         <!-- Custom HTML head -->
@@ -31,6 +31,8 @@
         <!-- Custom theme stylesheets -->
         <link rel="stylesheet" href="ferris.css">
         <link rel="stylesheet" href="theme/2018-edition.css">
+
+<link rel="stylesheet" href="code-class.css">
 
     </head>
     <body>
@@ -101,7 +103,7 @@
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
                             <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="Java">Java</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
@@ -146,115 +148,80 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h2 id="concise-control-flow-with-if-let"><a class="header" href="#concise-control-flow-with-if-let">Concise Control Flow with <code>if let</code></a></h2>
-<p>The <code>if let</code> syntax lets you combine <code>if</code> and <code>let</code> into a less verbose way to
-handle values that match one pattern while ignoring the rest. Consider the
-program in Listing 6-6 that matches on an <code>Option&lt;u8&gt;</code> value in the
-<code>config_max</code> variable but only wants to execute code if the value is the <code>Some</code>
-variant.</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
-</span>    let config_max = Some(3u8);
-    match config_max {
-        Some(max) =&gt; println!(&quot;The maximum is configured to be {}&quot;, max),
-        _ =&gt; (),
-    }
-<span class="boring">}</span></code></pre></pre>
-<p><span class="caption">Listing 6-6: A <code>match</code> that only cares about executing
-code when the value is <code>Some</code></span></p>
-<p>If the value is <code>Some</code>, we print out the value in the <code>Some</code> variant by binding
-the value to the variable <code>max</code> in the pattern. We don’t want to do anything
-with the <code>None</code> value. To satisfy the <code>match</code> expression, we have to add <code>_ =&gt; ()</code> after processing just one variant, which is annoying boilerplate code to
-add.</p>
-<p>Instead, we could write this in a shorter way using <code>if let</code>. The following
-code behaves the same as the <code>match</code> in Listing 6-6:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
-</span>    let config_max = Some(3u8);
-    if let Some(max) = config_max {
-        println!(&quot;The maximum is configured to be {}&quot;, max);
-    }
-<span class="boring">}</span></code></pre></pre>
-<p>The syntax <code>if let</code> takes a pattern and an expression separated by an equal
-sign. It works the same way as a <code>match</code>, where the expression is given to the
-<code>match</code> and the pattern is its first arm. In this case, the pattern is
-<code>Some(max)</code>, and the <code>max</code> binds to the value inside the <code>Some</code>. We can then
-use <code>max</code> in the body of the <code>if let</code> block in the same way we used <code>max</code> in
-the corresponding <code>match</code> arm. The code in the <code>if let</code> block isn’t run if the
-value doesn’t match the pattern.</p>
-<p>Using <code>if let</code> means less typing, less indentation, and less boilerplate code.
-However, you lose the exhaustive checking that <code>match</code> enforces. Choosing
-between <code>match</code> and <code>if let</code> depends on what you’re doing in your particular
-situation and whether gaining conciseness is an appropriate trade-off for
-losing exhaustive checking.</p>
-<p>In other words, you can think of <code>if let</code> as syntax sugar for a <code>match</code> that
-runs code when the value matches one pattern and then ignores all other values.</p>
-<p>We can include an <code>else</code> with an <code>if let</code>. The block of code that goes with the
-<code>else</code> is the same as the block of code that would go with the <code>_</code> case in the
-<code>match</code> expression that is equivalent to the <code>if let</code> and <code>else</code>. Recall the
-<code>Coin</code> enum definition in Listing 6-4, where the <code>Quarter</code> variant also held a
-<code>UsState</code> value. If we wanted to count all non-quarter coins we see while also
-announcing the state of the quarters, we could do that with a <code>match</code>
-expression, like this:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#[derive(Debug)]
-</span><span class="boring">enum UsState {
-</span><span class="boring">    Alabama,
-</span><span class="boring">    Alaska,
-</span><span class="boring">    // --snip--
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">enum Coin {
-</span><span class="boring">    Penny,
-</span><span class="boring">    Nickel,
-</span><span class="boring">    Dime,
-</span><span class="boring">    Quarter(UsState),
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">fn main() {
-</span><span class="boring">    let coin = Coin::Penny;
-</span>    let mut count = 0;
-    match coin {
-        Coin::Quarter(state) =&gt; println!(&quot;State quarter from {:?}!&quot;, state),
-        _ =&gt; count += 1,
-    }
-<span class="boring">}</span></code></pre></pre>
-<p>Or we could use an <code>if let</code> and <code>else</code> expression, like this:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#[derive(Debug)]
-</span><span class="boring">enum UsState {
-</span><span class="boring">    Alabama,
-</span><span class="boring">    Alaska,
-</span><span class="boring">    // --snip--
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">enum Coin {
-</span><span class="boring">    Penny,
-</span><span class="boring">    Nickel,
-</span><span class="boring">    Dime,
-</span><span class="boring">    Quarter(UsState),
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">fn main() {
-</span><span class="boring">    let coin = Coin::Penny;
-</span>    let mut count = 0;
-    if let Coin::Quarter(state) = coin {
-        println!(&quot;State quarter from {:?}!&quot;, state);
-    } else {
-        count += 1;
-    }
-<span class="boring">}</span></code></pre></pre>
-<p>If you have a situation in which your program has logic that is too verbose to
-express using a <code>match</code>, remember that <code>if let</code> is in your Rust toolbox as well.</p>
-<h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
-<p>We’ve now covered how to use enums to create custom types that can be one of a
-set of enumerated values. We’ve shown how the standard library’s <code>Option&lt;T&gt;</code>
-type helps you use the type system to prevent errors. When enum values have
-data inside them, you can use <code>match</code> or <code>if let</code> to extract and use those
-values, depending on how many cases you need to handle.</p>
-<p>Your Rust programs can now express concepts in your domain using structs and
-enums. Creating custom types to use in your API ensures type safety: the
-compiler will make certain your functions only get values of the type each
-function expects.</p>
-<p>In order to provide a well-organized API to your users that is straightforward
-to use and only exposes exactly what your users will need, let’s now turn to
-Rust’s modules.</p>
+                        <h2 id="Quiz"><a class="header" href="#Quiz">Quiz</a></h2>
+                        <p>Programs written for a
+                            graphical user interface have to deal with "events." Explain what is meant by
+                            the term <i>event.</i> Give at least two different examples of events, and
+                            discuss how a program might respond to those events.</p>
+
+                <div class="quiz-question">
+                    <p class="question">Question&nbsp;2:</p>
+                    <p>A central concept in JavaFX is the <i>scene graph</i>?  What is a scene graph?
+                    </p>
+                </div>
+                <div class="quiz-question">
+                    <p class="question">Question&nbsp;3:</p>
+                    <p>JavaFX has standard classes called <span class="classname">Canvas</span>
+                        and <span class="classname">GraphicsContext</span>.  Explain the purpose of
+                        these classes.</p>
+                </div>
+                <div class="quiz-question">
+                    <p class="question">Question&nbsp;4:</p>
+                    <p>Suppose that <span class="code">canvas</span> is a variable of type <span class="classname">Canvas</span>.
+                        Write a code segment that will draw a green square centered inside a red circle on the canvas, as illustrated.</p>
+
+                    <p align="center">
+                        <img src="./images/square-in-circle.png" width="100" height="100" alt="(Picture of Circle in Square)"></p>
+                </div>
+                <div class="quiz-question">
+                    <p class="question">Question&nbsp;5:</p>
+                    <p>Draw the picture that will
+                        be produced by the following <span class="code">for</span> loop, where
+                        <span class="code">g</span> is a variable of type <span class="classname">GraphicsContext</span>:</p>
+
+                    <pre><code class="java">for (int i=10; i &lt;= 210; i = i + 50) {
+   for (int j = 10; j &lt;= 210; j = j + 50) {
+      g.strokeLine(i,10,j,60);
+   }
+}</code></pre>
+                </div>
+                <div class="quiz-question">
+                    <p class="question">Question&nbsp;6:</p>
+                    <p>JavaFX has a standard class
+                        called <span class="classname">MouseEvent</span>. What is the purpose of this class? What does an
+                        object of type <span class="classname">MouseEvent</span> do?</p>
+                </div>
+                <div class="quiz-question">
+                    <p class="question">Question&nbsp;7:</p>
+                    <p>Explain the difference between a <span class="code">KeyPressed</span> event
+                        and a <span class="code">KeyTyped</span> event.</p>
+
+                </div>
+                <div class="quiz-question">
+                    <p class="question">Question&nbsp;8:</p>
+                    <p>Explain how <span class="classname">AnimationTimers</span>
+                        are used to do animation.</p>
+                </div>
+                <div class="quiz-question">
+                    <p class="question">Question&nbsp;9:</p>
+                    <p>What is a <span class="classname">CheckBox</span> and how is it used?  How does
+                        it differ from a <span class="classname">RadioButton</span>?</p>
+                </div>
+                <div class="quiz-question">
+                    <p class="question">Question&nbsp;10:</p>
+                    <p>What is meant by <i>layout</i> of GUI components?  Explain briefly how
+                        layout is done in JavaFX.</p>
+                </div>
+                <div class="quiz-question">
+                    <p class="question">Question&nbsp;11:</p>
+                    <p>How does a <span class="classname">BorderPane</span> arrange the components that it
+                        contains?</p>
+
+                </div>
+                <div class="quiz-question">
+                    <p class="question">Question&nbsp;12:</p>
+                    <p>How is the <i>preferred size</i> of a component set, and how is it used?</p>
+                </div>
 
                     </main>
 

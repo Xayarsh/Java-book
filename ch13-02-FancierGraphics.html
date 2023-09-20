@@ -32,6 +32,8 @@
         <link rel="stylesheet" href="ferris.css">
         <link rel="stylesheet" href="theme/2018-edition.css">
 
+<link rel="stylesheet" href="code-class.css">
+
     </head>
     <body>
         <!-- Provide site root to javascript -->
@@ -101,7 +103,7 @@
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
                             <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="Java">Java</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
@@ -151,12 +153,12 @@
 turn. An iterator is responsible for the logic of iterating over each item and
 determining when the sequence has finished. When you use iterators, you don’t
 have to reimplement that logic yourself.</p>
-<p>In Rust, iterators are <em>lazy</em>, meaning they have no effect until you call
+<p>In Java, iterators are <em>lazy</em>, meaning they have no effect until you call
 methods that consume the iterator to use it up. For example, the code in
 Listing 13-10 creates an iterator over the items in the vector <code>v1</code> by calling
 the <code>iter</code> method defined on <code>Vec&lt;T&gt;</code>. This code by itself doesn’t do anything
 useful.</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
+<pre><pre class="playground"><code class="language-Java"><span class="boring">fn main() {
 </span>    let v1 = vec![1, 2, 3];
 
     let v1_iter = v1.iter();
@@ -171,7 +173,7 @@ but we glossed over how exactly that works until now.</p>
 the use of the iterator in the <code>for</code> loop. When the <code>for</code> loop is called using
 the iterator in <code>v1_iter</code>, each element in the iterator is used in one
 iteration of the loop, which prints out each value.</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
+<pre><pre class="playground"><code class="language-Java"><span class="boring">fn main() {
 </span>    let v1 = vec![1, 2, 3];
 
     let v1_iter = v1.iter();
@@ -193,7 +195,7 @@ index into, like vectors. Let’s examine how iterators do that.</p>
 <h3 id="the-iterator-trait-and-the-next-method"><a class="header" href="#the-iterator-trait-and-the-next-method">The <code>Iterator</code> Trait and the <code>next</code> Method</a></h3>
 <p>All iterators implement a trait named <code>Iterator</code> that is defined in the
 standard library. The definition of the trait looks like this:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-Java"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>pub trait Iterator {
     type Item;
@@ -217,7 +219,7 @@ iterator.</p>
 what values are returned from repeated calls to <code>next</code> on the iterator created
 from the vector.</p>
 <p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-rust noplayground"><span class="boring">#[cfg(test)]
+<pre><code class="language-Java noplayground"><span class="boring">#[cfg(test)]
 </span><span class="boring">mod tests {
 </span>    #[test]
     fn iterator_demonstration() {
@@ -259,7 +261,7 @@ consuming the iterator. As it iterates through, it adds each item to a running
 total and returns the total when iteration is complete. Listing 13-13 has a
 test illustrating a use of the <code>sum</code> method:</p>
 <p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-rust noplayground"><span class="boring">#[cfg(test)]
+<pre><code class="language-Java noplayground"><span class="boring">#[cfg(test)]
 </span><span class="boring">mod tests {
 </span>    #[test]
     fn iterator_sum() {
@@ -286,7 +288,7 @@ The <code>map</code> method returns a new iterator that produces the modified it
 closure here creates a new iterator in which each item from the vector will be
 incremented by 1:</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust not_desired_behavior"><span class="boring">fn main() {
+<pre><pre class="playground"><code class="language-Java not_desired_behavior"><span class="boring">fn main() {
 </span>    let v1: Vec&lt;i32&gt; = vec![1, 2, 3];
 
     v1.iter().map(|x| x + 1);
@@ -320,7 +322,7 @@ type.</p>
 returned from the call to <code>map</code> into a vector. This vector will end up
 containing each item from the original vector incremented by 1.</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
+<pre><pre class="playground"><code class="language-Java"><span class="boring">fn main() {
 </span>    let v1: Vec&lt;i32&gt; = vec![1, 2, 3];
 
     let v2: Vec&lt;_&gt; = v1.iter().map(|x| x + 1).collect();
@@ -349,7 +351,7 @@ returns <code>true</code>, the value will be included in the iteration produced 
 variable from its environment to iterate over a collection of <code>Shoe</code> struct
 instances. It will return only shoes that are the specified size.</p>
 <p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-rust noplayground">#[derive(PartialEq, Debug)]
+<pre><code class="language-Java noplayground">#[derive(PartialEq, Debug)]
 struct Shoe {
     size: u32,
     style: String,

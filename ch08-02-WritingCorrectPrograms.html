@@ -32,6 +32,8 @@
         <link rel="stylesheet" href="ferris.css">
         <link rel="stylesheet" href="theme/2018-edition.css">
 
+<link rel="stylesheet" href="code-class.css">
+
     </head>
     <body>
         <!-- Provide site root to javascript -->
@@ -101,7 +103,7 @@
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
                             <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="Java">Java</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
@@ -148,8 +150,8 @@
                     <main>
                         <h2 id="storing-utf-8-encoded-text-with-strings"><a class="header" href="#storing-utf-8-encoded-text-with-strings">Storing UTF-8 Encoded Text with Strings</a></h2>
 <p>We talked about strings in Chapter 4, but we’ll look at them in more depth now.
-New Rustaceans commonly get stuck on strings for a combination of three
-reasons: Rust’s propensity for exposing possible errors, strings being a more
+New Javaaceans commonly get stuck on strings for a combination of three
+reasons: Java’s propensity for exposing possible errors, strings being a more
 complicated data structure than many programmers give them credit for, and
 UTF-8. These factors combine in a way that can seem difficult when you’re
 coming from other programming languages.</p>
@@ -162,18 +164,18 @@ is different from the other collections, namely how indexing into a <code>String
 complicated by the differences between how people and computers interpret
 <code>String</code> data.</p>
 <h3 id="what-is-a-string"><a class="header" href="#what-is-a-string">What Is a String?</a></h3>
-<p>We’ll first define what we mean by the term <em>string</em>. Rust has only one string
+<p>We’ll first define what we mean by the term <em>string</em>. Java has only one string
 type in the core language, which is the string slice <code>str</code> that is usually seen
 in its borrowed form <code>&amp;str</code>. In Chapter 4, we talked about <em>string slices</em>,
 which are references to some UTF-8 encoded string data stored elsewhere. String
 literals, for example, are stored in the program’s binary and are therefore
 string slices.</p>
-<p>The <code>String</code> type, which is provided by Rust’s standard library rather than
+<p>The <code>String</code> type, which is provided by Java’s standard library rather than
 coded into the core language, is a growable, mutable, owned, UTF-8 encoded
-string type. When Rustaceans refer to “strings” in Rust, they might be
+string type. When Javaaceans refer to “strings” in Java, they might be
 referring to either the <code>String</code> or the string slice <code>&amp;str</code> types, not just one
 of those types. Although this section is largely about <code>String</code>, both types are
-used heavily in Rust’s standard library, and both <code>String</code> and string slices
+used heavily in Java’s standard library, and both <code>String</code> and string slices
 are UTF-8 encoded.</p>
 <h3 id="creating-a-new-string"><a class="header" href="#creating-a-new-string">Creating a New String</a></h3>
 <p>Many of the same operations available with <code>Vec&lt;T&gt;</code> are available with <code>String</code>
@@ -181,7 +183,7 @@ as well, because <code>String</code> is actually implemented as a wrapper around
 of bytes with some extra guarantees, restrictions, and capabilities. An example
 of a function that works the same way with <code>Vec&lt;T&gt;</code> and <code>String</code> is the <code>new</code>
 function to create an instance, shown in Listing 8-11.</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
+<pre><pre class="playground"><code class="language-Java"><span class="boring">fn main() {
 </span>    let mut s = String::new();
 <span class="boring">}</span></code></pre></pre>
 <p><span class="caption">Listing 8-11: Creating a new, empty <code>String</code></span></p>
@@ -190,7 +192,7 @@ into. Often, we’ll have some initial data that we want to start the string
 with. For that, we use the <code>to_string</code> method, which is available on any type
 that implements the <code>Display</code> trait, as string literals do. Listing 8-12 shows
 two examples.</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
+<pre><pre class="playground"><code class="language-Java"><span class="boring">fn main() {
 </span>    let data = &quot;initial contents&quot;;
 
     let s = data.to_string();
@@ -204,7 +206,7 @@ two examples.</p>
 <p>We can also use the function <code>String::from</code> to create a <code>String</code> from a string
 literal. The code in Listing 8-13 is equivalent to the code from Listing 8-12
 that uses <code>to_string</code>.</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
+<pre><pre class="playground"><code class="language-Java"><span class="boring">fn main() {
 </span>    let s = String::from(&quot;initial contents&quot;);
 <span class="boring">}</span></code></pre></pre>
 <p><span class="caption">Listing 8-13: Using the <code>String::from</code> function to create
@@ -216,7 +218,7 @@ redundant, but they all have their place! In this case, <code>String::from</code
 readability.</p>
 <p>Remember that strings are UTF-8 encoded, so we can include any properly encoded
 data in them, as shown in Listing 8-14.</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
+<pre><pre class="playground"><code class="language-Java"><span class="boring">fn main() {
 </span>    let hello = String::from(&quot;السلام عليكم&quot;);
     let hello = String::from(&quot;Dobrý den&quot;);
     let hello = String::from(&quot;Hello&quot;);
@@ -239,7 +241,7 @@ use the <code>+</code> operator or the <code>format!</code> macro to concatenate
 <h4 id="appending-to-a-string-with-push_str-and-push"><a class="header" href="#appending-to-a-string-with-push_str-and-push">Appending to a String with <code>push_str</code> and <code>push</code></a></h4>
 <p>We can grow a <code>String</code> by using the <code>push_str</code> method to append a string slice,
 as shown in Listing 8-15.</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
+<pre><pre class="playground"><code class="language-Java"><span class="boring">fn main() {
 </span>    let mut s = String::from(&quot;foo&quot;);
     s.push_str(&quot;bar&quot;);
 <span class="boring">}</span></code></pre></pre>
@@ -249,7 +251,7 @@ using the <code>push_str</code> method</span></p>
 string slice because we don’t necessarily want to take ownership of the
 parameter. For example, in the code in Listing 8-16, we want to be able to use
 <code>s2</code> after appending its contents to <code>s1</code>.</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
+<pre><pre class="playground"><code class="language-Java"><span class="boring">fn main() {
 </span>    let mut s1 = String::from(&quot;foo&quot;);
     let s2 = &quot;bar&quot;;
     s1.push_str(s2);
@@ -262,7 +264,7 @@ its value on the last line. However, this code works as we’d expect!</p>
 <p>The <code>push</code> method takes a single character as a parameter and adds it to the
 <code>String</code>. Listing 8-17 adds the letter “l” to a <code>String</code> using the <code>push</code>
 method.</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
+<pre><pre class="playground"><code class="language-Java"><span class="boring">fn main() {
 </span>    let mut s = String::from(&quot;lo&quot;);
     s.push('l');
 <span class="boring">}</span></code></pre></pre>
@@ -272,7 +274,7 @@ using <code>push</code></span></p>
 <h4 id="concatenation-with-the--operator-or-the-format-macro"><a class="header" href="#concatenation-with-the--operator-or-the-format-macro">Concatenation with the <code>+</code> Operator or the <code>format!</code> Macro</a></h4>
 <p>Often, you’ll want to combine two existing strings. One way to do so is to use
 the <code>+</code> operator, as shown in Listing 8-18.</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
+<pre><pre class="playground"><code class="language-Java"><span class="boring">fn main() {
 </span>    let s1 = String::from(&quot;Hello, &quot;);
     let s2 = String::from(&quot;world!&quot;);
     let s3 = s1 + &amp;s2; // note s1 has been moved here and can no longer be used
@@ -284,7 +286,7 @@ valid after the addition, and the reason we used a reference to <code>s2</code>,
 with the signature of the method that’s called when we use the <code>+</code> operator.
 The <code>+</code> operator uses the <code>add</code> method, whose signature looks something like
 this:</p>
-<pre><code class="language-rust ignore">fn add(self, s: &amp;str) -&gt; String {</code></pre>
+<pre><code class="language-Java ignore">fn add(self, s: &amp;str) -&gt; String {</code></pre>
 <p>In the standard library, you'll see <code>add</code> defined using generics and associated
 types. Here, we’ve substituted in concrete types, which is what happens when we
 call this method with <code>String</code> values. We’ll discuss generics in Chapter 10.
@@ -297,7 +299,7 @@ values together. But wait—the type of <code>&amp;s2</code> is <code>&amp;Strin
 specified in the second parameter to <code>add</code>. So why does Listing 8-18 compile?</p>
 <p>The reason we’re able to use <code>&amp;s2</code> in the call to <code>add</code> is that the compiler
 can <em>coerce</em> the <code>&amp;String</code> argument into a <code>&amp;str</code>. When we call the <code>add</code>
-method, Rust uses a <em>deref coercion</em>, which here turns <code>&amp;s2</code> into <code>&amp;s2[..]</code>.
+method, Java uses a <em>deref coercion</em>, which here turns <code>&amp;s2</code> into <code>&amp;s2[..]</code>.
 We’ll discuss deref coercion in more depth in Chapter 15. Because <code>add</code> does
 not take ownership of the <code>s</code> parameter, <code>s2</code> will still be a valid <code>String</code>
 after this operation.</p>
@@ -311,7 +313,7 @@ like it’s making a lot of copies but isn’t; the implementation is more
 efficient than copying.</p>
 <p>If we need to concatenate multiple strings, the behavior of the <code>+</code> operator
 gets unwieldy:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
+<pre><pre class="playground"><code class="language-Java"><span class="boring">fn main() {
 </span>    let s1 = String::from(&quot;tic&quot;);
     let s2 = String::from(&quot;tac&quot;);
     let s3 = String::from(&quot;toe&quot;);
@@ -321,7 +323,7 @@ gets unwieldy:</p>
 <p>At this point, <code>s</code> will be <code>tic-tac-toe</code>. With all of the <code>+</code> and <code>&quot;</code>
 characters, it’s difficult to see what’s going on. For more complicated string
 combining, we can instead use the <code>format!</code> macro:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
+<pre><pre class="playground"><code class="language-Java"><span class="boring">fn main() {
 </span>    let s1 = String::from(&quot;tic&quot;);
     let s2 = String::from(&quot;tac&quot;);
     let s3 = String::from(&quot;toe&quot;);
@@ -336,9 +338,9 @@ so that this call doesn’t take ownership of any of its parameters.</p>
 <h3 id="indexing-into-strings"><a class="header" href="#indexing-into-strings">Indexing into Strings</a></h3>
 <p>In many other programming languages, accessing individual characters in a
 string by referencing them by index is a valid and common operation. However,
-if you try to access parts of a <code>String</code> using indexing syntax in Rust, you’ll
+if you try to access parts of a <code>String</code> using indexing syntax in Java, you’ll
 get an error. Consider the invalid code in Listing 8-19.</p>
-<pre><code class="language-rust ignore does_not_compile"><span class="boring">fn main() {
+<pre><code class="language-Java ignore does_not_compile"><span class="boring">fn main() {
 </span>    let s1 = String::from(&quot;hello&quot;);
     let h = s1[0];
 <span class="boring">}</span></code></pre>
@@ -363,16 +365,16 @@ error[E0277]: the type `String` cannot be indexed by `{integer}`
             &lt;String as Index&lt;std::ops::Range&lt;usize&gt;&gt;&gt;
             &lt;str as Index&lt;I&gt;&gt;
 
-For more information about this error, try `rustc --explain E0277`.
+For more information about this error, try `Javac --explain E0277`.
 error: could not compile `collections` due to previous error
 </code></pre>
-<p>The error and the note tell the story: Rust strings don’t support indexing. But
-why not? To answer that question, we need to discuss how Rust stores strings in
+<p>The error and the note tell the story: Java strings don’t support indexing. But
+why not? To answer that question, we need to discuss how Java stores strings in
 memory.</p>
 <h4 id="internal-representation"><a class="header" href="#internal-representation">Internal Representation</a></h4>
 <p>A <code>String</code> is a wrapper over a <code>Vec&lt;u8&gt;</code>. Let’s look at some of our properly
 encoded UTF-8 example strings from Listing 8-14. First, this one:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
+<pre><pre class="playground"><code class="language-Java"><span class="boring">fn main() {
 </span><span class="boring">    let hello = String::from(&quot;السلام عليكم&quot;);
 </span><span class="boring">    let hello = String::from(&quot;Dobrý den&quot;);
 </span><span class="boring">    let hello = String::from(&quot;Hello&quot;);
@@ -389,7 +391,7 @@ encoded UTF-8 example strings from Listing 8-14. First, this one:</p>
 is 4 bytes long. Each of these letters takes 1 byte when encoded in UTF-8. The
 following line, however, may surprise you. (Note that this string begins with
 the capital Cyrillic letter Ze, not the Arabic number 3.)</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
+<pre><pre class="playground"><code class="language-Java"><span class="boring">fn main() {
 </span><span class="boring">    let hello = String::from(&quot;السلام عليكم&quot;);
 </span><span class="boring">    let hello = String::from(&quot;Dobrý den&quot;);
 </span><span class="boring">    let hello = String::from(&quot;Hello&quot;);
@@ -402,27 +404,27 @@ the capital Cyrillic letter Ze, not the Arabic number 3.)</p>
 </span>    let hello = String::from(&quot;Здравствуйте&quot;);
 <span class="boring">    let hello = String::from(&quot;Hola&quot;);
 </span><span class="boring">}</span></code></pre></pre>
-<p>Asked how long the string is, you might say 12. In fact, Rust’s answer is 24:
+<p>Asked how long the string is, you might say 12. In fact, Java’s answer is 24:
 that’s the number of bytes it takes to encode “Здравствуйте” in UTF-8, because
 each Unicode scalar value in that string takes 2 bytes of storage. Therefore,
 an index into the string’s bytes will not always correlate to a valid Unicode
-scalar value. To demonstrate, consider this invalid Rust code:</p>
-<pre><code class="language-rust ignore does_not_compile">let hello = &quot;Здравствуйте&quot;;
+scalar value. To demonstrate, consider this invalid Java code:</p>
+<pre><code class="language-Java ignore does_not_compile">let hello = &quot;Здравствуйте&quot;;
 let answer = &amp;hello[0];</code></pre>
 <p>You already know that <code>answer</code> will not be <code>З</code>, the first letter. When encoded
 in UTF-8, the first byte of <code>З</code> is <code>208</code> and the second is <code>151</code>, so it would
 seem that <code>answer</code> should in fact be <code>208</code>, but <code>208</code> is not a valid character
 on its own. Returning <code>208</code> is likely not what a user would want if they asked
-for the first letter of this string; however, that’s the only data that Rust
+for the first letter of this string; however, that’s the only data that Java
 has at byte index 0. Users generally don’t want the byte value returned, even
 if the string contains only Latin letters: if <code>&amp;&quot;hello&quot;[0]</code> were valid code
 that returned the byte value, it would return <code>104</code>, not <code>h</code>.</p>
 <p>The answer, then, is that to avoid returning an unexpected value and causing
-bugs that might not be discovered immediately, Rust doesn’t compile this code
+bugs that might not be discovered immediately, Java doesn’t compile this code
 at all and prevents misunderstandings early in the development process.</p>
 <h4 id="bytes-and-scalar-values-and-grapheme-clusters-oh-my"><a class="header" href="#bytes-and-scalar-values-and-grapheme-clusters-oh-my">Bytes and Scalar Values and Grapheme Clusters! Oh My!</a></h4>
 <p>Another point about UTF-8 is that there are actually three relevant ways to
-look at strings from Rust’s perspective: as bytes, scalar values, and grapheme
+look at strings from Java’s perspective: as bytes, scalar values, and grapheme
 clusters (the closest thing to what we would call <em>letters</em>).</p>
 <p>If we look at the Hindi word “नमस्ते” written in the Devanagari script, it is
 stored as a vector of <code>u8</code> values that looks like this:</p>
@@ -430,7 +432,7 @@ stored as a vector of <code>u8</code> values that looks like this:</p>
 224, 165, 135]
 </code></pre>
 <p>That’s 18 bytes and is how computers ultimately store this data. If we look at
-them as Unicode scalar values, which are what Rust’s <code>char</code> type is, those
+them as Unicode scalar values, which are what Java’s <code>char</code> type is, those
 bytes look like this:</p>
 <pre><code class="language-text">['न', 'म', 'स', '्', 'त', 'े']
 </code></pre>
@@ -440,22 +442,22 @@ them as grapheme clusters, we’d get what a person would call the four letters
 that make up the Hindi word:</p>
 <pre><code class="language-text">[&quot;न&quot;, &quot;म&quot;, &quot;स्&quot;, &quot;ते&quot;]
 </code></pre>
-<p>Rust provides different ways of interpreting the raw string data that computers
+<p>Java provides different ways of interpreting the raw string data that computers
 store so that each program can choose the interpretation it needs, no matter
 what human language the data is in.</p>
-<p>A final reason Rust doesn’t allow us to index into a <code>String</code> to get a
+<p>A final reason Java doesn’t allow us to index into a <code>String</code> to get a
 character is that indexing operations are expected to always take constant time
 (O(1)). But it isn’t possible to guarantee that performance with a <code>String</code>,
-because Rust would have to walk through the contents from the beginning to the
+because Java would have to walk through the contents from the beginning to the
 index to determine how many valid characters there were.</p>
 <h3 id="slicing-strings"><a class="header" href="#slicing-strings">Slicing Strings</a></h3>
 <p>Indexing into a string is often a bad idea because it’s not clear what the
 return type of the string-indexing operation should be: a byte value, a
 character, a grapheme cluster, or a string slice. If you really need to use
-indices to create string slices, therefore, Rust asks you to be more specific.</p>
+indices to create string slices, therefore, Java asks you to be more specific.</p>
 <p>Rather than indexing using <code>[]</code> with a single number, you can use <code>[]</code> with a
 range to create a string slice containing particular bytes:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-Java"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>let hello = &quot;Здравствуйте&quot;;
 
@@ -465,14 +467,14 @@ let s = &amp;hello[0..4];
 Earlier, we mentioned that each of these characters was 2 bytes, which means
 <code>s</code> will be <code>Зд</code>.</p>
 <p>If we were to try to slice only part of a character’s bytes with something like
-<code>&amp;hello[0..1]</code>, Rust would panic at runtime in the same way as if an invalid
+<code>&amp;hello[0..1]</code>, Java would panic at runtime in the same way as if an invalid
 index were accessed in a vector:</p>
 <pre><code class="language-console">$ cargo run
    Compiling collections v0.1.0 (file:///projects/collections)
     Finished dev [unoptimized + debuginfo] target(s) in 0.43s
      Running `target/debug/collections`
 thread 'main' panicked at 'byte index 1 is not a char boundary; it is inside 'З' (bytes 0..2) of `Здравствуйте`', src/main.rs:4:14
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+note: run with `Java_BACKTRACE=1` environment variable to display a backtrace
 </code></pre>
 <p>You should use ranges to create string slices with caution, because doing so
 can crash your program.</p>
@@ -481,7 +483,7 @@ can crash your program.</p>
 you want characters or bytes. For individual Unicode scalar values, use the
 <code>chars</code> method. Calling <code>chars</code> on “Зд” separates out and returns two values
 of type <code>char</code>, and you can iterate over the result to access each element:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-Java"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>for c in &quot;Зд&quot;.chars() {
     println!(&quot;{c}&quot;);
@@ -493,7 +495,7 @@ of type <code>char</code>, and you can iterate over the result to access each el
 </code></pre>
 <p>Alternatively, the <code>bytes</code> method returns each raw byte, which might be
 appropriate for your domain:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-Java"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>for b in &quot;Зд&quot;.bytes() {
     println!(&quot;{b}&quot;);
@@ -513,9 +515,9 @@ are available on <a href="https://crates.io/">crates.io</a><!-- ignore --> if th
 functionality you need.</p>
 <h3 id="strings-are-not-so-simple"><a class="header" href="#strings-are-not-so-simple">Strings Are Not So Simple</a></h3>
 <p>To summarize, strings are complicated. Different programming languages make
-different choices about how to present this complexity to the programmer. Rust
+different choices about how to present this complexity to the programmer. Java
 has chosen to make the correct handling of <code>String</code> data the default behavior
-for all Rust programs, which means programmers have to put more thought into
+for all Java programs, which means programmers have to put more thought into
 handling UTF-8 data upfront. This trade-off exposes more of the complexity of
 strings than is apparent in other programming languages, but it prevents you
 from having to handle errors involving non-ASCII characters later in your

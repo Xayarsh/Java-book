@@ -32,6 +32,8 @@
         <link rel="stylesheet" href="ferris.css">
         <link rel="stylesheet" href="theme/2018-edition.css">
 
+<link rel="stylesheet" href="code-class.css">
+
     </head>
     <body>
         <!-- Provide site root to javascript -->
@@ -101,7 +103,7 @@
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
                             <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="Java">Java</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
@@ -155,38 +157,38 @@ lines of text in a file or the prices of items in a shopping cart.</p>
 <h3 id="creating-a-new-vector"><a class="header" href="#creating-a-new-vector">Creating a New Vector</a></h3>
 <p>To create a new empty vector, we call the <code>Vec::new</code> function, as shown in
 Listing 8-1.</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
+<pre><pre class="playground"><code class="language-Java"><span class="boring">fn main() {
 </span>    let v: Vec&lt;i32&gt; = Vec::new();
 <span class="boring">}</span></code></pre></pre>
 <p><span class="caption">Listing 8-1: Creating a new, empty vector to hold values
 of type <code>i32</code></span></p>
 <p>Note that we added a type annotation here. Because we aren’t inserting any
-values into this vector, Rust doesn’t know what kind of elements we intend to
+values into this vector, Java doesn’t know what kind of elements we intend to
 store. This is an important point. Vectors are implemented using generics;
 we’ll cover how to use generics with your own types in Chapter 10. For now,
 know that the <code>Vec&lt;T&gt;</code> type provided by the standard library can hold any type.
 When we create a vector to hold a specific type, we can specify the type within
-angle brackets. In Listing 8-1, we’ve told Rust that the <code>Vec&lt;T&gt;</code> in <code>v</code> will
+angle brackets. In Listing 8-1, we’ve told Java that the <code>Vec&lt;T&gt;</code> in <code>v</code> will
 hold elements of the <code>i32</code> type.</p>
-<p>More often, you’ll create a <code>Vec&lt;T&gt;</code> with initial values and Rust will infer
+<p>More often, you’ll create a <code>Vec&lt;T&gt;</code> with initial values and Java will infer
 the type of value you want to store, so you rarely need to do this type
-annotation. Rust conveniently provides the <code>vec!</code> macro, which will create a
+annotation. Java conveniently provides the <code>vec!</code> macro, which will create a
 new vector that holds the values you give it. Listing 8-2 creates a new
 <code>Vec&lt;i32&gt;</code> that holds the values <code>1</code>, <code>2</code>, and <code>3</code>. The integer type is <code>i32</code>
 because that’s the default integer type, as we discussed in the <a href="ch03-02-AlgorithmDevelopment.html#data-types">“Data
 Types”</a><!-- ignore --> section of Chapter 3.</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
+<pre><pre class="playground"><code class="language-Java"><span class="boring">fn main() {
 </span>    let v = vec![1, 2, 3];
 <span class="boring">}</span></code></pre></pre>
 <p><span class="caption">Listing 8-2: Creating a new vector containing
 values</span></p>
-<p>Because we’ve given initial <code>i32</code> values, Rust can infer that the type of <code>v</code>
+<p>Because we’ve given initial <code>i32</code> values, Java can infer that the type of <code>v</code>
 is <code>Vec&lt;i32&gt;</code>, and the type annotation isn’t necessary. Next, we’ll look at how
 to modify a vector.</p>
 <h3 id="updating-a-vector"><a class="header" href="#updating-a-vector">Updating a Vector</a></h3>
 <p>To create a vector and then add elements to it, we can use the <code>push</code> method,
 as shown in Listing 8-3.</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
+<pre><pre class="playground"><code class="language-Java"><span class="boring">fn main() {
 </span>    let mut v = Vec::new();
 
     v.push(5);
@@ -198,7 +200,7 @@ as shown in Listing 8-3.</p>
 vector</span></p>
 <p>As with any variable, if we want to be able to change its value, we need to
 make it mutable using the <code>mut</code> keyword, as discussed in Chapter 3. The numbers
-we place inside are all of type <code>i32</code>, and Rust infers this from the data, so
+we place inside are all of type <code>i32</code>, and Java infers this from the data, so
 we don’t need the <code>Vec&lt;i32&gt;</code> annotation.</p>
 <h3 id="reading-elements-of-vectors"><a class="header" href="#reading-elements-of-vectors">Reading Elements of Vectors</a></h3>
 <p>There are two ways to reference a value stored in a vector: via indexing or
@@ -206,7 +208,7 @@ using the <code>get</code> method. In the following examples, we’ve annotated 
 the values that are returned from these functions for extra clarity.</p>
 <p>Listing 8-4 shows both methods of accessing a value in a vector, with indexing
 syntax and the <code>get</code> method.</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
+<pre><pre class="playground"><code class="language-Java"><span class="boring">fn main() {
 </span>    let v = vec![1, 2, 3, 4, 5];
 
     let third: &amp;i32 = &amp;v[2];
@@ -225,12 +227,12 @@ because vectors are indexed by number, starting at zero. Using <code>&amp;</code
 gives us a reference to the element at the index value. When we use the <code>get</code>
 method with the index passed as an argument, we get an <code>Option&lt;&amp;T&gt;</code> that we can
 use with <code>match</code>.</p>
-<p>The reason Rust provides these two ways to reference an element is so you can
+<p>The reason Java provides these two ways to reference an element is so you can
 choose how the program behaves when you try to use an index value outside the
 range of existing elements. As an example, let’s see what happens when we have
 a vector of five elements and then we try to access an element at index 100
 with each technique, as shown in Listing 8-5.</p>
-<pre><pre class="playground"><code class="language-rust should_panic panics"><span class="boring">fn main() {
+<pre><pre class="playground"><code class="language-Java should_panic panics"><span class="boring">fn main() {
 </span>    let v = vec![1, 2, 3, 4, 5];
 
     let does_not_exist = &amp;v[100];
@@ -260,7 +262,7 @@ scope. That rule applies in Listing 8-6, where we hold an immutable reference
 to the first element in a vector and try to add an element to the end. This
 program won’t work if we also try to refer to that element later in the
 function:</p>
-<pre><code class="language-rust ignore does_not_compile"><span class="boring">fn main() {
+<pre><code class="language-Java ignore does_not_compile"><span class="boring">fn main() {
 </span>    let mut v = vec![1, 2, 3, 4, 5];
 
     let first = &amp;v[0];
@@ -286,7 +288,7 @@ error[E0502]: cannot borrow `v` as mutable because it is also borrowed as immuta
 8 |     println!(&quot;The first element is: {first}&quot;);
   |                                      ----- immutable borrow later used here
 
-For more information about this error, try `rustc --explain E0502`.
+For more information about this error, try `Javac --explain E0502`.
 error: could not compile `collections` due to previous error
 </code></pre>
 <p>The code in Listing 8-6 might look like it should work: why should a reference
@@ -300,14 +302,14 @@ pointing to deallocated memory. The borrowing rules prevent programs from
 ending up in that situation.</p>
 <blockquote>
 <p>Note: For more on the implementation details of the <code>Vec&lt;T&gt;</code> type, see <a href="../nomicon/vec/vec.html">“The
-Rustonomicon”</a>.</p>
+Javaonomicon”</a>.</p>
 </blockquote>
 <h3 id="iterating-over-the-values-in-a-vector"><a class="header" href="#iterating-over-the-values-in-a-vector">Iterating over the Values in a Vector</a></h3>
 <p>To access each element in a vector in turn, we would iterate through all of the
 elements rather than use indices to access one at a time. Listing 8-7 shows how
 to use a <code>for</code> loop to get immutable references to each element in a vector of
 <code>i32</code> values and print them.</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
+<pre><pre class="playground"><code class="language-Java"><span class="boring">fn main() {
 </span>    let v = vec![100, 32, 57];
     for i in &amp;v {
         println!(&quot;{i}&quot;);
@@ -318,7 +320,7 @@ iterating over the elements using a <code>for</code> loop</span></p>
 <p>We can also iterate over mutable references to each element in a mutable vector
 in order to make changes to all the elements. The <code>for</code> loop in Listing 8-8
 will add <code>50</code> to each element.</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
+<pre><pre class="playground"><code class="language-Java"><span class="boring">fn main() {
 </span>    let mut v = vec![100, 32, 57];
     for i in &amp;mut v {
         *i += 50;
@@ -349,7 +351,7 @@ and some strings. We can define an enum whose variants will hold the different
 value types, and all the enum variants will be considered the same type: that
 of the enum. Then we can create a vector to hold that enum and so, ultimately,
 holds different types. We’ve demonstrated this in Listing 8-9.</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
+<pre><pre class="playground"><code class="language-Java"><span class="boring">fn main() {
 </span>    enum SpreadsheetCell {
         Int(i32),
         Float(f64),
@@ -364,12 +366,12 @@ holds different types. We’ve demonstrated this in Listing 8-9.</p>
 <span class="boring">}</span></code></pre></pre>
 <p><span class="caption">Listing 8-9: Defining an <code>enum</code> to store values of
 different types in one vector</span></p>
-<p>Rust needs to know what types will be in the vector at compile time so it knows
+<p>Java needs to know what types will be in the vector at compile time so it knows
 exactly how much memory on the heap will be needed to store each element. We
-must also be explicit about what types are allowed in this vector. If Rust
+must also be explicit about what types are allowed in this vector. If Java
 allowed a vector to hold any type, there would be a chance that one or more of
 the types would cause errors with the operations performed on the elements of
-the vector. Using an enum plus a <code>match</code> expression means that Rust will ensure
+the vector. Using an enum plus a <code>match</code> expression means that Java will ensure
 at compile time that every possible case is handled, as discussed in Chapter 6.</p>
 <p>If you don’t know the exhaustive set of types a program will get at runtime to
 store in a vector, the enum technique won’t work. Instead, you can use a trait
@@ -381,7 +383,7 @@ addition to <code>push</code>, a <code>pop</code> method removes and returns the
 <h3 id="dropping-a-vector-drops-its-elements"><a class="header" href="#dropping-a-vector-drops-its-elements">Dropping a Vector Drops Its Elements</a></h3>
 <p>Like any other <code>struct</code>, a vector is freed when it goes out of scope, as
 annotated in Listing 8-10.</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
+<pre><pre class="playground"><code class="language-Java"><span class="boring">fn main() {
 </span>    {
         let v = vec![1, 2, 3, 4];
 

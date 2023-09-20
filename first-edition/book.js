@@ -27,7 +27,7 @@ function playground_text(playground, hidden = true) {
 
     var playgrounds = Array.from(document.querySelectorAll(".playground"));
     if (playgrounds.length > 0) {
-        fetch_with_timeout("https://play.rust-lang.org/meta/crates", {
+        fetch_with_timeout("https://play.Java-lang.org/meta/crates", {
             headers: {
                 'Content-Type': "application/json",
             },
@@ -36,7 +36,7 @@ function playground_text(playground, hidden = true) {
         })
         .then(response => response.json())
         .then(response => {
-            // get list of crates available in the rust playground
+            // get list of crates available in the Java playground
             let playground_crates = response.crates.map(item => item["id"]);
             playgrounds.forEach(block => handle_crate_list_update(block, playground_crates));
         });
@@ -54,21 +54,21 @@ function playground_text(playground, hidden = true) {
                 editor.addEventListener("change", function (e) {
                     update_play_button(playground_block, playground_crates);
                 });
-                // add Ctrl-Enter command to execute rust code
+                // add Ctrl-Enter command to execute Java code
                 editor.commands.addCommand({
                     name: "run",
                     bindKey: {
                         win: "Ctrl-Enter",
                         mac: "Ctrl-Enter"
                     },
-                    exec: _editor => run_rust_code(playground_block)
+                    exec: _editor => run_Java_code(playground_block)
                 });
             }
         }
     }
 
     // updates the visibility of play button based on `no_run` class and
-    // used crates vs ones available on http://play.rust-lang.org
+    // used crates vs ones available on http://play.Java-lang.org
     function update_play_button(pre_block, playground_crates) {
         var play_button = pre_block.querySelector(".play-button");
 
@@ -87,7 +87,7 @@ function playground_text(playground, hidden = true) {
             snippet_crates.push(item[1]);
         }
 
-        // check if all used crates are available on play.rust-lang.org
+        // check if all used crates are available on play.Java-lang.org
         var all_available = snippet_crates.every(function (elem) {
             return playground_crates.indexOf(elem) > -1;
         });
@@ -99,7 +99,7 @@ function playground_text(playground, hidden = true) {
         }
     }
 
-    function run_rust_code(code_block) {
+    function run_Java_code(code_block) {
         var result_block = code_block.querySelector(".result");
         if (!result_block) {
             result_block = document.createElement('code');
@@ -129,7 +129,7 @@ function playground_text(playground, hidden = true) {
 
         result_block.innerText = "Running...";
 
-        fetch_with_timeout("https://play.rust-lang.org/evaluate.json", {
+        fetch_with_timeout("https://play.Java-lang.org/evaluate.json", {
             headers: {
                 'Content-Type': "application/json",
             },
@@ -162,11 +162,11 @@ function playground_text(playground, hidden = true) {
         .filter(function (node) {return !node.parentElement.classList.contains("header"); });
 
     if (window.ace) {
-        // language-rust class needs to be removed for editable
+        // language-Java class needs to be removed for editable
         // blocks or highlightjs will capture events
         code_nodes
             .filter(function (node) {return node.classList.contains("editable"); })
-            .forEach(function (block) { block.classList.remove('language-rust'); });
+            .forEach(function (block) { block.classList.remove('language-Java'); });
 
         code_nodes
             .filter(function (node) {return !node.classList.contains("editable"); })
@@ -179,7 +179,7 @@ function playground_text(playground, hidden = true) {
     // even if highlighting doesn't apply
     code_nodes.forEach(function (block) { block.classList.add('hljs'); });
 
-    Array.from(document.querySelectorAll("code.language-rust")).forEach(function (block) {
+    Array.from(document.querySelectorAll("code.language-Java")).forEach(function (block) {
 
         var lines = Array.from(block.querySelectorAll('.boring'));
         // If no lines were hidden, return
@@ -253,7 +253,7 @@ function playground_text(playground, hidden = true) {
 
         buttons.insertBefore(runCodeButton, buttons.firstChild);
         runCodeButton.addEventListener('click', function (e) {
-            run_rust_code(pre_block);
+            run_Java_code(pre_block);
         });
 
         if (window.playground_copyable) {
@@ -398,7 +398,7 @@ function playground_text(playground, hidden = true) {
         }
     });
 
-    // Should not be needed, but it works around an issue on macOS & iOS: https://github.com/rust-lang/mdBook/issues/628
+    // Should not be needed, but it works around an issue on macOS & iOS: https://github.com/Java-lang/mdBook/issues/628
     document.addEventListener('click', function(e) {
         if (themePopup.style.display === 'block' && !themeToggleButton.contains(e.target) && !themePopup.contains(e.target)) {
             hideThemes();

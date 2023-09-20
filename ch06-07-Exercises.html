@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Concise Control Flow with if let - Introduction to Programming Using Java</title>
+        <title>Exercises - Introduction to Programming Using Java</title>
 
 
         <!-- Custom HTML head -->
@@ -31,6 +31,8 @@
         <!-- Custom theme stylesheets -->
         <link rel="stylesheet" href="ferris.css">
         <link rel="stylesheet" href="theme/2018-edition.css">
+
+<link rel="stylesheet" href="code-class.css">
 
     </head>
     <body>
@@ -101,7 +103,7 @@
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
                             <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="Java">Java</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
@@ -146,115 +148,291 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h2 id="concise-control-flow-with-if-let"><a class="header" href="#concise-control-flow-with-if-let">Concise Control Flow with <code>if let</code></a></h2>
-<p>The <code>if let</code> syntax lets you combine <code>if</code> and <code>let</code> into a less verbose way to
-handle values that match one pattern while ignoring the rest. Consider the
-program in Listing 6-6 that matches on an <code>Option&lt;u8&gt;</code> value in the
-<code>config_max</code> variable but only wants to execute code if the value is the <code>Some</code>
-variant.</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
-</span>    let config_max = Some(3u8);
-    match config_max {
-        Some(max) =&gt; println!(&quot;The maximum is configured to be {}&quot;, max),
-        _ =&gt; (),
+                        <h2 id="Exercises"><a class="header" href="#Exercises">Exercises</a></h2>
+                        <p>
+                            This page contains several exercises for Chapter 6
+                            in <a href="title-page.html">Introduction to Programming Using Java</a>.  Each solution includes a discussion of how a programmer might approach the
+                            problem and interesting points raised by the problem or its solution.</p>
+
+                        <h3 class="exercise">Exercise 6.1:</h3>
+                        <p>In <a href="ch06-03-BasicEvents.html">Subsection&nbsp;6.3.2</a>, the following code was
+                            given as an example.  It installs a <span class="code">MousePressed</span> event handler
+                            on a canvas.  The handler lets the user draw a red rectangle at the point
+                            where the user clicks the mouse, or, by holding the shift key down,
+                            a blue oval:</p>
+
+                        <pre><code class="java">canvas.setOnMousePressed( evt -&gt; {
+    GraphicsContext g = canvas.getGraphicsContext2D();
+    if ( evt.isShiftDown() ) {
+        g.setFill( Color.BLUE );
+        g.fillOval( evt.getX() - 30, evt.getY() - 15, 60, 30 )
     }
-<span class="boring">}</span></code></pre></pre>
-<p><span class="caption">Listing 6-6: A <code>match</code> that only cares about executing
-code when the value is <code>Some</code></span></p>
-<p>If the value is <code>Some</code>, we print out the value in the <code>Some</code> variant by binding
-the value to the variable <code>max</code> in the pattern. We don’t want to do anything
-with the <code>None</code> value. To satisfy the <code>match</code> expression, we have to add <code>_ =&gt; ()</code> after processing just one variant, which is annoying boilerplate code to
-add.</p>
-<p>Instead, we could write this in a shorter way using <code>if let</code>. The following
-code behaves the same as the <code>match</code> in Listing 6-6:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
-</span>    let config_max = Some(3u8);
-    if let Some(max) = config_max {
-        println!(&quot;The maximum is configured to be {}&quot;, max);
+    else {
+        g.setFill( Color.RED );
+        g.fillRect( evt.getX() - 30, evt.getY() - 15, 60, 30 );
     }
-<span class="boring">}</span></code></pre></pre>
-<p>The syntax <code>if let</code> takes a pattern and an expression separated by an equal
-sign. It works the same way as a <code>match</code>, where the expression is given to the
-<code>match</code> and the pattern is its first arm. In this case, the pattern is
-<code>Some(max)</code>, and the <code>max</code> binds to the value inside the <code>Some</code>. We can then
-use <code>max</code> in the body of the <code>if let</code> block in the same way we used <code>max</code> in
-the corresponding <code>match</code> arm. The code in the <code>if let</code> block isn’t run if the
-value doesn’t match the pattern.</p>
-<p>Using <code>if let</code> means less typing, less indentation, and less boilerplate code.
-However, you lose the exhaustive checking that <code>match</code> enforces. Choosing
-between <code>match</code> and <code>if let</code> depends on what you’re doing in your particular
-situation and whether gaining conciseness is an appropriate trade-off for
-losing exhaustive checking.</p>
-<p>In other words, you can think of <code>if let</code> as syntax sugar for a <code>match</code> that
-runs code when the value matches one pattern and then ignores all other values.</p>
-<p>We can include an <code>else</code> with an <code>if let</code>. The block of code that goes with the
-<code>else</code> is the same as the block of code that would go with the <code>_</code> case in the
-<code>match</code> expression that is equivalent to the <code>if let</code> and <code>else</code>. Recall the
-<code>Coin</code> enum definition in Listing 6-4, where the <code>Quarter</code> variant also held a
-<code>UsState</code> value. If we wanted to count all non-quarter coins we see while also
-announcing the state of the quarters, we could do that with a <code>match</code>
-expression, like this:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#[derive(Debug)]
-</span><span class="boring">enum UsState {
-</span><span class="boring">    Alabama,
-</span><span class="boring">    Alaska,
-</span><span class="boring">    // --snip--
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">enum Coin {
-</span><span class="boring">    Penny,
-</span><span class="boring">    Nickel,
-</span><span class="boring">    Dime,
-</span><span class="boring">    Quarter(UsState),
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">fn main() {
-</span><span class="boring">    let coin = Coin::Penny;
-</span>    let mut count = 0;
-    match coin {
-        Coin::Quarter(state) =&gt; println!(&quot;State quarter from {:?}!&quot;, state),
-        _ =&gt; count += 1,
-    }
-<span class="boring">}</span></code></pre></pre>
-<p>Or we could use an <code>if let</code> and <code>else</code> expression, like this:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#[derive(Debug)]
-</span><span class="boring">enum UsState {
-</span><span class="boring">    Alabama,
-</span><span class="boring">    Alaska,
-</span><span class="boring">    // --snip--
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">enum Coin {
-</span><span class="boring">    Penny,
-</span><span class="boring">    Nickel,
-</span><span class="boring">    Dime,
-</span><span class="boring">    Quarter(UsState),
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">fn main() {
-</span><span class="boring">    let coin = Coin::Penny;
-</span>    let mut count = 0;
-    if let Coin::Quarter(state) = coin {
-        println!(&quot;State quarter from {:?}!&quot;, state);
-    } else {
-        count += 1;
-    }
-<span class="boring">}</span></code></pre></pre>
-<p>If you have a situation in which your program has logic that is too verbose to
-express using a <code>match</code>, remember that <code>if let</code> is in your Rust toolbox as well.</p>
-<h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
-<p>We’ve now covered how to use enums to create custom types that can be one of a
-set of enumerated values. We’ve shown how the standard library’s <code>Option&lt;T&gt;</code>
-type helps you use the type system to prevent errors. When enum values have
-data inside them, you can use <code>match</code> or <code>if let</code> to extract and use those
-values, depending on how many cases you need to handle.</p>
-<p>Your Rust programs can now express concepts in your domain using structs and
-enums. Creating custom types to use in your API ensures type safety: the
-compiler will make certain your functions only get values of the type each
-function expects.</p>
-<p>In order to provide a well-organized API to your users that is straightforward
-to use and only exposes exactly what your users will need, let’s now turn to
-Rust’s modules.</p>
+} );</code></pre>
+
+                        <p>Write a complete program that does the same, but in addition, the program
+                            will continue to draw figures if the user drags the mouse.
+                            That is, the mouse will leave a trail of figures as the user
+                            drags.  However, if the user right-clicks the canvas, then the canvas should simply be
+                            cleared and no figures should be drawn even if the user drags the mouse after
+                            right-clicking. See the discussion of dragging in <a href="ch06-03-BasicEvents.html">Subsection&nbsp;6.3.3</a>.
+                            Here is a picture of my solution:</p>
+
+                        <p align="center">
+                            <img src="./images/simple-stamper-with-drag.png" width="400" height="305" alt="the program showing trails of ovals and rects"></p>
+
+                        <p>Note that a black border has been added around each shape to make them more distinct.</p>
+
+                        <p>To make the problem a little more challenging, when drawing shapes
+                            during a drag operation, make sure that the shapes that are drawn are at least, say,
+                            5 pixels apart.  To implement this, you have to keep track of the position where the
+                            previous shape was drawn.</p>
+
+                        <h3 class="exercise">Exercise 6.2:</h3>
+                        <p>Write a program that shows a small red square and a small blue
+                            square. The user should be able to drag either square with the mouse.
+                            (You'll need an instance variable to remember which square the user is
+                            dragging.) The user can drag the square out of the window if she wants, and it will
+                            disappear.  To allow the user to get the squares back into the window,
+                            add a <span class="code">KeyPressed</span> event handler that will restore the
+                            squares to their original positions when the user presses the Escape key.
+                            The key code for the Escape key is <span class="code">KeyCode.ESCAPE</span>.</p>
+
+                        <h3 class="exercise">Exercise 6.3:</h3>
+                        <p>Write a program that shows a pair of dice.  The
+                            dice are drawn on a <span class="classname">Canvas</span>.
+                            You can assume that the size of the canvas is 100 by 100 pixels.
+                            When the user clicks on the canvas, the dice should be rolled
+                            (that is, the dice should be assigned newly computed random values). Each die
+                            should be drawn as a square showing from 1 to 6 dots. Since you have to draw
+                            two dice, its a good idea to write a subroutine, such as "<span class="code">void drawDie(GraphicsContext g,
+int val, int x, int y)</span>", to draw a die at the specified <span class="code">(x,y)</span>
+                            coordinates. The second parameter, <span class="code">val</span>, specifies the number of dots that are
+                            showing on the die.
+                            Here is a picture of a canvas displaying two the dice:</p>
+
+                        <p align="center">
+                            <img src="./images/roll-dice-gui.png" width="100" height="100" alt="a pair of dice"></p>
+
+                        <h3 class="exercise">Exercise 6.4:</h3>
+                        <p>In Exercise&nbsp;6.3,
+                            you wrote a graphical pair-of-dice program where the dice are rolled when the user clicks on
+                            the canvas. Now make a pair-of-dice program where the user rolls the
+                            dice by clicking a button.  The button should appear under the
+                            canvas that shows the dice.  Also make the following change:  When the
+                            dice are rolled, instead of just showing the new value, show a short animation
+                            during which the values on the dice are changed in every frame.  The animation
+                            is supposed to make the dice look more like they are actually rolling.</p>
+
+
+                        <h3 class="exercise">Exercise 6.5:</h3>
+                        <p>In Exercise&nbsp;3.8, you drew a checkerboard. For this
+                            exercise, write a program where the user can select a square by
+                            clicking on it.
+                            Highlight the selected square by drawing a colored border around
+                            it. When the program starts, no square is selected. When the user
+                            clicks on a square that is not currently selected, it becomes selected, and the
+                            previously selected square, if any, is unselected. If the
+                            user clicks the square that is selected, it becomes unselected. Assume that the
+                            size of the checkerboard is exactly 400 by 400 pixels, so that each square on the
+                            checkerboard is 50 by 50 pixels.  Here is my checkerboard, with the square in
+                            row 3, column 3 selected, shown at reduced size:</p>
+
+                        <p align="center">
+                            <img src="./images/clickable-checkerboard.png" width="160" height="160" alt="checkerboard"></p>
+
+
+                        <h3 class="exercise">Exercise 6.6:</h3>
+                        <p>For this exercise, you
+                            should modify the SubKiller game from <a href="ch06-03-BasicEvents.html">Subsection&nbsp;6.3.6</a>. You
+                            can start with the existing source code, from the file
+                            <span class="sourceref"><a href="./source/chapter6/SubKiller.java">SubKiller.java</a></span>. Modify the game so it
+                            keeps track of the number of hits and misses and displays these quantities.
+                            That is, every time the depth charge blows up the sub, the number of hits goes
+                            up by one. Every time the depth charge falls off the bottom of the screen
+                            without hitting the sub, the number of misses goes up by one. There is room at
+                            the top of the canvas to display these numbers. To do this exercise, you only
+                            have to add a half-dozen lines to the source code. But you have to figure out
+                            what they are and where to add them. To do this, you'll have to read the source
+                            code closely enough to understand how it works.</p>
+
+
+                        <h3 class="exercise">Exercise 6.7:</h3>
+                        <p>
+                            Exercise&nbsp;5.2 involved a class, <span class="sourceref"><a href="./source/chapter5/StatCalc.java">StatCalc.java</a></span>,
+                            that could compute some statistics
+                            of a set of numbers. Write a GUI program that uses the <span class="classname">StatCalc</span> class to
+                            compute and display statistics of numbers entered by the user. The program will
+                            have an instance variable of type <span class="classname">StatCalc</span> that does the computations.
+                            The program should include a <span class="classname">TextField</span> where the user enters a number.
+                            It should have four labels that display four statistics for the numbers that
+                            have been entered: the number of numbers, the sum, the mean, and the standard
+                            deviation. Every time the user enters a new number, the statistics displayed on
+                            the labels should change. The user enters a number by typing it into the
+                            <span class="classname">TextField</span> and then either clicking an "Enter" button or
+                            pressing the Return (or Enter) key.  There should be a "Clear" button that
+                            clears out all the data. This means creating a new <span class="classname">StatCalc</span> object and
+                            changing the text that is displayed on the labels.
+                            (See the discussion of "default buttons" at the end of
+                            <a href="ch06-04-BasicControls.html">Subsection&nbsp;6.4.2</a> for one way of implementing a response the Return key.)
+                            Here is a picture of my solution to this problem:</p>
+
+                        <p align="center">
+                            <img src="./images/stat-calc-gui.png" alt="screenshot from StatCalcGUI program"></p>
+
+                        <p>Getting the interface to look just like I wanted it was the hardest part.
+                            In the end, I used <span class="classname">TilePanes</span> (<a href="ch06-05-BasicLayout.html">Subsection&nbsp;6.5.4</a>) for the layout.</p>
+
+                        <h3 class="exercise">Exercise 6.8:</h3>
+                        <p> Write a program that has a
+                            <span class="classname">TextArea</span> where the user can enter some text.
+                            The program should have a
+                            button such that when the user clicks on the button, the program will count the number
+                            of lines in the user's input, the number of words in the user's input, and the
+                            number of characters in the user's input. This information should be displayed
+                            on three <span class="classname">Labels</span>. Recall that if <span class="code">textInput</span> is a
+                            <span class="classname">TextArea</span>, then you can get the contents of the <span class="classname">TextArea</span> by
+                            calling the function <span class="code">textInput.getText()</span>. This function returns a
+                            <span class="classname">String</span> containing all the text from the text area. The number
+                            of characters is just the length of this <span class="classname">String</span>. Lines in the
+                            <span class="classname">String</span> are separated by the new line character, <span class="code">'\n'</span>, so the number of
+                            lines is just the number of new line characters in the <span class="classname">String</span>, plus
+                            one. Words are a little harder to count. <a href="ch03-10-Exercises.html">Exercise&nbsp;3.4</a>
+                            has some advice about finding the
+                            words in a <span class="classname">String</span>. Essentially, you want to count the number of
+                            characters that are first characters in words.  Here is a picture of my solution:</p>
+
+                        <p align="center">
+                            <img src="./images/text-count.png" width="342" height="346" alt="TextCounter program showing some text and the numbers of words, lines and chars"></p>
+
+
+                        <h3 class="exercise">Exercise 6.9:</h3>
+                        <p> A <span class="newword">polygon</span>
+                            is a geometric figure made up of a sequence of
+                            connected line segments. The points where the line segments meet are called the
+                            <span class="newword">vertices</span> of the polygon. <a href="ch06-02-BasicClasses.html">Subsection&nbsp;6.2.4</a> has
+                            a list of shape-drawing methods in a <span class="classname">GraphicsContext</span>.
+                            Among them are methods for stroking and for filling polygons:
+                            <span class="code">g.strokePolygon(xcoords,ycoords,n)</span> and
+                            <span class="code">g.fillPolygon(xcoords,ycoords,n)</span>, For these commands,
+                            the coordinates of the vertices of the polygon are stored in arrays
+                            <span class="code">xcoords</span> and <span class="code">ycoords</span> of type <span class="atype">double[]</span>,
+                            and the number of vertices of the polygon is given by the third parameter, <span class="code">n</span>.
+                            Note that it is OK for the sides of a polygon to cross each other,
+                            but the interior of a polygon with self-intersections might not be exactly what
+                            you expect.</p>
+
+                        <p>Write a program that lets the user draw polygons.  As the user clicks a
+                            sequence of points in a <span class="classname">Canvas</span>, count the points and store their x- and y-coordinates in two
+                            arrays. These points will be the vertices of the polygon. As the user is creating
+                            the polygon, you should just connect all the points with line segments.
+                            When the user clicks near the starting point, draw the complete polygon. Draw
+                            it with a red interior and a black border.  Once the user has completed a
+                            polygon, the next click should clear the data and start a new polygon from scratch.</p>
+
+                        <p>Here is a picture of my solution after the user has drawn a fairly complex polygon:</p>
+
+                        <p align="center">
+                            <img src="./images/polygon.png" width="300" height="300" alt="screen shot of the solution"></p>
+
+                        <h3 class="exercise">Exercise 6.10:</h3>
+                        <p>Write a GUI Blackjack program
+                            that lets the user play a game of Blackjack, with the computer as the dealer.
+                            The program should draw the user's cards and the dealer's cards, just as was
+                            done for the graphical HighLow card game in  <a href="ch06-06-CompetePrograms.html">Subsection&nbsp;6.6.1</a>.
+                            You can use the source code for that game, <span class="sourceref"><a href="./source/chapter6/HighLowGUI.java">HighLowGUI.java</a></span>, for some ideas about how to
+                            write your Blackjack game. The structures of the HighLow program and the
+                            Blackjack program are very similar. You will certainly want to use the
+                            <span class="code">drawCard()</span> method from the HighLow program.</p>
+
+
+                        <p>You can find a description of the game of Blackjack in <a href="ch05-09-Exercises.html">Exercise&nbsp;5.5</a>.
+                            Add the following rule to that
+                            description: If a player takes five cards without going over 21, that player
+                            wins immediately. This rule is used in some casinos. For your program, it means
+                            that you only have to allow room for five cards. You should make the
+                            canvas just wide enough to show five cards, and tall enough to
+                            show both the user's hand and the dealer's hand.</p>
+
+
+                        <p>Note that the design of a GUI Blackjack game is very different from the
+                            design of the text-oriented program that you wrote for <a href="ch05-09-Exercises.html">Exercise&nbsp;5.5</a>. The user
+                            should play the game by clicking on "Hit" and "Stand" buttons. There should be
+                            a "New Game" button that can be used to start another game after one game ends.
+                            You have to decide what happens when each of these buttons is pressed. You
+                            don't have much chance of getting this right unless you think in terms of the
+                            states that the game can be in and how the state can change.</p>
+
+
+                        <p>Your program will need the classes defined in
+                            <span class="sourceref"><a href="./source/chapter6/Card.java">Card.java</a></span>,
+                            <span class="sourceref"><a href="./source/chapter6/Hand.java">Hand.java</a></span>,
+                            <span class="sourceref"><a href="./source/chapter6/Deck.java">Deck.java</a></span>, and
+                            <span class="sourceref"><a href="./source/chapter6/BlackjackHand.java">BlackjackHand.java</a></span>.  It will also need the images file
+                            <span class="sourceref"><a href="./source/chapter6/cards.png">cards.png</a></span>, which contains pictures of the cards.</p>
+
+
+                        <p>The next exercise has a picture of a Blackjack game that
+                            you can use a guide, except that the version for this exercise does not allow betting.
+                            (Some aesthetic changes to the GUI were made in that Blackjack program, compared to the
+                            HighLow program.)</p>
+
+
+                        <h3 class="exercise">Exercise 6.11:</h3>
+                        <p>In the Blackjack game
+                            from Exercise&nbsp;6.10, the user can click on the "Hit",
+                            "Stand", and "NewGame" buttons even when it doesn't make sense to do so. It
+                            would be better if the buttons were disabled at the appropriate times. The "New
+                            Game" button should be disabled when there is a game in progress. The "Hit" and
+                            "Stand" buttons should be disabled when there is <b>not</b> a game in progress. The
+                            instance variable <span class="code">gameInProgress</span> tells whether or not a game is in
+                            progress, so you just have to make sure that the buttons are properly enabled
+                            and disabled whenever this variable changes value.
+                            I strongly advise writing a method that can be called every time it is
+                            necessary to set the value of the <span class="code">gameInProgress</span> variable. That
+                            method can take full responsibility for enabling and disabling the buttons
+                            (as long as it is used consistently).
+                            Recall that if <span class="code">bttn</span> is a variable of type <span class="code">Button</span>, then
+                            <span class="code">bttn.setDisable(true)</span> disables the button and
+                            <span class="code">bttn.setDisable(false)</span> enables the button.</p>
+
+
+                        <p>As a second (and more difficult) improvement, make it possible
+                            for the user to place bets on the Blackjack game. When the program starts, give
+                            the user $100. Add a <span class="classname">TextField</span> to the strip of controls along the
+                            bottom of the panel. The user enters the bet in this <span class="classname">TextField</span>.
+                            When the game begins, check the amount of the bet. You should do this when the
+                            game begins, not when it ends, because several errors can occur: The contents
+                            of the <span class="classname">TextField</span> might not be a legal number, the bet that the user
+                            places might be more money than the user has, or the bet might be &lt;= 0. You
+                            should detect these errors and show an error message instead of starting the
+                            game. The user's bet should be an integral number of dollars.</p>
+
+
+                        <p>It would be a good idea to make the <span class="classname">TextField</span> uneditable while the
+                            game is in progress. If <span class="code">betInput</span> is the <span class="classname">TextField</span>, you can
+                            make it editable and uneditable by the user with the commands
+                            <span class="code">betInput.setEditable(true)</span> and <span class="code">betInput.setEditable(false)</span>.</p>
+
+
+                        <p>In the <span class="code">drawBoard()</span> method, you should include commands to
+                            display the amount of money that the user has left.</p>
+
+
+                        <p>There is one other thing to think about: Ideally, the program should not start a new
+                            game when it is first created. The user should have a chance to set a bet
+                            amount before the game starts. So, in the <span class="code">start()</span> method, you
+                            should not call <span class="code">doNewGame()</span>. You might want to display a message such
+                            as "Welcome to Blackjack" before the first game starts.</p>
+
+
+                        <p>Here is a picture of my program:</p>
+
+                        <p align="center">
+                            <img src="./images/blackjack-gui.png" width="417" height="373" alt="a blackjack game in progress"></p>
 
                     </main>
 

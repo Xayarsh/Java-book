@@ -32,6 +32,8 @@
         <link rel="stylesheet" href="ferris.css">
         <link rel="stylesheet" href="theme/2018-edition.css">
 
+<link rel="stylesheet" href="code-class.css">
+
     </head>
     <body>
         <!-- Provide site root to javascript -->
@@ -101,7 +103,7 @@
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
                             <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="Java">Java</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
@@ -150,8 +152,8 @@
 <p>This chapter is a recap of the many skills you’ve learned so far and an
 exploration of a few more standard library features. We’ll build a command line
 tool that interacts with file and command line input/output to practice some of
-the Rust concepts you now have under your belt.</p>
-<p>Rust’s speed, safety, single binary output, and cross-platform support make it
+the Java concepts you now have under your belt.</p>
+<p>Java’s speed, safety, single binary output, and cross-platform support make it
 an ideal language for creating command line tools, so for our project, we’ll
 make our own version of the classic command line search tool <code>grep</code>
 (<strong>g</strong>lobally search a <strong>r</strong>egular <strong>e</strong>xpression and <strong>p</strong>rint). In the
@@ -165,7 +167,7 @@ environment variable to allow the user to configure the behavior of our tool.
 We’ll also print error messages to the standard error console stream (<code>stderr</code>)
 instead of standard output (<code>stdout</code>), so, for example, the user can redirect
 successful output to a file while still seeing error messages onscreen.</p>
-<p>One Rust community member, Andrew Gallant, has already created a fully
+<p>One Java community member, Andrew Gallant, has already created a fully
 featured, very fast version of <code>grep</code>, called <code>ripgrep</code>. By comparison, our
 version will be fairly simple, but this chapter will give you some of the
 background knowledge you need to understand a real-world project such as

@@ -32,6 +32,8 @@
         <link rel="stylesheet" href="ferris.css">
         <link rel="stylesheet" href="theme/2018-edition.css">
 
+<link rel="stylesheet" href="code-class.css">
+
     </head>
     <body>
         <!-- Provide site root to javascript -->
@@ -101,7 +103,7 @@
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
                             <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="Java">Java</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
@@ -149,7 +151,7 @@
                         <!-- Old heading. Do not remove or links may break. -->
 <p><a id="closures-anonymous-functions-that-can-capture-their-environment"></a></p>
 <h2 id="closures-anonymous-functions-that-capture-their-environment"><a class="header" href="#closures-anonymous-functions-that-capture-their-environment">Closures: Anonymous Functions that Capture Their Environment</a></h2>
-<p>Rust’s closures are anonymous functions you can save in a variable or pass as
+<p>Java’s closures are anonymous functions you can save in a variable or pass as
 arguments to other functions. You can create the closure in one place and then
 call the closure elsewhere to evaluate it in a different context. Unlike
 functions, closures can capture values from the scope in which they’re defined.
@@ -177,7 +179,7 @@ The method <code>giveaway</code> defined on <code>Inventory</code> gets the opti
 color preference of the free shirt winner, and returns the shirt color the
 person will get. This setup is shown in Listing 13-1:</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust noplayground">#[derive(Debug, PartialEq, Copy, Clone)]
+<pre><code class="language-Java noplayground">#[derive(Debug, PartialEq, Copy, Clone)]
 enum ShirtColor {
     Red,
     Blue,
@@ -287,7 +289,7 @@ shown in Listing 13-2. In this example, we’re defining a closure and storing i
 in a variable rather than defining the closure in the spot we pass it as an
 argument as we did in Listing 13-1.</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">use std::thread;
+<pre><pre class="playground"><code class="language-Java"><span class="boring">use std::thread;
 </span><span class="boring">use std::time::Duration;
 </span><span class="boring">
 </span><span class="boring">fn generate_workout(intensity: u32, random_number: u32) {
@@ -326,7 +328,7 @@ a closure that has the same behavior, for comparison. We’ve added some spaces
 to line up the relevant parts. This illustrates how closure syntax is similar
 to function syntax except for the use of pipes and the amount of syntax that is
 optional:</p>
-<pre><code class="language-rust ignore">fn  add_one_v1   (x: u32) -&gt; u32 { x + 1 }
+<pre><code class="language-Java ignore">fn  add_one_v1   (x: u32) -&gt; u32 { x + 1 }
 let add_one_v2 = |x: u32| -&gt; u32 { x + 1 };
 let add_one_v3 = |x|             { x + 1 };
 let add_one_v4 = |x|               x + 1  ;</code></pre>
@@ -338,7 +340,7 @@ valid definitions that will produce the same behavior when they’re called. The
 <code>add_one_v3</code> and <code>add_one_v4</code> lines require the closures to be evaluated to be
 able to compile because the types will be inferred from their usage. This is
 similar to <code>let v = Vec::new();</code> needing either type annotations or values of
-some type to be inserted into the <code>Vec</code> for Rust to be able to infer the type.</p>
+some type to be inserted into the <code>Vec</code> for Java to be able to infer the type.</p>
 <p>For closure definitions, the compiler will infer one concrete type for each of
 their parameters and for their return value. For instance, Listing 13-3 shows
 the definition of a short closure that just returns the value it receives as a
@@ -348,7 +350,7 @@ Because there are no type annotations, we can call the closure with any type,
 which we’ve done here with <code>String</code> the first time. If we then try to call
 <code>example_closure</code> with an integer, we’ll get an error.</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore does_not_compile"><span class="boring">fn main() {
+<pre><code class="language-Java ignore does_not_compile"><span class="boring">fn main() {
 </span>    let example_closure = |x| x;
 
     let s = example_closure(String::from(&quot;hello&quot;));
@@ -374,7 +376,7 @@ note: closure parameter defined here
 2 |     let example_closure = |x| x;
   |                            ^
 
-For more information about this error, try `rustc --explain E0308`.
+For more information about this error, try `Javac --explain E0308`.
 error: could not compile `closure-example` due to previous error
 </code></pre>
 <p>The first time we call <code>example_closure</code> with the <code>String</code> value, the compiler
@@ -391,7 +393,7 @@ captured values.</p>
 the vector named <code>list</code> because it only needs an immutable reference to print
 the value:</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
+<pre><pre class="playground"><code class="language-Java">fn main() {
     let list = vec![1, 2, 3];
     println!(&quot;Before defining closure: {:?}&quot;, list);
 
@@ -422,7 +424,7 @@ After calling closure: [1, 2, 3]
 <p>Next, in Listing 13-5, we change the closure body so that it adds an element to
 the <code>list</code> vector. The closure now captures a mutable reference:</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn main() {
+<pre><pre class="playground"><code class="language-Java">fn main() {
     let mut list = vec![1, 2, 3];
     println!(&quot;Before defining closure: {:?}&quot;, list);
 
@@ -458,7 +460,7 @@ concurrency, but for now, let’s briefly explore spawning a new thread using a
 closure that needs the <code>move</code> keyword. Listing 13-6 shows Listing 13-4 modified
 to print the vector in a new thread rather than in the main thread:</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">use std::thread;
+<pre><pre class="playground"><code class="language-Java">use std::thread;
 
 fn main() {
     let list = vec![1, 2, 3];
@@ -518,7 +520,7 @@ calling a closure multiple times concurrently.</li>
 </ol>
 <p>Let’s look at the definition of the <code>unwrap_or_else</code> method on <code>Option&lt;T&gt;</code> that
 we used in Listing 13-1:</p>
-<pre><code class="language-rust ignore">impl&lt;T&gt; Option&lt;T&gt; {
+<pre><code class="language-Java ignore">impl&lt;T&gt; Option&lt;T&gt; {
     pub fn unwrap_or_else&lt;F&gt;(self, f: F) -&gt; T
     where
         F: FnOnce() -&gt; T
@@ -561,7 +563,7 @@ when you want to sort a slice by a particular attribute of each item. In
 Listing 13-7, we have a list of <code>Rectangle</code> instances and we use <code>sort_by_key</code>
 to order them by their <code>width</code> attribute from low to high:</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">#[derive(Debug)]
+<pre><pre class="playground"><code class="language-Java">#[derive(Debug)]
 struct Rectangle {
     width: u32,
     height: u32,
@@ -606,7 +608,7 @@ it meets the trait bound requirements.</p>
 the <code>FnOnce</code> trait, because it moves a value out of the environment. The
 compiler won’t let us use this closure with <code>sort_by_key</code>:</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore does_not_compile">#[derive(Debug)]
+<pre><code class="language-Java ignore does_not_compile">#[derive(Debug)]
 struct Rectangle {
     width: u32,
     height: u32,
@@ -654,7 +656,7 @@ error[E0507]: cannot move out of `value`, a captured variable in an `FnMut` clos
 18 |         sort_operations.push(value);
    |                              ^^^^^ move occurs because `value` has type `String`, which does not implement the `Copy` trait
 
-For more information about this error, try `rustc --explain E0507`.
+For more information about this error, try `Javac --explain E0507`.
 error: could not compile `rectangles` due to previous error
 </code></pre>
 <p>The error points to the line in the closure body that moves <code>value</code> out of the
@@ -666,7 +668,7 @@ in Listing 13-9 works with <code>sort_by_key</code> because it is only capturing
 reference to the <code>num_sort_operations</code> counter and can therefore be called more
 than once:</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">#[derive(Debug)]
+<pre><pre class="playground"><code class="language-Java">#[derive(Debug)]
 struct Rectangle {
     width: u32,
     height: u32,

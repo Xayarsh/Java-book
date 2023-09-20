@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Separating Modules into Different Files - Introduction to Programming Using Java</title>
+        <title>Quiz - Introduction to Programming Using Java</title>
 
 
         <!-- Custom HTML head -->
@@ -31,6 +31,8 @@
         <!-- Custom theme stylesheets -->
         <link rel="stylesheet" href="ferris.css">
         <link rel="stylesheet" href="theme/2018-edition.css">
+
+        <link rel="stylesheet" href="code-class.css">
 
     </head>
     <body>
@@ -101,7 +103,7 @@
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
                             <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="Java">Java</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
@@ -146,106 +148,160 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h2 id="separating-modules-into-different-files"><a class="header" href="#separating-modules-into-different-files">Separating Modules into Different Files</a></h2>
-<p>So far, all the examples in this chapter defined multiple modules in one file.
-When modules get large, you might want to move their definitions to a separate
-file to make the code easier to navigate.</p>
-<p>For example, let’s start from the code in Listing 7-17 that had multiple
-restaurant modules. We’ll extract modules into files instead of having all the
-modules defined in the crate root file. In this case, the crate root file is
-<em>src/lib.rs</em>, but this procedure also works with binary crates whose crate root
-file is <em>src/main.rs</em>.</p>
-<p>First, we’ll extract the <code>front_of_house</code> module to its own file. Remove the
-code inside the curly brackets for the <code>front_of_house</code> module, leaving only
-the <code>mod front_of_house;</code> declaration, so that <em>src/lib.rs</em> contains the code
-shown in Listing 7-21. Note that this won’t compile until we create the
-<em>src/front_of_house.rs</em> file in Listing 7-22.</p>
-<p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-rust ignore does_not_compile">mod front_of_house;
+                        <h2 id="Quiz"><a class="header" href="#Quiz">Quiz</a></h2>
+                        <p>
+                            This page contains questions on Chapter 7 of
+                            <a href="title-page.html"><i>Introduction to Programming Using Java</i></a>.
+                            You should be able to answer these questions after studying that chapter.</p>
+                        <div class="quiz-question">
+                            <p class="question">Question&nbsp;1:</p>
+                            <p>What is meant by the <i>basetype</i> of an array?</p>
 
-pub use crate::front_of_house::hosting;
+                        </div>
+                        <div class="quiz-question">
+                            <p class="question">Question&nbsp;2:</p>
+                            <p>What is the purpose of the following variable-arity method? What are
+                                the values of <span class="code">same(1,2,3)</span>, <span class="code">same(17,17,17,17)</span>,
+                                and <span class="code">same(2)</span>?  Why?</p>
 
-pub fn eat_at_restaurant() {
-    hosting::add_to_waitlist();
+                            <pre><code class="java">static double same( int... value ) {
+    for (int i = 1; i &lt; value.length; i++) {
+        if ( value[i-1] != value[i] )
+            return false;
+    }
+    return true;
 }</code></pre>
-<p><span class="caption">Listing 7-21: Declaring the <code>front_of_house</code> module whose
-body will be in <em>src/front_of_house.rs</em></span></p>
-<p>Next, place the code that was in the curly brackets into a new file named
-<em>src/front_of_house.rs</em>, as shown in Listing 7-22. The compiler knows to look
-in this file because it came across the module declaration in the crate root
-with the name <code>front_of_house</code>.</p>
-<p><span class="filename">Filename: src/front_of_house.rs</span></p>
-<pre><code class="language-rust ignore">pub mod hosting {
-    pub fn add_to_waitlist() {}
+
+                        </div>
+                        <div class="quiz-question">
+                            <p class="question">Question&nbsp;3:</p>
+                            <p>What does it mean to sort an array?</p>
+
+                        </div>
+                        <div class="quiz-question">
+                            <p class="question">Question&nbsp;4:</p>
+                            <p>What is the main advantage of binary search over linear search?  What is the
+                                main disadvantage?</p>
+                        </div>
+                        <div class="quiz-question">
+                            <p class="question">Question&nbsp;5:</p>
+                            <p>What is meant by a
+                                <i>dynamic array?</i> What is the advantage of a dynamic array over a regular
+                                array?</p>
+                        </div>
+                        <div class="quiz-question">
+                            <p class="question">Question&nbsp;6:</p>
+                            <p>What does it mean to say that <span class="classname">ArrayList</span> is a
+                                parameterized type?</p>
+                        </div>
+                        <div class="quiz-question">
+                            <p class="question">Question&nbsp;7:</p>
+                            <p>Suppose that a variable <span class="code">strlst</span> has been declared as</p>
+
+                            <pre><code class="java">ArrayList&lt;String&gt; strlst = new ArrayList&lt;String&gt;();</code></pre>
+
+                            <p>Assume that the list is not empty and that all the items in the list
+                                are non-null. Write a code segment that will find and print the string in the list
+                                that comes first in lexicographic order.</p>
+
+                        </div>
+                        <div class="quiz-question">
+                            <p class="question">Question&nbsp;8:</p>
+                            <p>Show the exact output
+                                produced by the following code segment.</p>
+
+                            <pre><code class="java">char[][] pic = new char[6][6];
+for (int i = 0; i &lt; 6; i++)
+   for (int j = 0; j &lt; 6; j++) {
+      if ( i == j  ||  i == 0  ||  i == 5 )
+         pic[i][j] = '*';
+      else
+         pic[i][j] = '.';
+   }
+for (int i = 0; i &lt; 6; i++) {
+   for (int j = 0; j &lt; 6; j++)
+      System.out.print(pic[i][j]);
+   System.out.println();
 }</code></pre>
-<p><span class="caption">Listing 7-22: Definitions inside the <code>front_of_house</code>
-module in <em>src/front_of_house.rs</em></span></p>
-<p>Note that you only need to load a file using a <code>mod</code> declaration <em>once</em> in your
-module tree. Once the compiler knows the file is part of the project (and knows
-where in the module tree the code resides because of where you’ve put the <code>mod</code>
-statement), other files in your project should refer to the loaded file’s code
-using a path to where it was declared, as covered in the <a href="ch07-03-ArrayLists.html">“Paths for Referring
-to an Item in the Module Tree”</a><!-- ignore --> section. In other words,
-<code>mod</code> is <em>not</em> an “include” operation that you may have seen in other
-programming languages.</p>
-<p>Next, we’ll extract the <code>hosting</code> module to its own file. The process is a bit
-different because <code>hosting</code> is a child module of <code>front_of_house</code>, not of the
-root module. We’ll place the file for <code>hosting</code> in a new directory that will be
-named for its ancestors in the module tree, in this case <em>src/front_of_house/</em>.</p>
-<p>To start moving <code>hosting</code>, we change <em>src/front_of_house.rs</em> to contain only the
-declaration of the <code>hosting</code> module:</p>
-<p><span class="filename">Filename: src/front_of_house.rs</span></p>
-<pre><code class="language-rust ignore">pub mod hosting;</code></pre>
-<p>Then we create a <em>src/front_of_house</em> directory and a file <em>hosting.rs</em> to
-contain the definitions made in the <code>hosting</code> module:</p>
-<p><span class="filename">Filename: src/front_of_house/hosting.rs</span></p>
-<pre><code class="language-rust ignore">pub fn add_to_waitlist() {}</code></pre>
-<p>If we instead put <em>hosting.rs</em> in the <em>src</em> directory, the compiler would
-expect the <em>hosting.rs</em> code to be in a <code>hosting</code> module declared in the crate
-root, and not declared as a child of the <code>front_of_house</code> module. The
-compiler’s rules for which files to check for which modules’ code means the
-directories and files more closely match the module tree.</p>
-<blockquote>
-<h3 id="alternate-file-paths"><a class="header" href="#alternate-file-paths">Alternate File Paths</a></h3>
-<p>So far we’ve covered the most idiomatic file paths the Rust compiler uses,
-but Rust also supports an older style of file path. For a module named
-<code>front_of_house</code> declared in the crate root, the compiler will look for the
-module’s code in:</p>
-<ul>
-<li><em>src/front_of_house.rs</em> (what we covered)</li>
-<li><em>src/front_of_house/mod.rs</em> (older style, still supported path)</li>
-</ul>
-<p>For a module named <code>hosting</code> that is a submodule of <code>front_of_house</code>, the
-compiler will look for the module’s code in:</p>
-<ul>
-<li><em>src/front_of_house/hosting.rs</em> (what we covered)</li>
-<li><em>src/front_of_house/hosting/mod.rs</em> (older style, still supported path)</li>
-</ul>
-<p>If you use both styles for the same module, you’ll get a compiler error. Using
-a mix of both styles for different modules in the same project is allowed, but
-might be confusing for people navigating your project.</p>
-<p>The main downside to the style that uses files named <em>mod.rs</em> is that your
-project can end up with many files named <em>mod.rs</em>, which can get confusing
-when you have them open in your editor at the same time.</p>
-</blockquote>
-<p>We’ve moved each module’s code to a separate file, and the module tree remains
-the same. The function calls in <code>eat_at_restaurant</code> will work without any
-modification, even though the definitions live in different files. This
-technique lets you move modules to new files as they grow in size.</p>
-<p>Note that the <code>pub use crate::front_of_house::hosting</code> statement in
-<em>src/lib.rs</em> also hasn’t changed, nor does <code>use</code> have any impact on what files
-are compiled as part of the crate. The <code>mod</code> keyword declares modules, and Rust
-looks in a file with the same name as the module for the code that goes into
-that module.</p>
-<h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
-<p>Rust lets you split a package into multiple crates and a crate into modules
-so you can refer to items defined in one module from another module. You can do
-this by specifying absolute or relative paths. These paths can be brought into
-scope with a <code>use</code> statement so you can use a shorter path for multiple uses of
-the item in that scope. Module code is private by default, but you can make
-definitions public by adding the <code>pub</code> keyword.</p>
-<p>In the next chapter, we’ll look at some collection data structures in the
-standard library that you can use in your neatly organized code.</p>
+                        </div>
+                        <div class="quiz-question">
+                            <p class="question">Question&nbsp;9:</p>
+                            <p>Write a complete static method
+                                that finds the largest value in an array of <span class="code">ints</span>. The method
+                                should have one parameter, which is an array of type <span class="code">int[]</span>. The
+                                largest number in the array should be returned as the value of the
+                                method.</p>
+                        </div>
+                        <div class="quiz-question">
+                            <p class="question">Question&nbsp;10:</p>
+                            <p>Suppose that temperature
+                                measurements were made on each day of 2021 in each of 100 cities. The
+                                measurements have been stored in an array</p>
+
+                            <pre><code class="java">int[][]  temps  =  new  int[100][365];</code></pre>
+
+                            <p>where <span class="code">temps[c][d]</span> holds the measurement for city number <span class="code">c</span>
+                                on the <span class="code">d</span><sup>th</sup> day of the year. Write a code segment that will
+                                print out the average temperature, over the course of the whole year, for each
+                                city. The average temperature for a city can be obtained by adding up all 365
+                                measurements for that city and dividing the answer by 365.0.</p>
+                        </div>
+                        <div class="quiz-question">
+                            <p class="question">Question&nbsp;11:</p>
+                            <p>Suppose that a class,
+                                <span class="classname">Employee,</span> is defined as follows:</p>
+
+                            <pre><code class="java">class Employee {
+   String lastName;
+   String firstName;
+   double hourlyWage;
+   int yearsWithCompany;
+}</code></pre>
+
+                            <p>Suppose that data about 100 employees is <b>already</b> stored in an
+                                array:</p>
+
+                            <pre><code class="java">Employee[] employeeData = new Employee[100];</code></pre>
+
+                            <p>Write a code segment that will output the first name, last name, and hourly
+                                wage of each employee who has been with the company for 20 years or more.  Write two
+                                versions of the code segment, one that uses a regular <span class="code">for</span> loop, and one that
+                                uses a for-each loop.</p>
+                        </div>
+                        <div class="quiz-question">
+                            <p class="question">Question&nbsp;12:</p>
+
+                            <p>Convert the <span class="classname">Employee</span> class from the previous
+                                question into a record class.  What changes would then need to be made to the
+                                previous question's solution?</p>
+
+                        </div>
+                        <div class="quiz-question">
+                            <p class="question">Question&nbsp;13:</p>
+
+                            <p>Write a record class to represent dates, where a <span class="classname">Date</span> object
+                                contains three integer fields giving the month, day, and year of the date.
+                                The canonical constructor should throw an exception if the values for the month
+                                and day are not legal.  Also include a <span class="code">toString()</span> method that
+                                prints a date in a form such as "5/27/2022".</p>
+
+                        </div>
+                        <div class="quiz-question">
+                            <p class="question">Question&nbsp;14:</p>
+                            <p>What is the purpose of the
+                                following subroutine? What is the meaning of the value that it returns, in
+                                terms of the value of its parameter?</p>
+
+                            <pre><code class="java">static double[] sums( double[][] data ) {
+    double[] answers = new double[ data.length ];
+    for (int i = 0; i &lt; data.length; i++) {
+        double sum = 0;
+        for (int j = 0; j &lt; data[i].length; i++)
+            sum = sum + data[i][j];
+        answers[i] = sum;
+    }
+    return answers;
+                                }</code></pre></div>
 
                     </main>
 

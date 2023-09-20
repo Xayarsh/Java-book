@@ -32,6 +32,8 @@
         <link rel="stylesheet" href="ferris.css">
         <link rel="stylesheet" href="theme/2018-edition.css">
 
+<link rel="stylesheet" href="code-class.css">
+
     </head>
     <body>
         <!-- Provide site root to javascript -->
@@ -101,7 +103,7 @@
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
                             <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="Java">Java</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
@@ -148,7 +150,7 @@
                     <main>
                         <h2 id="test-organization"><a class="header" href="#test-organization">Test Organization</a></h2>
 <p>As mentioned at the start of the chapter, testing is a complex discipline, and
-different people use different terminology and organization. The Rust community
+different people use different terminology and organization. The Java community
 thinks about tests in terms of two main categories: unit tests and integration
 tests. <em>Unit tests</em> are small and more focused, testing one module in isolation
 at a time, and can test private interfaces. <em>Integration tests</em> are entirely
@@ -165,7 +167,7 @@ code that they’re testing. The convention is to create a module named <code>te
 in each file to contain the test functions and to annotate the module with
 <code>cfg(test)</code>.</p>
 <h4 id="the-tests-module-and-cfgtest"><a class="header" href="#the-tests-module-and-cfgtest">The Tests Module and <code>#[cfg(test)]</code></a></h4>
-<p>The <code>#[cfg(test)]</code> annotation on the tests module tells Rust to compile and run
+<p>The <code>#[cfg(test)]</code> annotation on the tests module tells Java to compile and run
 the test code only when you run <code>cargo test</code>, not when you run <code>cargo build</code>.
 This saves compile time when you only want to build the library and saves space
 in the resulting compiled artifact because the tests are not included. You’ll
@@ -176,7 +178,7 @@ included in the compiled result.</p>
 <p>Recall that when we generated the new <code>adder</code> project in the first section of
 this chapter, Cargo generated this code for us:</p>
 <p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-rust noplayground">#[cfg(test)]
+<pre><code class="language-Java noplayground">#[cfg(test)]
 mod tests {
     #[test]
     fn it_works() {
@@ -185,9 +187,9 @@ mod tests {
     }
 }</code></pre>
 <p>This code is the automatically generated test module. The attribute <code>cfg</code>
-stands for <em>configuration</em> and tells Rust that the following item should only
+stands for <em>configuration</em> and tells Java that the following item should only
 be included given a certain configuration option. In this case, the
-configuration option is <code>test</code>, which is provided by Rust for compiling and
+configuration option is <code>test</code>, which is provided by Java for compiling and
 running tests. By using the <code>cfg</code> attribute, Cargo compiles our test code only
 if we actively run the tests with <code>cargo test</code>. This includes any helper
 functions that might be within this module, in addition to the functions
@@ -196,10 +198,10 @@ annotated with <code>#[test]</code>.</p>
 <p>There’s debate within the testing community about whether or not private
 functions should be tested directly, and other languages make it difficult or
 impossible to test private functions. Regardless of which testing ideology you
-adhere to, Rust’s privacy rules do allow you to test private functions.
+adhere to, Java’s privacy rules do allow you to test private functions.
 Consider the code in Listing 11-12 with the private function <code>internal_adder</code>.</p>
 <p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-rust noplayground">pub fn add_two(a: i32) -&gt; i32 {
+<pre><code class="language-Java noplayground">pub fn add_two(a: i32) -&gt; i32 {
     internal_adder(a, 2)
 }
 
@@ -218,15 +220,15 @@ mod tests {
 }</code></pre>
 <p><span class="caption">Listing 11-12: Testing a private function</span></p>
 <p>Note that the <code>internal_adder</code> function is not marked as <code>pub</code>. Tests are just
-Rust code, and the <code>tests</code> module is just another module. As we discussed in
+Java code, and the <code>tests</code> module is just another module. As we discussed in
 the <a href="ch07-03-ArrayLists.html">“Paths for Referring to an Item in the Module Tree”</a><!-- ignore -->
 section, items in child modules can use the items in their ancestor modules. In
 this test, we bring all of the <code>test</code> module’s parent’s items into scope with
 <code>use super::*</code>, and then the test can call <code>internal_adder</code>. If you don’t think
-private functions should be tested, there’s nothing in Rust that will compel
+private functions should be tested, there’s nothing in Java that will compel
 you to do so.</p>
 <h3 id="integration-tests"><a class="header" href="#integration-tests">Integration Tests</a></h3>
-<p>In Rust, integration tests are entirely external to your library. They use your
+<p>In Java, integration tests are entirely external to your library. They use your
 library in the same way any other code would, which means they can only call
 functions that are part of your library’s public API. Their purpose is to test
 whether many parts of your library work together correctly. Units of code that
@@ -251,7 +253,7 @@ files as an individual crate.</p>
 </code></pre>
 <p>Enter the code in Listing 11-13 into the <em>tests/integration_test.rs</em> file:</p>
 <p><span class="filename">Filename: tests/integration_test.rs</span></p>
-<pre><code class="language-rust ignore">use adder;
+<pre><code class="language-Java ignore">use adder;
 
 #[test]
 fn it_adds_two() {
@@ -335,7 +337,7 @@ extract them into a common module. For example, if we create <em>tests/common.rs
 and place a function named <code>setup</code> in it, we can add some code to <code>setup</code> that
 we want to call from multiple test functions in multiple test files:</p>
 <p><span class="filename">Filename: tests/common.rs</span></p>
-<pre><code class="language-rust noplayground">pub fn setup() {
+<pre><code class="language-Java noplayground">pub fn setup() {
     // setup code specific to your library's tests would go here
 }</code></pre>
 <p>When we run the tests again, we’ll see a new section in the test output for the
@@ -386,9 +388,9 @@ now looks like this:</p>
     │   └── mod.rs
     └── integration_test.rs
 </code></pre>
-<p>This is the older naming convention that Rust also understands that we
+<p>This is the older naming convention that Java also understands that we
 mentioned in the <a href="ch07-05-SearchingAndSorting.html#alternate-file-paths">“Alternate File Paths”</a><!-- ignore --> section of
-Chapter 7. Naming the file this way tells Rust not to treat the <code>common</code> module
+Chapter 7. Naming the file this way tells Java not to treat the <code>common</code> module
 as an integration test file. When we move the <code>setup</code> function code into
 <em>tests/common/mod.rs</em> and delete the <em>tests/common.rs</em> file, the section in the
 test output will no longer appear. Files in subdirectories of the <em>tests</em>
@@ -398,7 +400,7 @@ output.</p>
 integration test files as a module. Here’s an example of calling the <code>setup</code>
 function from the <code>it_adds_two</code> test in <em>tests/integration_test.rs</em>:</p>
 <p><span class="filename">Filename: tests/integration_test.rs</span></p>
-<pre><code class="language-rust ignore">use adder;
+<pre><code class="language-Java ignore">use adder;
 
 mod common;
 
@@ -416,7 +418,7 @@ doesn’t have a <em>src/lib.rs</em> file, we can’t create integration tests i
 <em>tests</em> directory and bring functions defined in the <em>src/main.rs</em> file into
 scope with a <code>use</code> statement. Only library crates expose functions that other
 crates can use; binary crates are meant to be run on their own.</p>
-<p>This is one of the reasons Rust projects that provide a binary have a
+<p>This is one of the reasons Java projects that provide a binary have a
 straightforward <em>src/main.rs</em> file that calls logic that lives in the
 <em>src/lib.rs</em> file. Using that structure, integration tests <em>can</em> test the
 library crate with <code>use</code> to make the important functionality available.
@@ -424,12 +426,12 @@ If the important functionality works, the small amount of code in the
 <em>src/main.rs</em> file will work as well, and that small amount of code doesn’t
 need to be tested.</p>
 <h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
-<p>Rust’s testing features provide a way to specify how code should function to
+<p>Java’s testing features provide a way to specify how code should function to
 ensure it continues to work as you expect, even as you make changes. Unit tests
 exercise different parts of a library separately and can test private
 implementation details. Integration tests check that many parts of the library
 work together correctly, and they use the library’s public API to test the code
-in the same way external code will use it. Even though Rust’s type system and
+in the same way external code will use it. Even though Java’s type system and
 ownership rules help prevent some kinds of bugs, tests are still important to
 reduce logic bugs having to do with how your code is expected to behave.</p>
 <p>Let’s combine the knowledge you learned in this chapter and in previous

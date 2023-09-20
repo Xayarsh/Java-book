@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>The Slice Type - Introduction to Programming Using Java</title>
+        <title>Exercises - Introduction to Programming Using Java</title>
 
 
         <!-- Custom HTML head -->
@@ -31,6 +31,8 @@
         <!-- Custom theme stylesheets -->
         <link rel="stylesheet" href="ferris.css">
         <link rel="stylesheet" href="theme/2018-edition.css">
+
+<link rel="stylesheet" href="code-class.css">
 
     </head>
     <body>
@@ -101,7 +103,7 @@
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
                             <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="Java">Java</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
@@ -146,408 +148,194 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h2 id="the-slice-type"><a class="header" href="#the-slice-type">The Slice Type</a></h2>
-<p><em>Slices</em> let you reference a contiguous sequence of elements in a collection
-rather than the whole collection. A slice is a kind of reference, so it does
-not have ownership.</p>
-<p>Here’s a small programming problem: write a function that takes a string of
-words separated by spaces and returns the first word it finds in that string.
-If the function doesn’t find a space in the string, the whole string must be
-one word, so the entire string should be returned.</p>
-<p>Let’s work through how we’d write the signature of this function without using
-slices, to understand the problem that slices will solve:</p>
-<pre><code class="language-rust ignore">fn first_word(s: &amp;String) -&gt; ?</code></pre>
-<p>The <code>first_word</code> function has a <code>&amp;String</code> as a parameter. We don’t want
-ownership, so this is fine. But what should we return? We don’t really have a
-way to talk about <em>part</em> of a string. However, we could return the index of the
-end of the word, indicated by a space. Let’s try that, as shown in Listing 4-7.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn first_word(s: &amp;String) -&gt; usize {
-    let bytes = s.as_bytes();
+                        <h2 id="Exercises"><a class="header" href="#Exercises">Exercises</a></h2>
+                        <p>
+                            This page contains several exercises for Chapter 4
+                            in <a href="title-page.html">Introduction to Programming Using Java</a>.  Each solution includes a discussion of how a programmer might approach the
+                            problem and interesting points raised by the problem or its solution.</p>
 
-    for (i, &amp;item) in bytes.iter().enumerate() {
-        if item == b' ' {
-            return i;
-        }
-    }
+                        <h3 class="exercise">Exercise 4.1:</h3>
+                        <p>To "capitalize" a string
+                            means to change the first letter of each word in the string to upper case (if
+                            it is not already upper case). For example, a capitalized version of "Now is
+                            the time to act!" is "Now Is The Time To Act!". Write a subroutine named
+                            <span class="code">printCapitalized</span> that will print a capitalized version of a string to
+                            standard output. The string to be printed should be a parameter to the
+                            subroutine. Test your subroutine with a <span class="code">main()</span> routine that gets a
+                            line of input from the user and applies the subroutine to it.</p>
 
-    s.len()
-}
-<span class="boring">
-</span><span class="boring">fn main() {}</span></code></pre></pre>
-<p><span class="caption">Listing 4-7: The <code>first_word</code> function that returns a
-byte index value into the <code>String</code> parameter</span></p>
-<p>Because we need to go through the <code>String</code> element by element and check whether
-a value is a space, we’ll convert our <code>String</code> to an array of bytes using the
-<code>as_bytes</code> method.</p>
-<pre><code class="language-rust ignore"><span class="boring">fn first_word(s: &amp;String) -&gt; usize {
-</span>    let bytes = s.as_bytes();
-<span class="boring">
-</span><span class="boring">    for (i, &amp;item) in bytes.iter().enumerate() {
-</span><span class="boring">        if item == b' ' {
-</span><span class="boring">            return i;
-</span><span class="boring">        }
-</span><span class="boring">    }
-</span><span class="boring">
-</span><span class="boring">    s.len()
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">fn main() {}</span></code></pre>
-<p>Next, we create an iterator over the array of bytes using the <code>iter</code> method:</p>
-<pre><code class="language-rust ignore"><span class="boring">fn first_word(s: &amp;String) -&gt; usize {
-</span><span class="boring">    let bytes = s.as_bytes();
-</span><span class="boring">
-</span>    for (i, &amp;item) in bytes.iter().enumerate() {
-<span class="boring">        if item == b' ' {
-</span><span class="boring">            return i;
-</span><span class="boring">        }
-</span><span class="boring">    }
-</span><span class="boring">
-</span><span class="boring">    s.len()
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">fn main() {}</span></code></pre>
-<p>We’ll discuss iterators in more detail in <a href="ch13-02-FancierGraphics.html">Chapter 13</a><!-- ignore -->.
-For now, know that <code>iter</code> is a method that returns each element in a collection
-and that <code>enumerate</code> wraps the result of <code>iter</code> and returns each element as
-part of a tuple instead. The first element of the tuple returned from
-<code>enumerate</code> is the index, and the second element is a reference to the element.
-This is a bit more convenient than calculating the index ourselves.</p>
-<p>Because the <code>enumerate</code> method returns a tuple, we can use patterns to
-destructure that tuple. We’ll be discussing patterns more in <a href="ch06-02-BasicClasses.html#patterns-that-bind-to-values">Chapter
-6</a><!-- ignore -->. In the <code>for</code> loop, we specify a pattern that has <code>i</code>
-for the index in the tuple and <code>&amp;item</code> for the single byte in the tuple.
-Because we get a reference to the element from <code>.iter().enumerate()</code>, we use
-<code>&amp;</code> in the pattern.</p>
-<p>Inside the <code>for</code> loop, we search for the byte that represents the space by
-using the byte literal syntax. If we find a space, we return the position.
-Otherwise, we return the length of the string by using <code>s.len()</code>.</p>
-<pre><code class="language-rust ignore"><span class="boring">fn first_word(s: &amp;String) -&gt; usize {
-</span><span class="boring">    let bytes = s.as_bytes();
-</span><span class="boring">
-</span><span class="boring">    for (i, &amp;item) in bytes.iter().enumerate() {
-</span>        if item == b' ' {
-            return i;
-        }
-    }
+                        <p>Note that a letter is the first letter of a word if it is not immediately
+                            preceded in the string by another letter. Recall
+                            from Exercise&nbsp;3.4 that there is a standard
+                            <span class="ptype">boolean</span>-valued function <span class="code">Character.isLetter(char)</span> that can be
+                            used to test whether its parameter is a letter. There is another standard
+                            <span class="ptype">char</span>-valued function, <span class="code">Character.toUpperCase(char)</span>, that
+                            returns a capitalized version of the single character passed to it as a
+                            parameter. That is, if the parameter is a letter, it returns the upper-case
+                            version. If the parameter is not a letter, it just returns a copy of the
+                            parameter.</p>
 
-    s.len()
-<span class="boring">}
-</span><span class="boring">
-</span><span class="boring">fn main() {}</span></code></pre>
-<p>We now have a way to find out the index of the end of the first word in the
-string, but there’s a problem. We’re returning a <code>usize</code> on its own, but it’s
-only a meaningful number in the context of the <code>&amp;String</code>. In other words,
-because it’s a separate value from the <code>String</code>, there’s no guarantee that it
-will still be valid in the future. Consider the program in Listing 4-8 that
-uses the <code>first_word</code> function from Listing 4-7.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn first_word(s: &amp;String) -&gt; usize {
-</span><span class="boring">    let bytes = s.as_bytes();
-</span><span class="boring">
-</span><span class="boring">    for (i, &amp;item) in bytes.iter().enumerate() {
-</span><span class="boring">        if item == b' ' {
-</span><span class="boring">            return i;
-</span><span class="boring">        }
-</span><span class="boring">    }
-</span><span class="boring">
-</span><span class="boring">    s.len()
-</span><span class="boring">}
-</span><span class="boring">
-</span>fn main() {
-    let mut s = String::from(&quot;hello world&quot;);
+                        <h3 class="exercise">Exercise 4.2:</h3>
+                        <p>The hexadecimal digits are
+                            the ordinary, base-10 digits '0' through '9' plus the letters 'A' through 'F'.
+                            In the hexadecimal system, these digits represent the values 0 through 15,
+                            respectively. Write a function named <span class="code">hexValue</span> that uses a
+                            <span class="code">switch</span> statement to find the hexadecimal value of a given character.
+                            The character is a parameter to the function, and its hexadecimal value is the
+                            return value of the function. You should count lower case letters 'a' through
+                            'f' as having the same value as the corresponding upper case letters. If the
+                            parameter is not one of the legal hexadecimal digits, return <span class="code">-1</span> as the value of
+                            the function.</p>
 
-    let word = first_word(&amp;s); // word will get the value 5
 
-    s.clear(); // this empties the String, making it equal to &quot;&quot;
+                        <p>A hexadecimal integer is a sequence of hexadecimal digits, such as 34A7,
+                            ff8, 174204, or FADE. If <span class="code">str</span> is a string containing a hexadecimal
+                            integer, then the corresponding base-10 integer can be computed as follows:</p>
 
-    // word still has the value 5 here, but there's no more string that
-    // we could meaningfully use the value 5 with. word is now totally invalid!
-}</code></pre></pre>
-<p><span class="caption">Listing 4-8: Storing the result from calling the
-<code>first_word</code> function and then changing the <code>String</code> contents</span></p>
-<p>This program compiles without any errors and would also do so if we used <code>word</code>
-after calling <code>s.clear()</code>. Because <code>word</code> isn’t connected to the state of <code>s</code>
-at all, <code>word</code> still contains the value <code>5</code>. We could use that value <code>5</code> with
-the variable <code>s</code> to try to extract the first word out, but this would be a bug
-because the contents of <code>s</code> have changed since we saved <code>5</code> in <code>word</code>.</p>
-<p>Having to worry about the index in <code>word</code> getting out of sync with the data in
-<code>s</code> is tedious and error prone! Managing these indices is even more brittle if
-we write a <code>second_word</code> function. Its signature would have to look like this:</p>
-<pre><code class="language-rust ignore">fn second_word(s: &amp;String) -&gt; (usize, usize) {</code></pre>
-<p>Now we’re tracking a starting <em>and</em> an ending index, and we have even more
-values that were calculated from data in a particular state but aren’t tied to
-that state at all. We have three unrelated variables floating around that need
-to be kept in sync.</p>
-<p>Luckily, Rust has a solution to this problem: string slices.</p>
-<h3 id="string-slices"><a class="header" href="#string-slices">String Slices</a></h3>
-<p>A <em>string slice</em> is a reference to part of a <code>String</code>, and it looks like this:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
-</span>    let s = String::from(&quot;hello world&quot;);
 
-    let hello = &amp;s[0..5];
-    let world = &amp;s[6..11];
-<span class="boring">}</span></code></pre></pre>
-<p>Rather than a reference to the entire <code>String</code>, <code>hello</code> is a reference to a
-portion of the <code>String</code>, specified in the extra <code>[0..5]</code> bit. We create slices
-using a range within brackets by specifying <code>[starting_index..ending_index]</code>,
-where <code>starting_index</code> is the first position in the slice and <code>ending_index</code> is
-one more than the last position in the slice. Internally, the slice data
-structure stores the starting position and the length of the slice, which
-corresponds to <code>ending_index</code> minus <code>starting_index</code>. So, in the case of <code>let world = &amp;s[6..11];</code>, <code>world</code> would be a slice that contains a pointer to the
-byte at index 6 of <code>s</code> with a length value of <code>5</code>.</p>
-<p>Figure 4-6 shows this in a diagram.</p>
-<p><img alt="Three tables: a table representing the stack data of s, which points
-to the byte at index 0 in a table of the string data &quot;hello world&quot; on
-the heap. The third table rep-resents the stack data of the slice world, which
-has a length value of 5 and points to byte 6 of the heap data table."
-src="img/trpl04-06.svg" class="center" style="width: 50%;" /></p>
-<p><span class="caption">Figure 4-6: String slice referring to part of a
-<code>String</code></span></p>
-<p>With Rust’s <code>..</code> range syntax, if you want to start at index 0, you can drop
-the value before the two periods. In other words, these are equal:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>let s = String::from(&quot;hello&quot;);
+                        <pre><code class="java">value = 0;
+for ( i = 0; i &lt; str.length();  i++ )
+   value = value*16 + hexValue( str.charAt(i) );</code></pre>
 
-let slice = &amp;s[0..2];
-let slice = &amp;s[..2];
-<span class="boring">}</span></code></pre></pre>
-<p>By the same token, if your slice includes the last byte of the <code>String</code>, you
-can drop the trailing number. That means these are equal:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>let s = String::from(&quot;hello&quot;);
 
-let len = s.len();
+                        <p>Of course, this is not valid if <span class="code">str</span> contains any characters that
+                            are not hexadecimal digits. Write a program that reads a string from the user.
+                            If all the characters in the string are hexadecimal digits, print out the
+                            corresponding base-10 value. If not, print out an error message.</p>
 
-let slice = &amp;s[3..len];
-let slice = &amp;s[3..];
-<span class="boring">}</span></code></pre></pre>
-<p>You can also drop both values to take a slice of the entire string. So these
-are equal:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>let s = String::from(&quot;hello&quot;);
 
-let len = s.len();
 
-let slice = &amp;s[0..len];
-let slice = &amp;s[..];
-<span class="boring">}</span></code></pre></pre>
-<blockquote>
-<p>Note: String slice range indices must occur at valid UTF-8 character
-boundaries. If you attempt to create a string slice in the middle of a
-multibyte character, your program will exit with an error. For the purposes
-of introducing string slices, we are assuming ASCII only in this section; a
-more thorough discussion of UTF-8 handling is in the <a href="ch08-02-WritingCorrectPrograms.html#storing-utf-8-encoded-text-with-strings">“Storing UTF-8 Encoded
-Text with Strings”</a><!-- ignore --> section of Chapter 8.</p>
-</blockquote>
-<p>With all this information in mind, let’s rewrite <code>first_word</code> to return a
-slice. The type that signifies “string slice” is written as <code>&amp;str</code>:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn first_word(s: &amp;String) -&gt; &amp;str {
-    let bytes = s.as_bytes();
+                        <h3 class="exercise">Exercise 4.3:</h3>
+                        <p>Write a function that
+                            simulates rolling a pair of dice until the total on the dice comes up to be a
+                            given number. The number that you are rolling for is a parameter to the
+                            function. The number of times you have to roll the dice is the return value of
+                            the function. The parameter should be one of the possible totals:
+                            2, 3, ..., 12.  The function should throw an <span class="classname">IllegalArgumentException</span>
+                            if this is not the case.  Use your function in a program that computes and prints the
+                            number of rolls it takes to get snake eyes. (Snake eyes means that the total
+                            showing on the dice is 2.)</p>
 
-    for (i, &amp;item) in bytes.iter().enumerate() {
-        if item == b' ' {
-            return &amp;s[0..i];
-        }
-    }
+                        <h3 class="exercise">Exercise 4.4:</h3>
+                        <p>This exercise builds on Exercise&nbsp;4.3.
+                            Every time you roll the dice repeatedly, trying to get a given
+                            total, the number of rolls it takes can be different. The question naturally
+                            arises, what's the average number of rolls to get a given total? Write a function that performs the
+                            experiment of rolling to get a given total 10000 times. The desired total is a
+                            parameter to the subroutine. The average number of rolls is the return value.
+                            Each individual experiment should be done by calling the function you wrote for
+                            Exercise&nbsp;4.3. Now, write a main program that will call your function once for
+                            each of the possible totals (2, 3, ..., 12). It should make a table of the
+                            results, something like:</p>
 
-    &amp;s[..]
-}
-<span class="boring">
-</span><span class="boring">fn main() {}</span></code></pre></pre>
-<p>We get the index for the end of the word the same way we did in Listing 4-7, by
-looking for the first occurrence of a space. When we find a space, we return a
-string slice using the start of the string and the index of the space as the
-starting and ending indices.</p>
-<p>Now when we call <code>first_word</code>, we get back a single value that is tied to the
-underlying data. The value is made up of a reference to the starting point of
-the slice and the number of elements in the slice.</p>
-<p>Returning a slice would also work for a <code>second_word</code> function:</p>
-<pre><code class="language-rust ignore">fn second_word(s: &amp;String) -&gt; &amp;str {</code></pre>
-<p>We now have a straightforward API that’s much harder to mess up because the
-compiler will ensure the references into the <code>String</code> remain valid. Remember
-the bug in the program in Listing 4-8, when we got the index to the end of the
-first word but then cleared the string so our index was invalid? That code was
-logically incorrect but didn’t show any immediate errors. The problems would
-show up later if we kept trying to use the first word index with an emptied
-string. Slices make this bug impossible and let us know we have a problem with
-our code much sooner. Using the slice version of <code>first_word</code> will throw a
-compile-time error:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore does_not_compile"><span class="boring">fn first_word(s: &amp;String) -&gt; &amp;str {
-</span><span class="boring">    let bytes = s.as_bytes();
-</span><span class="boring">
-</span><span class="boring">    for (i, &amp;item) in bytes.iter().enumerate() {
-</span><span class="boring">        if item == b' ' {
-</span><span class="boring">            return &amp;s[0..i];
-</span><span class="boring">        }
-</span><span class="boring">    }
-</span><span class="boring">
-</span><span class="boring">    &amp;s[..]
-</span><span class="boring">}
-</span><span class="boring">
-</span>fn main() {
-    let mut s = String::from(&quot;hello world&quot;);
 
-    let word = first_word(&amp;s);
+                        <pre><code class="console">Total On Dice     Average Number of Rolls
+-------------     -----------------------
+       2               35.8382
+       3               18.0607
+       .                .
+       .                .</code></pre>
 
-    s.clear(); // error!
 
-    println!(&quot;the first word is: {}&quot;, word);
+                        <h3 class="exercise">Exercise 4.5:</h3>
+                        <p>This exercise asks you to write a few lambda expressions
+                            and a function that returns a lambda expression as its value.  Suppose that
+                            a function interface <span class="classname">ArrayProcessor</span> is defined as</p>
+
+                        <pre><code class="java">public interface ArrayProcessor {
+    double apply( double[] array );
 }</code></pre>
-<p>Here’s the compiler error:</p>
-<pre><code class="language-console">$ cargo run
-   Compiling ownership v0.1.0 (file:///projects/ownership)
-error[E0502]: cannot borrow `s` as mutable because it is also borrowed as immutable
-  --&gt; src/main.rs:18:5
-   |
-16 |     let word = first_word(&amp;s);
-   |                           -- immutable borrow occurs here
-17 |
-18 |     s.clear(); // error!
-   |     ^^^^^^^^^ mutable borrow occurs here
-19 |
-20 |     println!(&quot;the first word is: {}&quot;, word);
-   |                                       ---- immutable borrow later used here
 
-For more information about this error, try `rustc --explain E0502`.
-error: could not compile `ownership` due to previous error
-</code></pre>
-<p>Recall from the borrowing rules that if we have an immutable reference to
-something, we cannot also take a mutable reference. Because <code>clear</code> needs to
-truncate the <code>String</code>, it needs to get a mutable reference. The <code>println!</code>
-after the call to <code>clear</code> uses the reference in <code>word</code>, so the immutable
-reference must still be active at that point. Rust disallows the mutable
-reference in <code>clear</code> and the immutable reference in <code>word</code> from existing at the
-same time, and compilation fails. Not only has Rust made our API easier to use,
-but it has also eliminated an entire class of errors at compile time!</p>
-<!-- Old heading. Do not remove or links may break. -->
-<p><a id="string-literals-are-slices"></a></p>
-<h4 id="string-literals-as-slices"><a class="header" href="#string-literals-as-slices">String Literals as Slices</a></h4>
-<p>Recall that we talked about string literals being stored inside the binary. Now
-that we know about slices, we can properly understand string literals:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>let s = &quot;Hello, world!&quot;;
-<span class="boring">}</span></code></pre></pre>
-<p>The type of <code>s</code> here is <code>&amp;str</code>: it’s a slice pointing to that specific point of
-the binary. This is also why string literals are immutable; <code>&amp;str</code> is an
-immutable reference.</p>
-<h4 id="string-slices-as-parameters"><a class="header" href="#string-slices-as-parameters">String Slices as Parameters</a></h4>
-<p>Knowing that you can take slices of literals and <code>String</code> values leads us to
-one more improvement on <code>first_word</code>, and that’s its signature:</p>
-<pre><code class="language-rust ignore">fn first_word(s: &amp;String) -&gt; &amp;str {</code></pre>
-<p>A more experienced Rustacean would write the signature shown in Listing 4-9
-instead because it allows us to use the same function on both <code>&amp;String</code> values
-and <code>&amp;str</code> values.</p>
-<pre><code class="language-rust ignore">fn first_word(s: &amp;str) -&gt; &amp;str {
-<span class="boring">    let bytes = s.as_bytes();
-</span><span class="boring">
-</span><span class="boring">    for (i, &amp;item) in bytes.iter().enumerate() {
-</span><span class="boring">        if item == b' ' {
-</span><span class="boring">            return &amp;s[0..i];
-</span><span class="boring">        }
-</span><span class="boring">    }
-</span><span class="boring">
-</span><span class="boring">    &amp;s[..]
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">fn main() {
-</span><span class="boring">    let my_string = String::from(&quot;hello world&quot;);
-</span><span class="boring">
-</span><span class="boring">    // `first_word` works on slices of `String`s, whether partial or whole
-</span><span class="boring">    let word = first_word(&amp;my_string[0..6]);
-</span><span class="boring">    let word = first_word(&amp;my_string[..]);
-</span><span class="boring">    // `first_word` also works on references to `String`s, which are equivalent
-</span><span class="boring">    // to whole slices of `String`s
-</span><span class="boring">    let word = first_word(&amp;my_string);
-</span><span class="boring">
-</span><span class="boring">    let my_string_literal = &quot;hello world&quot;;
-</span><span class="boring">
-</span><span class="boring">    // `first_word` works on slices of string literals, whether partial or whole
-</span><span class="boring">    let word = first_word(&amp;my_string_literal[0..6]);
-</span><span class="boring">    let word = first_word(&amp;my_string_literal[..]);
-</span><span class="boring">
-</span><span class="boring">    // Because string literals *are* string slices already,
-</span><span class="boring">    // this works too, without the slice syntax!
-</span><span class="boring">    let word = first_word(my_string_literal);
-</span><span class="boring">}</span></code></pre>
-<p><span class="caption">Listing 4-9: Improving the <code>first_word</code> function by using
-a string slice for the type of the <code>s</code> parameter</span></p>
-<p>If we have a string slice, we can pass that directly. If we have a <code>String</code>, we
-can pass a slice of the <code>String</code> or a reference to the <code>String</code>. This
-flexibility takes advantage of <em>deref coercions</em>, a feature we will cover in
-<a href="ch15-02-deref.html#implicit-deref-coercions-with-functions-and-methods">“Implicit Deref Coercions with Functions and
-Methods”</a><!--ignore--> section of Chapter 15.</p>
-<p>Defining a function to take a string slice instead of a reference to a <code>String</code>
-makes our API more general and useful without losing any functionality:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn first_word(s: &amp;str) -&gt; &amp;str {
-</span><span class="boring">    let bytes = s.as_bytes();
-</span><span class="boring">
-</span><span class="boring">    for (i, &amp;item) in bytes.iter().enumerate() {
-</span><span class="boring">        if item == b' ' {
-</span><span class="boring">            return &amp;s[0..i];
-</span><span class="boring">        }
-</span><span class="boring">    }
-</span><span class="boring">
-</span><span class="boring">    &amp;s[..]
-</span><span class="boring">}
-</span><span class="boring">
-</span>fn main() {
-    let my_string = String::from(&quot;hello world&quot;);
+                        <p>Write a class that defines four <span class="code">public static final</span> variables
+                            of type <span class="classname">ArrayProcessor</span> that process an array in the
+                            following ways: find the maximum value in the array, find the minimum
+                            value in an array, find the sum of the values in the array, and find the
+                            average of the values in the array.  In each case, the value of the variable
+                            should be given by a lambda expression.  The class should also define a
+                            function</p>
 
-    // `first_word` works on slices of `String`s, whether partial or whole
-    let word = first_word(&amp;my_string[0..6]);
-    let word = first_word(&amp;my_string[..]);
-    // `first_word` also works on references to `String`s, which are equivalent
-    // to whole slices of `String`s
-    let word = first_word(&amp;my_string);
+                        <pre><code class="java">public static ArrayProcessor counter( double value ) { ...</code></pre>
 
-    let my_string_literal = &quot;hello world&quot;;
+                        <p>This function should return an <span class="classname">ArrayProcessor</span> that
+                            counts the number of times that <i>value</i> occurs in an array.  The return
+                            value should be given as a lambda expression.</p>
 
-    // `first_word` works on slices of string literals, whether partial or whole
-    let word = first_word(&amp;my_string_literal[0..6]);
-    let word = first_word(&amp;my_string_literal[..]);
+                        <p>The class should have a <i>main</i>() routine that tests your work.
+                            The program that you write for this exercise will need access to the
+                            file <span class="sourceref"><a href="./source/chapter4/ArrayProcessor.java">ArrayProcessor.java</a></span>, which defines the functional
+                            interface.</p>
 
-    // Because string literals *are* string slices already,
-    // this works too, without the slice syntax!
-    let word = first_word(my_string_literal);
-}</code></pre></pre>
-<h3 id="other-slices"><a class="header" href="#other-slices">Other Slices</a></h3>
-<p>String slices, as you might imagine, are specific to strings. But there’s a
-more general slice type too. Consider this array:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>let a = [1, 2, 3, 4, 5];
-<span class="boring">}</span></code></pre></pre>
-<p>Just as we might want to refer to part of a string, we might want to refer to
-part of an array. We’d do so like this:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>let a = [1, 2, 3, 4, 5];
 
-let slice = &amp;a[1..3];
+                        <h3 class="exercise">Exercise 4.6:</h3>
+                        <p>The sample program
+                            <span class="sourceref"><a href="./source/chapter4/RandomMosaicWalk.java">RandomMosaicWalk.java</a></span> from
+                            <a href="ch04-07-MoreOnProgramDesign.html">Section&nbsp;4.7</a> shows a "disturbance" that wanders around a
+                            grid of colored squares. When the disturbance visits a square, the color of
+                            that square is changed.  Here's an idea for a variation on that program.
+                            In the new version, all the squares start
+                            out with the default color, black. Every time the disturbance visits a square,
+                            a small amount is added to the green component of the color of that square.
+                            The result will be a visually interesting effect, as the path followed by the
+                            disturbance gradually turns a brighter and brighter green.</p>
 
-assert_eq!(slice, &amp;[2, 3]);
-<span class="boring">}</span></code></pre></pre>
-<p>This slice has the type <code>&amp;[i32]</code>. It works the same way as string slices do, by
-storing a reference to the first element and a length. You’ll use this kind of
-slice for all sorts of other collections. We’ll discuss these collections in
-detail when we talk about vectors in Chapter 8.</p>
-<h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
-<p>The concepts of ownership, borrowing, and slices ensure memory safety in Rust
-programs at compile time. The Rust language gives you control over your memory
-usage in the same way as other systems programming languages, but having the
-owner of data automatically clean up that data when the owner goes out of scope
-means you don’t have to write and debug extra code to get this control.</p>
-<p>Ownership affects how lots of other parts of Rust work, so we’ll talk about
-these concepts further throughout the rest of the book. Let’s move on to
-Chapter 5 and look at grouping pieces of data together in a <code>struct</code>.</p>
+                        <p>Write a subroutine that will add 25 to the green component of one of the squares in the
+                            mosaic.  (But don't let the green component go over 255, since that's the largest
+                            legal value for a color component.)
+                            The row and column numbers of the square should be given as parameters
+                            to the subroutine. Recall that you can discover the current green component of
+                            the square in row <span class="code">r</span> and column <span class="code">c</span> with the function call
+                            <span class="code">Mosaic.getGreen(r,c)</span>. Use your subroutine as a substitute for the
+                            <span class="code">changeToRandomColor()</span> subroutine in the program <span class="sourceref"><a href="./source/chapter4/RandomMosaicWalk2.java">RandomMosaicWalk2.java</a></span>.
+                            (This is the improved version of the program from <a href="ch04-08-TruthAboutDeclarations.html">Section&nbsp;4.8</a> that uses named constants for
+                            the number of rows, number of columns, and square size.) Set the number of rows
+                            and the number of columns to 80. Set the square size to 5.</p>
+
+                        <p>By default, the rectangles in the mosaic have a "3D" appearance and a gray border that makes
+                            them look nicer in the random walk program.  But for this program, you want to turn off that
+                            effect.  To do so, call <span class="code">Mosaic.setUse3DEffect(false)</span> in the main program.</p>
+
+                        <p>Don't forget that you will need <span class="sourceref"><a href="./source/chapter4/Mosaic.java">Mosaic.java</a></span> and <span class="sourceref"><a href="./source/chapter4/MosaicCanvas.java">MosaicCanvas.java</a></span>
+                            to compile and run your program, since they define non-standard classes that are required by the program.
+                        </p>
+
+
+                        <h3 class="exercise">Exercise 4.7:</h3>
+                        <p>For this exercise, you will do something even more interesting
+                            with the <span class="classname">Mosaic</span> class that was discussed in <a href="ch04-07-MoreOnProgramDesign.html">Section&nbsp;4.7</a>.
+                            (Again, don't forget that you will need <span class="sourceref"><a href="./source/chapter4/Mosaic.java">Mosaic.java</a></span> and <span class="sourceref"><a href="./source/chapter4/MosaicCanvas.java">MosaicCanvas.java</a></span>
+                            to compile and run your program.)
+                        </p>
+
+                        <p>The program that you write for this exercise should start by filling a mosaic with
+                            random colors.  Then repeat the following until the user closes the mosaic window:
+                            Select one of the rectangles in the mosaic at random.  Then select one of the
+                            neighboring rectangles&mdash;above it, below it, to the left of it, or to the right of it.
+                            Copy the color of the originally selected rectangle to the selected neighbor, so that
+                            the two rectangles now have the same color.
+                        </p>
+
+                        <p>As this process is repeated over and over, it becomes more and more likely that neighboring
+                            squares will have the same color.  The result is to build up larger color patches.  On the other
+                            hand, once the last square of a given color disappears, there is no way for that color to
+                            ever reappear. (Extinction is forever!)  If you let the program run long enough, eventually
+                            the entire mosaic will be one uniform color.</p>
+
+
+                        <h3 class="exercise">Exercise 4.8:</h3>
+                        <p>Write a program that administers a basic addition quiz to the user.
+                            There should be ten questions.  Each question is a simple addition problem such as
+                            <span class="code">17&nbsp;+&nbsp;42</span>, where the numbers in the problem are chosen at random
+                            (and are not too big).  The program should ask the user all ten questions and get
+                            the user's answers.  After asking all the questions, the user should print each question
+                            again, with the user's answer.  If the user got the answer right, the program should
+                            say so; if not, the program should give the correct answer.  At the end, tell the user
+                            their score on the quiz, where each correct answer counts for ten points.</p>
+
+                        <p>The program should use three subroutines, one to create the quiz, one to administer
+                            the quiz, and one to grade the quiz.  It can use three arrays, with three global variables of type
+                            <span class="atype">int[]</span>, to refer to the arrays.  The first array holds the first number from every
+                            question, the second holds the second number from every questions, and the third holds
+                            the user's answers.</p>
 
                     </main>
 

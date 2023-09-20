@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Method Syntax - Introduction to Programming Using Java</title>
+        <title>Programming with Objects - Introduction to Programming Using Java</title>
 
 
         <!-- Custom HTML head -->
@@ -31,6 +31,8 @@
         <!-- Custom theme stylesheets -->
         <link rel="stylesheet" href="ferris.css">
         <link rel="stylesheet" href="theme/2018-edition.css">
+
+<link rel="stylesheet" href="code-class.css">
 
     </head>
     <body>
@@ -101,7 +103,7 @@
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
                             <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="Java">Java</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
@@ -146,340 +148,484 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h2 id="method-syntax"><a class="header" href="#method-syntax">Method Syntax</a></h2>
-<p><em>Methods</em> are similar to functions: we declare them with the <code>fn</code> keyword and a
-name, they can have parameters and a return value, and they contain some code
-that’s run when the method is called from somewhere else. Unlike functions,
-methods are defined within the context of a struct (or an enum or a trait
-object, which we cover in <a href="ch06-00-GUIProgramming.html">Chapter 6</a><!-- ignore --> and <a href="ch17-02-trait-objects.html">Chapter
-17</a><!-- ignore -->, respectively), and their first parameter is
-always <code>self</code>, which represents the instance of the struct the method is being
-called on.</p>
-<h3 id="defining-methods"><a class="header" href="#defining-methods">Defining Methods</a></h3>
-<p>Let’s change the <code>area</code> function that has a <code>Rectangle</code> instance as a parameter
-and instead make an <code>area</code> method defined on the <code>Rectangle</code> struct, as shown
-in Listing 5-13.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">#[derive(Debug)]
-struct Rectangle {
-    width: u32,
-    height: u32,
-}
+                        <h2 id="Programming with Objects"><a class="header" href="#Programming with Objects">Programming with Objects</a></h2>
+                        <p>
+                            There are several ways in which object-oriented
+                            concepts can be applied to the process of designing and writing programs. The
+                            broadest of these is <span class="newword">object-oriented analysis and design</span>
+                            which applies an object-oriented methodology to the earliest
+                            stages of program development, during which the overall design of a program is
+                            created. Here, the idea is to identify things in the problem domain that can be
+                            modeled as objects. On another level, object-oriented programming encourages
+                            programmers to produce <span class="newword">generalized software components</span>
+                            that can be used in a wide variety of programming projects.</p>
 
-impl Rectangle {
-    fn area(&amp;self) -&gt; u32 {
-        self.width * self.height
-    }
-}
 
-fn main() {
-    let rect1 = Rectangle {
-        width: 30,
-        height: 50,
-    };
 
-    println!(
-        &quot;The area of the rectangle is {} square pixels.&quot;,
-        rect1.area()
-    );
-}</code></pre></pre>
-<p><span class="caption">Listing 5-13: Defining an <code>area</code> method on the
-<code>Rectangle</code> struct</span></p>
-<p>To define the function within the context of <code>Rectangle</code>, we start an <code>impl</code>
-(implementation) block for <code>Rectangle</code>. Everything within this <code>impl</code> block
-will be associated with the <code>Rectangle</code> type. Then we move the <code>area</code> function
-within the <code>impl</code> curly brackets and change the first (and in this case, only)
-parameter to be <code>self</code> in the signature and everywhere within the body. In
-<code>main</code>, where we called the <code>area</code> function and passed <code>rect1</code> as an argument,
-we can instead use <em>method syntax</em> to call the <code>area</code> method on our <code>Rectangle</code>
-instance. The method syntax goes after an instance: we add a dot followed by
-the method name, parentheses, and any arguments.</p>
-<p>In the signature for <code>area</code>, we use <code>&amp;self</code> instead of <code>rectangle: &amp;Rectangle</code>.
-The <code>&amp;self</code> is actually short for <code>self: &amp;Self</code>. Within an <code>impl</code> block, the
-type <code>Self</code> is an alias for the type that the <code>impl</code> block is for. Methods must
-have a parameter named <code>self</code> of type <code>Self</code> for their first parameter, so Rust
-lets you abbreviate this with only the name <code>self</code> in the first parameter spot.
-Note that we still need to use the <code>&amp;</code> in front of the <code>self</code> shorthand to
-indicate that this method borrows the <code>Self</code> instance, just as we did in
-<code>rectangle: &amp;Rectangle</code>. Methods can take ownership of <code>self</code>, borrow <code>self</code>
-immutably, as we’ve done here, or borrow <code>self</code> mutably, just as they can any
-other parameter.</p>
-<p>We chose <code>&amp;self</code> here for the same reason we used <code>&amp;Rectangle</code> in the function
-version: we don’t want to take ownership, and we just want to read the data in
-the struct, not write to it. If we wanted to change the instance that we’ve
-called the method on as part of what the method does, we’d use <code>&amp;mut self</code> as
-the first parameter. Having a method that takes ownership of the instance by
-using just <code>self</code> as the first parameter is rare; this technique is usually
-used when the method transforms <code>self</code> into something else and you want to
-prevent the caller from using the original instance after the transformation.</p>
-<p>The main reason for using methods instead of functions, in addition to
-providing method syntax and not having to repeat the type of <code>self</code> in every
-method’s signature, is for organization. We’ve put all the things we can do
-with an instance of a type in one <code>impl</code> block rather than making future users
-of our code search for capabilities of <code>Rectangle</code> in various places in the
-library we provide.</p>
-<p>Note that we can choose to give a method the same name as one of the struct’s
-fields. For example, we can define a method on <code>Rectangle</code> that is also named
-<code>width</code>:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#[derive(Debug)]
-</span><span class="boring">struct Rectangle {
-</span><span class="boring">    width: u32,
-</span><span class="boring">    height: u32,
-</span><span class="boring">}
-</span><span class="boring">
-</span>impl Rectangle {
-    fn width(&amp;self) -&gt; bool {
-        self.width &gt; 0
-    }
-}
+                        <p>Of course, for the most part, you will experience "generalized software
+                            components" by using the standard classes that come along with Java.  We begin
+                            this section by looking at some built-in classes that are used for creating
+                            objects.  At the end of the section, we will get back to generalities.</p>
 
-fn main() {
-    let rect1 = Rectangle {
-        width: 30,
-        height: 50,
-    };
 
-    if rect1.width() {
-        println!(&quot;The rectangle has a nonzero width; it is {}&quot;, rect1.width);
-    }
-}</code></pre></pre>
-<p>Here, we’re choosing to make the <code>width</code> method return <code>true</code> if the value in
-the instance’s <code>width</code> field is greater than <code>0</code> and <code>false</code> if the value is
-<code>0</code>: we can use a field within a method of the same name for any purpose. In
-<code>main</code>, when we follow <code>rect1.width</code> with parentheses, Rust knows we mean the
-method <code>width</code>. When we don’t use parentheses, Rust knows we mean the field
-<code>width</code>.</p>
-<p>Often, but not always, when we give a method the same name as a field we want
-it to only return the value in the field and do nothing else. Methods like this
-are called <em>getters</em>, and Rust does not implement them automatically for struct
-fields as some other languages do. Getters are useful because you can make the
-field private but the method public, and thus enable read-only access to that
-field as part of the type’s public API. We will discuss what public and private
-are and how to designate a field or method as public or private in <a href="ch07-03-ArrayLists.html#exposing-paths-with-the-pub-keyword">Chapter
-7</a><!-- ignore -->.</p>
-<blockquote>
-<h3 id="wheres-the---operator"><a class="header" href="#wheres-the---operator">Where’s the <code>-&gt;</code> Operator?</a></h3>
-<p>In C and C++, two different operators are used for calling methods: you use
-<code>.</code> if you’re calling a method on the object directly and <code>-&gt;</code> if you’re
-calling the method on a pointer to the object and need to dereference the
-pointer first. In other words, if <code>object</code> is a pointer,
-<code>object-&gt;something()</code> is similar to <code>(*object).something()</code>.</p>
-<p>Rust doesn’t have an equivalent to the <code>-&gt;</code> operator; instead, Rust has a
-feature called <em>automatic referencing and dereferencing</em>. Calling methods is
-one of the few places in Rust that has this behavior.</p>
-<p>Here’s how it works: when you call a method with <code>object.something()</code>, Rust
-automatically adds in <code>&amp;</code>, <code>&amp;mut</code>, or <code>*</code> so <code>object</code> matches the signature of
-the method. In other words, the following are the same:</p>
-<!-- CAN'T EXTRACT SEE BUG https://github.com/rust-lang/mdBook/issues/1127 -->
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span><span class="boring">#[derive(Debug,Copy,Clone)]
-</span><span class="boring">struct Point {
-</span><span class="boring">    x: f64,
-</span><span class="boring">    y: f64,
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">impl Point {
-</span><span class="boring">   fn distance(&amp;self, other: &amp;Point) -&gt; f64 {
-</span><span class="boring">       let x_squared = f64::powi(other.x - self.x, 2);
-</span><span class="boring">       let y_squared = f64::powi(other.y - self.y, 2);
-</span><span class="boring">
-</span><span class="boring">       f64::sqrt(x_squared + y_squared)
-</span><span class="boring">   }
-</span><span class="boring">}
-</span><span class="boring">let p1 = Point { x: 0.0, y: 0.0 };
-</span><span class="boring">let p2 = Point { x: 5.0, y: 6.5 };
-</span>p1.distance(&amp;p2);
-(&amp;p1).distance(&amp;p2);
-<span class="boring">}</span></code></pre></pre>
-<p>The first one looks much cleaner. This automatic referencing behavior works
-because methods have a clear receiver—the type of <code>self</code>. Given the receiver
-and name of a method, Rust can figure out definitively whether the method is
-reading (<code>&amp;self</code>), mutating (<code>&amp;mut self</code>), or consuming (<code>self</code>). The fact
-that Rust makes borrowing implicit for method receivers is a big part of
-making ownership ergonomic in practice.</p>
-</blockquote>
-<h3 id="methods-with-more-parameters"><a class="header" href="#methods-with-more-parameters">Methods with More Parameters</a></h3>
-<p>Let’s practice using methods by implementing a second method on the <code>Rectangle</code>
-struct. This time we want an instance of <code>Rectangle</code> to take another instance
-of <code>Rectangle</code> and return <code>true</code> if the second <code>Rectangle</code> can fit completely
-within <code>self</code> (the first <code>Rectangle</code>); otherwise, it should return <code>false</code>.
-That is, once we’ve defined the <code>can_hold</code> method, we want to be able to write
-the program shown in Listing 5-14.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore">fn main() {
-    let rect1 = Rectangle {
-        width: 30,
-        height: 50,
-    };
-    let rect2 = Rectangle {
-        width: 10,
-        height: 40,
-    };
-    let rect3 = Rectangle {
-        width: 60,
-        height: 45,
-    };
 
-    println!(&quot;Can rect1 hold rect2? {}&quot;, rect1.can_hold(&amp;rect2));
-    println!(&quot;Can rect1 hold rect3? {}&quot;, rect1.can_hold(&amp;rect3));
+                       <h3 id="Some Built-in Classes"><a class="header" href="#Some Built-in Classes">Some Built-in Classes</a></h3>
+
+
+                        <p>Although the focus of object-oriented programming is generally on the design
+                            and implementation of new classes, it's important not to forget that the
+                            designers of Java have already provided a large number of reusable classes.
+                            Some of these classes are meant to be extended to produce new classes, while
+                            others can be used directly to create useful objects. A true mastery of Java
+                            requires familiarity with a large number of built-in classes&mdash;something that
+                            takes a lot of time and experience to develop. Let's take a moment to look at a
+                            few built-in classes that you might find useful.</p>
+
+
+                        <p>A string can be built up from smaller pieces using the <span class="code">+</span> operator,
+                            but this is not always efficient. If <span class="code">str</span> is a <span class="classname">String</span> and
+                            <span class="code">ch</span> is a character, then executing the command
+                            "<span class="code">str&nbsp;= str&nbsp;+&nbsp;ch;</span>" involves creating a whole new
+                            string that is a copy of <span class="code">str</span>, with the value of <span class="code">ch</span> appended
+                            onto the end. Copying the string takes some time. Building up a long string
+                            letter by letter would require a surprising amount of processing. The class
+                            <span class="classname">StringBuilder</span> makes it possible to be efficient about
+                            building up a long string from a number of smaller pieces.  To do this,
+                            you must make an object belonging to the <span class="classname">StringBuilder</span>
+                            class.  For example:</p>
+
+
+                        <pre><code class="java">StringBuilder builder = new StringBuilder();</code></pre>
+
+
+                        <p>(This statement both declares the variable <span class="code">builder</span> and initializes
+                            it to refer to a newly created <span class="classname">StringBuilder</span> object.  Combining
+                            declaration with initialization was covered in <a href="ch04-08-TruthAboutDeclarations.html">Subsection&nbsp;4.8.1</a> and works
+                            for objects just as it does for primitive types.)</p>
+
+
+                        <p>Like a <span class="classname">String</span>, a <span class="classname">StringBuilder</span>
+                            contains a sequence of characters.
+                            However, it is possible to add new characters onto the end of a
+                            <span class="code">StringBuilder</span> without continually making copies of the data that it already
+                            contains. If
+                            <span class="code">x</span> is a value of any type and <span class="code">builder</span> is the variable
+                            defined above, then the command <span class="code">builder.append(x)</span>
+                            will add <span class="code">x</span>, converted into a string representation, onto the end of
+                            the data that was already in the builder.  This can be done more efficiently than
+                            copying the data every time something is appended. A&nbsp;long
+                            string can be built up in a <span class="classname">StringBuilder</span> using a sequence of
+                            <span class="code">append()</span> commands. When the string is complete, the function
+                            <span class="code">builder.toString()</span> will return a copy of the string in the builder as an
+                            ordinary value of type <span class="classname">String</span>. The <span class="classname">StringBuilder</span>
+                            class is in the standard package <span class="code">java.lang</span>, so you can use its simple name without
+                            importing it.</p>
+
+
+                        <p>A number of useful classes are collected in the package <span class="code">java.util</span>.
+                            For example, this package contains classes for working with collections of objects.  We
+                            will study such collection classes extensively in <a href="ch10-00-GenericProgrammingandCollectionClasses.html">Chapter&nbsp;10</a>.
+                            And we have already encountered <span class="code">java.util.Scanner</span> in
+                            <a href="ch02-04-TextInputAndOutput.html">Subsection&nbsp;2.4.6</a>.
+                            Another class in this package, <span class="code">java.util.Date</span>, is
+                            used to represent times. When a <span class="code">Date</span> object is constructed without
+                            parameters, the result represents the current date and time, so an easy way to
+                            display this information is:</p>
+
+
+                        <pre><code class="java">System.out.println( new Date() );</code></pre>
+
+
+                        <p>Of course, since it is in the package <span class="code">java.util</span>,
+                            in order to use the <span class="code">Date</span> class in your program, you must make it
+                            available by importing it with one of the statements
+                            "<span class="code">import&nbsp;java.util.Date;</span>" or "<span class="code">import&nbsp;java.util.*;</span>"
+                            at the beginning of your program. (See <a href="ch04-06-APIPackagesModulesJavadoc.html">Subsection&nbsp;4.6.3</a>
+                            for a discussion of packages and <span class="code">import</span>.)</p>
+
+
+                        <p>I will also mention the class <span class="code">java.util.Random</span>. An object
+                            belonging to this class is a <i>source</i> of random numbers (or, more precisely
+                            pseudorandom numbers).  The standard
+                            function <span class="code">Math.random()</span> uses one of these objects behind the scenes to
+                            generate its random numbers. An object of type <span class="code">Random</span> can generate
+                            random integers, as well as random real numbers. If <span class="code">randGen</span> is created
+                            with the command:</p>
+
+
+                        <pre><code class="java">Random randGen = new Random();</code></pre>
+
+
+                        <p>and if <span class="code">N</span> is a positive integer, then <span class="code">randGen.nextInt(N)</span>
+                            generates a random integer in the range from <span class="code">0</span> to <span class="code">N-1</span>. For
+                            example, this makes it a little easier to roll a pair of dice. Instead of
+                            saying "<span class="code">die1&nbsp;= (int)(6*Math.random())+1;</span>", one can say
+                            "<span class="code">die1&nbsp;= randGen.nextInt(6)+1;</span>". (Since you also have to
+                            import the class <span class="code">java.util.Random</span> and create the <span class="code">Random</span>
+                            object, you might not agree that it is actually easier.)  An object of
+                            type <span class="code">Random</span> can also be used to generate so-called
+                            Gaussian distributed random real numbers.</p>
+
+
+                        <p>Some of Java's standard classes are used in GUI programming. You will encounter
+                            many of them in <a href="ch06-00-GUIProgramming.html">Chapter&nbsp;6</a>.  Here, I will mention only
+                            the class <span class="classname">Color</span>,
+                            from the package <span class="code">javafx.scene.paint</span>,
+                            so that I can use it in the next example. A <span class="classname">Color</span> object represents a
+                            color that can be used for drawing.  In <a href="ch03-09-GUI.html">Section&nbsp;3.9</a>, you encountered
+                            color constants such as <span class="code">Color.RED</span>.  These constants are final static member
+                            variables in the <span class="classname">Color</span> class, and their values are objects of type
+                            <span class="classname">Color</span>.  It is also possible to create new color objects.  Class
+                            <span class="classname">Color</span> has a constructor
+                            <span class="code">new&nbsp;Color(r,g,b,a)</span>, which takes four <span class="ptype">double</span>
+                            parameters to specify the
+                            red, green, and blue components of the color, plus an "alpha" component that says how transparent the color is.
+                            The parameters must be in the range 0.0
+                            to 1.0.  For example, a value of 0.0 for <i>r</i> means that
+                            the color contains no red, while a value of 1.0 means that the color contains the maximum
+                            possible amount of red.  When you draw with a partially transparent
+                            color, the background shows through the color to some extent.  A larger value of
+                            the fourth parameter gives a color that is less transparent and more opaque.</p>
+
+
+                        <p>A <span class="classname">Color</span> object has only a few instance methods that you
+                            are likely to use.  Mainly, there are functions like <span class="code">getRed()</span> to
+                            get the individual color components of the color.  There are no "setter" methods
+                            to change the color components.  In fact, a <span class="classname">Color</span> is
+                            an <span class="newword">immutable</span> object, meaning that all of its instance variables
+                            are <span class="code">final</span> and cannot be changed after the object is created.
+                            <span class="classname">Strings</span> are another example of immutable objects, and we
+                            will make some of our own later in this chapter.</p>
+
+
+                        <p>The main point of all this, again, is that many problems have already been solved,
+                            and the solutions are available in Java's standard classes. If you are faced
+                            with a task that looks like it should be fairly common, it might be worth
+                            looking through a Java reference to see whether someone has already written a
+                            class that you can use.</p>
+
+
+                       <h3 id="The class Object"><a class="header" href="#The class Object">The class "Object"</a></h3>
+
+                        <p>We have already seen that one of the major features of object-oriented programming
+                            is the ability to create subclasses of a class.   The subclass inherits all the properties
+                            or behaviors of the class, but can modify and add to what it inherits.  In <a href="ch05-05-InheritanceAndPolymorphism.html">Section&nbsp;5.5</a>,
+                            you'll learn how to create subclasses.   What you don't
+                            know yet is that <b>every</b> class in Java (with just one exception) is a subclass
+                            of some other class.  If you create a class and don't explicitly make it a subclass of
+                            some other class, then it automatically becomes a subclass of the special class
+                            named <span class="classname">Object</span>, in package <span class="code">java.lang</span>.  (<span class="classname">Object</span> is the one class
+                            that is not a subclass of any other class.)</p>
+
+
+                        <p>Class <span class="classname">Object</span> defines several instance methods that are inherited by
+                            every other class.  These methods can be used with any object whatsoever. I will mention
+                            two of them here.  You will encounter more of them later in the book.</p>
+
+
+                        <p>The method <span class="code">equals(obj)</span> is defined in class <span class="classname">Object</span>.  It takes
+                            one parameter, which can be any object.  It is meant for testing whether two objects are "equal"
+                            but its definition gives <span class="code">obj1.equals(obj2)</span> the same meaning as
+                            <span class="code">obj1&nbsp;==&nbsp;obj2</span>.  That is, it tests whether <span class="code">obj1</span> and
+                            <span class="code">obj2</span> refer to the same object.  The <span class="classname">String</span> class overrides this
+                            method to say that two <span class="classname">Strings</span> are equal if they contain the same sequence of characters,
+                            and it is common to similarly override <span class="code">equals()</span> in a class to say that two objects belonging
+                            to that class are equal if they have the same contents.  We see again that what it means for
+                            objects to be "equal" is not always clear.  We will have more use for this method later.</p>
+
+
+                        <p>The instance method <span class="code">toString()</span> in class <span class="classname">Object</span> returns
+                            a value of type <span class="classname">String</span> that is supposed to be a string representation
+                            of the object.  You've already used this method implicitly,  any time you've printed out an object or
+                            concatenated an object onto a string.  When you use an object in a context that requires a
+                            string, the object is automatically converted to type <span class="classname">String</span>
+                            by calling its <span class="code">toString()</span> method.</p>
+
+
+                        <p>The version of <span class="code">toString</span> that is defined in <span class="classname">Object</span> just returns
+                            the name of the class that the object belongs to, concatenated with a code number called the
+                            <span class="newword">hash code</span> of the object; this is not very useful. When you create a class,
+                            you can write a new <span class="code">toString()</span> method for it, which will replace the inherited
+                            version.  For example, we might add the following method to any of the <span class="classname">PairOfDice</span>
+                            classes from the previous section:</p>
+
+
+                        <pre><code class="java">/**
+ * Return a String representation of a pair of dice, where die1
+ * and die2 are instance variables containing the numbers that are
+ * showing on the two dice.
+ */
+public String toString() {
+   if (die1 == die2)
+      return "double " + die1;
+   else
+      return die1 + " and " + die2;
 }</code></pre>
-<p><span class="caption">Listing 5-14: Using the as-yet-unwritten <code>can_hold</code>
-method</span></p>
-<p>The expected output would look like the following because both dimensions of
-<code>rect2</code> are smaller than the dimensions of <code>rect1</code>, but <code>rect3</code> is wider than
-<code>rect1</code>:</p>
-<pre><code class="language-text">Can rect1 hold rect2? true
-Can rect1 hold rect3? false
-</code></pre>
-<p>We know we want to define a method, so it will be within the <code>impl Rectangle</code>
-block. The method name will be <code>can_hold</code>, and it will take an immutable borrow
-of another <code>Rectangle</code> as a parameter. We can tell what the type of the
-parameter will be by looking at the code that calls the method:
-<code>rect1.can_hold(&amp;rect2)</code> passes in <code>&amp;rect2</code>, which is an immutable borrow to
-<code>rect2</code>, an instance of <code>Rectangle</code>. This makes sense because we only need to
-read <code>rect2</code> (rather than write, which would mean we’d need a mutable borrow),
-and we want <code>main</code> to retain ownership of <code>rect2</code> so we can use it again after
-calling the <code>can_hold</code> method. The return value of <code>can_hold</code> will be a
-Boolean, and the implementation will check whether the width and height of
-<code>self</code> are greater than the width and height of the other <code>Rectangle</code>,
-respectively. Let’s add the new <code>can_hold</code> method to the <code>impl</code> block from
-Listing 5-13, shown in Listing 5-15.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#[derive(Debug)]
-</span><span class="boring">struct Rectangle {
-</span><span class="boring">    width: u32,
-</span><span class="boring">    height: u32,
-</span><span class="boring">}
-</span><span class="boring">
-</span>impl Rectangle {
-    fn area(&amp;self) -&gt; u32 {
-        self.width * self.height
+
+
+                        <p>If <span class="code">dice</span> refers to a <span class="classname">PairOfDice</span> object, then
+                            <span class="code">dice.toString()</span> will return strings such as "3&nbsp;and&nbsp;6",
+                            "5&nbsp;and&nbsp;1", and "double&nbsp;2", depending on the numbers showing on the dice.
+                            This method would be used automatically to convert <span class="code">dice</span> to type
+                            <span class="classname">String</span> in a statement such as</p>
+
+
+                        <pre><code class="java">System.out.println( "The dice came up " + dice );</code></pre>
+
+
+                        <p>so this statement might output, "The dice came up 5 and&nbsp;1" or "The
+                            dice came up double 2".  You'll see another example of a <span class="code">toString()</span>
+                            method in the <a href="ch05-04-AnExample.html">next section</a>.</p>
+
+
+                       <h3 id="Writing and Using a Class"><a class="header" href="#Writing and Using a Class">Writing and Using a Class</a></h3>
+
+                        <p>As an example of designing and using a new class, we will write an animation program, based on the same
+                            animation framework that was used in <a href="ch03-09-GUI.html">Subsection&nbsp;3.9.3</a>.  The animation
+                            shows a number of semi-transparent disks that grow in size as the
+                            animation plays.  The disks have random colors and locations.  When a disk gets too
+                            big, or sometimes just at random, the disk disappears and is replaced with a
+                            new disk at a random location.  Here is a reduced-size screenshot from the program:
+                        </p>
+
+
+                        <p align="center">
+                            <img src="./images/growing-circles.png" width="300" height="240" alt="100 translucent filled circles"></p>
+
+
+                        <p>A disk in this program can be represented as an object.  A disk has properties&mdash;color,
+                            location, and size&mdash;that can be instance variables in the object.  As for instance
+                            methods, we need to think about what we might want to do with a disk.  An obvious candidate
+                            is that we need to be able to draw it, so we can include an instance method
+                            <span class="code">draw(g)</span>, where <span class="code">g</span> is a graphics context that will be used to
+                            do the drawing.  The class can also include one or more constructors.  A constructor
+                            initializes the object.  It's not always clear what data should be provided as parameters
+                            to the constructor.  In this case, as an example,
+                            the constructor's parameters specify the location and size for
+                            the circle, but the constructor makes up a color using random values for the red, green,
+                            and blue components.  Here's the complete class:</p>
+
+
+                        <pre><code class="java">import javafx.scene.paint.Color;
+import javafx.scene.canvas.GraphicsContext;
+
+/**
+ * A simple class that holds the size, color, and location of a colored disk,
+ * with a method for drawing the circle in a graphics context.  The circle
+ * is drawn as a filled oval, with a black outline.
+ */
+public class CircleInfo {
+
+    public int radius;    // The radius of the circle.
+    public int x,y;       // The location of the center of the circle.
+    public Color color;   // The color of the circle.
+
+    /**
+     * Create a CircleInfo with a given location and radius and with a
+     * randomly selected, semi-transparent color.
+     * @param centerX   The x coordinate of the center.
+     * @param centerY   The y coordinate of the center.
+     * @param rad       The radius of the circle.
+     */
+    public CircleInfo( int centerX, int centerY, int rad ) {
+        x = centerX;
+        y = centerY;
+        radius = rad;
+        double red = Math.random();
+        double green = Math.random();
+        double blue = Math.random();
+        color = new Color( red,green,blue, 0.4 );
     }
 
-    fn can_hold(&amp;self, other: &amp;Rectangle) -&gt; bool {
-        self.width &gt; other.width &amp;&amp; self.height &gt; other.height
+    /**
+     * Draw the disk in graphics context g, with a black outline.
+     */
+    public void draw( GraphicsContext g ) {
+        g.setFill( color );
+        g.fillOval( x - radius, y - radius, 2*radius, 2*radius );
+        g.setStroke( Color.BLACK );
+        g.strokeOval( x - radius, y - radius, 2*radius, 2*radius );
     }
-}
-<span class="boring">
-</span><span class="boring">fn main() {
-</span><span class="boring">    let rect1 = Rectangle {
-</span><span class="boring">        width: 30,
-</span><span class="boring">        height: 50,
-</span><span class="boring">    };
-</span><span class="boring">    let rect2 = Rectangle {
-</span><span class="boring">        width: 10,
-</span><span class="boring">        height: 40,
-</span><span class="boring">    };
-</span><span class="boring">    let rect3 = Rectangle {
-</span><span class="boring">        width: 60,
-</span><span class="boring">        height: 45,
-</span><span class="boring">    };
-</span><span class="boring">
-</span><span class="boring">    println!(&quot;Can rect1 hold rect2? {}&quot;, rect1.can_hold(&amp;rect2));
-</span><span class="boring">    println!(&quot;Can rect1 hold rect3? {}&quot;, rect1.can_hold(&amp;rect3));
-</span><span class="boring">}</span></code></pre></pre>
-<p><span class="caption">Listing 5-15: Implementing the <code>can_hold</code> method on
-<code>Rectangle</code> that takes another <code>Rectangle</code> instance as a parameter</span></p>
-<p>When we run this code with the <code>main</code> function in Listing 5-14, we’ll get our
-desired output. Methods can take multiple parameters that we add to the
-signature after the <code>self</code> parameter, and those parameters work just like
-parameters in functions.</p>
-<h3 id="associated-functions"><a class="header" href="#associated-functions">Associated Functions</a></h3>
-<p>All functions defined within an <code>impl</code> block are called <em>associated functions</em>
-because they’re associated with the type named after the <code>impl</code>. We can define
-associated functions that don’t have <code>self</code> as their first parameter (and thus
-are not methods) because they don’t need an instance of the type to work with.
-We’ve already used one function like this: the <code>String::from</code> function that’s
-defined on the <code>String</code> type.</p>
-<p>Associated functions that aren’t methods are often used for constructors that
-will return a new instance of the struct. These are often called <code>new</code>, but
-<code>new</code> isn’t a special name and isn’t built into the language. For example, we
-could choose to provide an associated function named <code>square</code> that would have
-one dimension parameter and use that as both width and height, thus making it
-easier to create a square <code>Rectangle</code> rather than having to specify the same
-value twice:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#[derive(Debug)]
-</span><span class="boring">struct Rectangle {
-</span><span class="boring">    width: u32,
-</span><span class="boring">    height: u32,
-</span><span class="boring">}
-</span><span class="boring">
-</span>impl Rectangle {
-    fn square(size: u32) -&gt; Self {
-        Self {
-            width: size,
-            height: size,
-        }
-    }
-}
-<span class="boring">
-</span><span class="boring">fn main() {
-</span><span class="boring">    let sq = Rectangle::square(3);
-</span><span class="boring">}</span></code></pre></pre>
-<p>The <code>Self</code> keywords in the return type and in the body of the function are
-aliases for the type that appears after the <code>impl</code> keyword, which in this case
-is <code>Rectangle</code>.</p>
-<p>To call this associated function, we use the <code>::</code> syntax with the struct name;
-<code>let sq = Rectangle::square(3);</code> is an example. This function is namespaced by
-the struct: the <code>::</code> syntax is used for both associated functions and
-namespaces created by modules. We’ll discuss modules in <a href="ch07-02-ArrayProcessing.html">Chapter
-7</a><!-- ignore -->.</p>
-<h3 id="multiple-impl-blocks"><a class="header" href="#multiple-impl-blocks">Multiple <code>impl</code> Blocks</a></h3>
-<p>Each struct is allowed to have multiple <code>impl</code> blocks. For example, Listing
-5-15 is equivalent to the code shown in Listing 5-16, which has each method in
-its own <code>impl</code> block.</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#[derive(Debug)]
-</span><span class="boring">struct Rectangle {
-</span><span class="boring">    width: u32,
-</span><span class="boring">    height: u32,
-</span><span class="boring">}
-</span><span class="boring">
-</span>impl Rectangle {
-    fn area(&amp;self) -&gt; u32 {
-        self.width * self.height
-    }
-}
+}</code></pre>
 
-impl Rectangle {
-    fn can_hold(&amp;self, other: &amp;Rectangle) -&gt; bool {
-        self.width &gt; other.width &amp;&amp; self.height &gt; other.height
-    }
-}
-<span class="boring">
-</span><span class="boring">fn main() {
-</span><span class="boring">    let rect1 = Rectangle {
-</span><span class="boring">        width: 30,
-</span><span class="boring">        height: 50,
-</span><span class="boring">    };
-</span><span class="boring">    let rect2 = Rectangle {
-</span><span class="boring">        width: 10,
-</span><span class="boring">        height: 40,
-</span><span class="boring">    };
-</span><span class="boring">    let rect3 = Rectangle {
-</span><span class="boring">        width: 60,
-</span><span class="boring">        height: 45,
-</span><span class="boring">    };
-</span><span class="boring">
-</span><span class="boring">    println!(&quot;Can rect1 hold rect2? {}&quot;, rect1.can_hold(&amp;rect2));
-</span><span class="boring">    println!(&quot;Can rect1 hold rect3? {}&quot;, rect1.can_hold(&amp;rect3));
-</span><span class="boring">}</span></code></pre></pre>
-<p><span class="caption">Listing 5-16: Rewriting Listing 5-15 using multiple <code>impl</code>
-blocks</span></p>
-<p>There’s no reason to separate these methods into multiple <code>impl</code> blocks here,
-but this is valid syntax. We’ll see a case in which multiple <code>impl</code> blocks are
-useful in Chapter 10, where we discuss generic types and traits.</p>
-<h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
-<p>Structs let you create custom types that are meaningful for your domain. By
-using structs, you can keep associated pieces of data connected to each other
-and name each piece to make your code clear. In <code>impl</code> blocks, you can define
-functions that are associated with your type, and methods are a kind of
-associated function that let you specify the behavior that instances of your
-structs have.</p>
-<p>But structs aren’t the only way you can create custom types: let’s turn to
-Rust’s enum feature to add another tool to your toolbox.</p>
+
+                        <p>It would probably be better style to write getters and setters for the
+                            instance variables, but to keep things simple, I made the variables public.</p>
+
+
+                        <p>The main program for my animation is a class <span class="classname">GrowingCircleAnimation</span>.
+                            The program uses 100 disks, each one represented by an object of type
+                            <span class="classname">CircleInfo</span>.  To make that manageable, the program uses
+                            an array of objects.  The array variable is an instance variable in the class:
+                        </p>
+
+
+                        <pre><code class="java">private CircleInfo[] circleData; // holds the data for all 100 circles</code></pre>
+
+
+                        <p>Note that it is not <span class="code">static</span>.  GUI programming generally uses objects
+                            rather than static variables and methods.  Basically, this is because we can imagine
+                            having several <span class="classname">GrowingCircleAnimations</span> going on at the same time,
+                            each with its own array of disks.  Each animation would be represented by an object,
+                            and each object will need to have its own <span class="code">circleData</span> instance variable.  If
+                            <span class="code">circleData</span> were static, there would only be one array and all the
+                            animations would show exactly the same thing.</p>
+
+
+                        <p>The array must be created and filled with data.  The array is created using
+                            <span class="code">new&nbsp;CircleInfo[100]</span>, and then 100 objects of type <span class="classname">CircleInfo</span>
+                            are created to fill the array.  The new objects are created with random locations and sizes.
+                            In the program, this is done before drawing the first frame of the animation.  Here is the
+                            code, where <span class="code">width</span> and <span class="code">height</span> are the size of the
+                            drawing area:</p>
+
+
+                        <pre><code class="java">circleData = new CircleInfo[100];  // create the array
+
+for (int i = 0; i &lt; circleData.length; i++) { // create the objects
+    circleData[i] = new CircleInfo(
+                            (int)(width*Math.random()),
+                            (int)(height*Math.random()),
+                            (int)(100*Math.random()) );
+}</code></pre>
+
+
+                        <p>In each frame, the radius of the disk is increased and the disk is drawn using
+                            the code</p>
+
+
+                        <pre><code class="java">circleData[i].radius++;
+circleData[i].draw(g);</code></pre>
+
+
+                        <p>These statements look complicated, so let's unpack them.  Now,
+                            <span class="code">circleData[i]</span> is an element of the array <span class="code">circleData</span>.
+                            That means that it is a variable of type <span class="classname">CircleInfo</span>.  This variable
+                            refers to an object of type <span class="classname">CircleInfo</span>, which contains a public
+                            instance variable named <span class="code">radius</span>.  This means that <span class="code">circleData[i].radius</span> is the
+                            full name for that variable.  Since it is a variable of type <span class="ptype">int</span>, we
+                            can use the <span class="code">++</span> operator to increment its value.  So the effect
+                            of <span class="code">circleData[i].radius++</span> is to increase the radius of the circle by one.
+                            The second line of code is similar, but in that statement, <span class="code">circleData[i].draw</span>
+                            is an instance method in the <span class="classname">CircleInfo</span> object.  The statement
+                            <span class="code">circleData[i].draw(g)</span> calls that instance method with a parameter&nbsp;<span class="code">g</span>
+                            that represents the graphics context that is being used for drawing.</p>
+
+
+                        <p>The source code example <span class="sourceref"><a href="./source/chapter5/GrowingCircleAnimation.java">GrowingCircleAnimation.java</a></span> contains the
+                            full source code for the program, if you are interested.  Since the program uses
+                            class <span class="classname">CircleInfo</span>, you will also need a copy of <span class="sourceref"><a href="./source/chapter5/CircleInfo.java">CircleInfo.java</a></span>
+                            in order to compile and run the program.
+                        </p>
+
+                       <h3 id="Object-oriented Analysis and Design"><a class="header" href="#Object-oriented Analysis and Design">Object-oriented Analysis and Design</a></h3>
+
+
+                        <p>Every programmer builds up a stock of techniques and expertise expressed as
+                            snippets of code that can be reused in new programs using the tried-and-true
+                            method of cut-and-paste: The old code is physically copied into the new program
+                            and then edited to customize it as necessary. The problem is that the editing
+                            is error-prone and time-consuming, and the whole enterprise is dependent on the
+                            programmer's ability to pull out that particular piece of code from last year's
+                            project that looks like it might be made to fit. (On the level of a corporation
+                            that wants to save money by not reinventing the wheel for each new project,
+                            just keeping track of all the old wheels becomes a major task.)</p>
+
+
+                        <p>Well-designed classes are software components that can be reused without
+                            editing. A well-designed class is not carefully crafted to do a particular job
+                            in a particular program. Instead, it is crafted to model some particular type
+                            of object or a single coherent concept. Since objects and concepts can recur in
+                            many problems, a well-designed class is likely to be reusable without
+                            modification in a variety of projects.</p>
+
+
+                        <p>Furthermore, in an object-oriented programming language, it is possible to
+                            make <span class="newword">subclasses</span> of an existing class. This makes
+                            classes even more reusable. If a class needs to be customized, a subclass can
+                            be created, and additions or modifications can be made in the subclass without
+                            making any changes to the original class. This can be done even if the
+                            programmer doesn't have access to the source code of the class and doesn't know
+                            any details of its internal, hidden implementation.</p>
+
+
+
+
+
+                        <p>The <span class="classname">PairOfDice</span> class in the <a href="ch05-02-ConstructorObjectInit.html">previous section</a>
+                            is already an example of a generalized software component, although one that
+                            could certainly be improved. The class represents a single, coherent concept,
+                            "a pair of dice." The instance variables hold the data relevant to the state of
+                            the dice, that is, the number showing on each of the dice. The instance method
+                            represents the behavior of a pair of dice, that is, the ability to be rolled.
+                            This class would be reusable in many different programming projects.</p>
+
+
+                        <p>On the other hand, the <span class="classname">Student</span> class from the previous section is
+                            not very reusable. It seems to be crafted to represent students in a particular
+                            course where the grade will be based on three tests. If there are more tests or
+                            quizzes or papers, it's useless. If there are two people in the class who have
+                            the same name, we are in trouble (one reason why numerical student ID's are
+                            often used). Admittedly, it's much more difficult to develop a general-purpose
+                            student class than a general-purpose pair-of-dice class. But this particular
+                            <span class="classname">Student</span> class is good only as an example in a programming
+                            textbook.</p>
+
+
+
+
+
+                        <p>A large programming project goes through a number of stages, starting with
+                            <span class="newword">specification</span> of the problem to be solved,
+                            followed by <span class="newword">analysis</span> of the problem and
+                            <span class="newword">design</span> of a program to solve it. Then comes
+                            <span class="newword">coding</span>, in which the program's design is expressed
+                            in some actual programming language. This is followed by <span class="newword">testing</span>
+                            and <span class="newword">debugging</span> of the
+                            program. After that comes a long period of <span class="newword">maintenance</span>,
+                            which means fixing any new problems that are
+                            found in the program and modifying it to adapt it to changing requirements.
+                            Together, these stages form what is called the <span class="newword">software life cycle</span>.
+                            (In the real world, the ideal of consecutive stages is
+                            seldom if ever achieved. During the analysis stage, it might turn out that the
+                            specifications are incomplete or inconsistent. A problem found during testing
+                            requires at least a brief return to the coding stage. If the problem is serious
+                            enough, it might even require a new design. Maintenance usually involves
+                            redoing some of the work from previous stages....)</p>
+
+
+                        <p>Large, complex programming projects are only likely to succeed if a careful,
+                            systematic approach is adopted during all stages of the software life cycle.
+                            The systematic approach to programming, using accepted principles of good
+                            design, is called <span class="newword">software engineering</span>. The
+                            software engineer tries to efficiently construct programs that verifiably meet
+                            their specifications and that are easy to modify if necessary. There is a wide
+                            range of "methodologies" that can be applied to help in the systematic design
+                            of programs. (Most of these methodologies seem to involve drawing little boxes
+                            to represent program components, with labeled arrows to represent relationships
+                            among the boxes.)</p>
+
+
+                        <p>We have been discussing object orientation in programming languages, which
+                            is relevant to the coding stage of program development. But there are also
+                            object-oriented methodologies for analysis and design. The question in this
+                            stage of the software life cycle is, How can one discover or invent the overall
+                            structure of a program? As an example of a rather simple object-oriented
+                            approach to analysis and design, consider this advice: Write down a description
+                            of the problem. Underline all the nouns in that description. The nouns should
+                            be considered as candidates for becoming classes or objects in the program
+                            design. Similarly, underline all the verbs. These are candidates for methods.
+                            This is your starting point. Further analysis might uncover the need for more
+                            classes and methods, and it might reveal that subclassing can be used to take
+                            advantage of similarities among classes.</p>
+
+
+                        <p>This is perhaps a bit simple-minded. (This is not a software engineering textbook.)
+                            But the idea is clear and the general
+                            approach can be effective: Analyze the problem to discover the concepts that
+                            are involved, and create classes to represent those concepts. The design should
+                            arise from the problem itself, and you should end up with a program whose
+                            structure reflects the structure of the problem in a natural way.</p>
 
                     </main>
 

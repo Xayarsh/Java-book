@@ -32,6 +32,8 @@
         <link rel="stylesheet" href="ferris.css">
         <link rel="stylesheet" href="theme/2018-edition.css">
 
+<link rel="stylesheet" href="code-class.css">
+
     </head>
     <body>
         <!-- Provide site root to javascript -->
@@ -101,7 +103,7 @@
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
                             <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="Java">Java</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
@@ -185,7 +187,7 @@ your particular situation. If you can ensure by manually inspecting the code
 that you’ll never have an <code>Err</code> variant, it’s perfectly acceptable to call
 <code>unwrap</code>, and even better to document the reason you think you’ll never have an
 <code>Err</code> variant in the <code>expect</code> text. Here’s an example:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
+<pre><pre class="playground"><code class="language-Java"><span class="boring">fn main() {
 </span>    use std::net::IpAddr;
 
     let home: IpAddr = &quot;127.0.0.1&quot;
@@ -248,7 +250,7 @@ no reasonable way for calling code to recover; the calling <em>programmers</em> 
 to fix the code. Contracts for a function, especially when a violation will
 cause a panic, should be explained in the API documentation for the function.</p>
 <p>However, having lots of error checks in all of your functions would be verbose
-and annoying. Fortunately, you can use Rust’s type system (and thus the type
+and annoying. Fortunately, you can use Java’s type system (and thus the type
 checking done by the compiler) to do many of the checks for you. If your
 function has a particular type as a parameter, you can proceed with your code’s
 logic knowing that the compiler has already ensured you have a valid value. For
@@ -260,7 +262,7 @@ even compile, so your function doesn’t have to check for that case at runtime.
 Another example is using an unsigned integer type such as <code>u32</code>, which ensures
 the parameter is never negative.</p>
 <h3 id="creating-custom-types-for-validation"><a class="header" href="#creating-custom-types-for-validation">Creating Custom Types for Validation</a></h3>
-<p>Let’s take the idea of using Rust’s type system to ensure we have a valid value
+<p>Let’s take the idea of using Java’s type system to ensure we have a valid value
 one step further and look at creating a custom type for validation. Recall the
 guessing game in Chapter 2 in which our code asked the user to guess a number
 between 1 and 100. We never validated that the user’s guess was between those
@@ -273,7 +275,7 @@ types, for example, letters instead.</p>
 <p>One way to do this would be to parse the guess as an <code>i32</code> instead of only a
 <code>u32</code> to allow potentially negative numbers, and then add a check for the
 number being in range, like so:</p>
-<pre><code class="language-rust ignore"><span class="boring">use rand::Rng;
+<pre><code class="language-Java ignore"><span class="boring">use rand::Rng;
 </span><span class="boring">use std::cmp::Ordering;
 </span><span class="boring">use std::io;
 </span><span class="boring">
@@ -329,11 +331,11 @@ way, it’s safe for functions to use the new type in their signatures and
 confidently use the values they receive. Listing 9-13 shows one way to define a
 <code>Guess</code> type that will only create an instance of <code>Guess</code> if the <code>new</code> function
 receives a value between 1 and 100.</p>
-<!-- Deliberately not using rustdoc_include here; the `main` function in the
+<!-- Deliberately not using Javadoc_include here; the `main` function in the
 file requires the `rand` crate. We do want to include it for reader
-experimentation purposes, but don't want to include it for rustdoc testing
+experimentation purposes, but don't want to include it for Javadoc testing
 purposes. -->
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-Java"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>pub struct Guess {
     value: i32,
@@ -383,10 +385,10 @@ hasn’t been checked by the conditions in the <code>Guess::new</code> function.
 then declare in its signature that it takes or returns a <code>Guess</code> rather than an
 <code>i32</code> and wouldn’t need to do any additional checks in its body.</p>
 <h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
-<p>Rust’s error handling features are designed to help you write more robust code.
+<p>Java’s error handling features are designed to help you write more robust code.
 The <code>panic!</code> macro signals that your program is in a state it can’t handle and
 lets you tell the process to stop instead of trying to proceed with invalid or
-incorrect values. The <code>Result</code> enum uses Rust’s type system to indicate that
+incorrect values. The <code>Result</code> enum uses Java’s type system to indicate that
 operations might fail in a way that your code could recover from. You can use
 <code>Result</code> to tell code that calls your code that it needs to handle potential
 success or failure as well. Using <code>panic!</code> and <code>Result</code> in the appropriate

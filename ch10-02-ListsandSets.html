@@ -32,6 +32,8 @@
         <link rel="stylesheet" href="ferris.css">
         <link rel="stylesheet" href="theme/2018-edition.css">
 
+<link rel="stylesheet" href="code-class.css">
+
     </head>
     <body>
         <!-- Provide site root to javascript -->
@@ -101,7 +103,7 @@
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
                             <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="Java">Java</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
@@ -171,7 +173,7 @@ instance. To do this, we need a summary from each type, and we’ll request
 that summary by calling a <code>summarize</code> method on an instance. Listing 10-12
 shows the definition of a public <code>Summary</code> trait that expresses this behavior.</p>
 <p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-rust noplayground">pub trait Summary {
+<pre><code class="language-Java noplayground">pub trait Summary {
     fn summarize(&amp;self) -&gt; String;
 }</code></pre>
 <p><span class="caption">Listing 10-12: A <code>Summary</code> trait that consists of the
@@ -198,7 +200,7 @@ the headline, the author, and the location to create the return value of
 followed by the entire text of the tweet, assuming that tweet content is
 already limited to 280 characters.</p>
 <p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-rust noplayground"><span class="boring">pub trait Summary {
+<pre><code class="language-Java noplayground"><span class="boring">pub trait Summary {
 </span><span class="boring">    fn summarize(&amp;self) -&gt; String;
 </span><span class="boring">}
 </span><span class="boring">
@@ -242,7 +244,7 @@ behavior that we want the methods of the trait to have for the particular type.<
 difference is that the user must bring the trait into scope as well as the
 types. Here’s an example of how a binary crate could use our <code>aggregator</code>
 library crate:</p>
-<pre><code class="language-rust ignore">use aggregator::{Summary, Tweet};
+<pre><code class="language-Java ignore">use aggregator::{Summary, Tweet};
 
 fn main() {
     let tweet = Tweet {
@@ -273,7 +275,7 @@ aren’t local to our <code>aggregator</code> crate. This restriction is part of
 called <em>coherence</em>, and more specifically the <em>orphan rule</em>, so named because
 the parent type is not present. This rule ensures that other people’s code
 can’t break your code and vice versa. Without the rule, two crates could
-implement the same trait for the same type, and Rust wouldn’t know which
+implement the same trait for the same type, and Java wouldn’t know which
 implementation to use.</p>
 <h3 id="default-implementations"><a class="header" href="#default-implementations">Default Implementations</a></h3>
 <p>Sometimes it’s useful to have default behavior for some or all of the methods
@@ -284,7 +286,7 @@ each method’s default behavior.</p>
 <code>Summary</code> trait instead of only defining the method signature, as we did in
 Listing 10-12.</p>
 <p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-rust noplayground">pub trait Summary {
+<pre><code class="language-Java noplayground">pub trait Summary {
     fn summarize(&amp;self) -&gt; String {
         String::from(&quot;(Read more...)&quot;)
     }
@@ -319,7 +321,7 @@ specify an empty <code>impl</code> block with <code>impl Summary for NewsArticle
 directly, we’ve provided a default implementation and specified that
 <code>NewsArticle</code> implements the <code>Summary</code> trait. As a result, we can still call
 the <code>summarize</code> method on an instance of <code>NewsArticle</code>, like this:</p>
-<pre><code class="language-rust ignore"><span class="boring">use aggregator::{self, NewsArticle, Summary};
+<pre><code class="language-Java ignore"><span class="boring">use aggregator::{self, NewsArticle, Summary};
 </span><span class="boring">
 </span><span class="boring">fn main() {
 </span>    let article = NewsArticle {
@@ -346,7 +348,7 @@ a small part of it. For example, we could define the <code>Summary</code> trait 
 <code>summarize_author</code> method whose implementation is required, and then define a
 <code>summarize</code> method that has a default implementation that calls the
 <code>summarize_author</code> method:</p>
-<pre><code class="language-rust noplayground">pub trait Summary {
+<pre><code class="language-Java noplayground">pub trait Summary {
     fn summarize_author(&amp;self) -&gt; String;
 
     fn summarize(&amp;self) -&gt; String {
@@ -368,7 +370,7 @@ a small part of it. For example, we could define the <code>Summary</code> trait 
 </span><span class="boring">}</span></code></pre>
 <p>To use this version of <code>Summary</code>, we only need to define <code>summarize_author</code>
 when we implement the trait on a type:</p>
-<pre><code class="language-rust ignore"><span class="boring">pub trait Summary {
+<pre><code class="language-Java ignore"><span class="boring">pub trait Summary {
 </span><span class="boring">    fn summarize_author(&amp;self) -&gt; String;
 </span><span class="boring">
 </span><span class="boring">    fn summarize(&amp;self) -&gt; String {
@@ -393,7 +395,7 @@ when we implement the trait on a type:</p>
 definition of <code>summarize_author</code> that we’ve provided. Because we’ve implemented
 <code>summarize_author</code>, the <code>Summary</code> trait has given us the behavior of the
 <code>summarize</code> method without requiring us to write any more code.</p>
-<pre><code class="language-rust ignore"><span class="boring">use aggregator::{self, Summary, Tweet};
+<pre><code class="language-Java ignore"><span class="boring">use aggregator::{self, Summary, Tweet};
 </span><span class="boring">
 </span><span class="boring">fn main() {
 </span>    let tweet = Tweet {
@@ -417,7 +419,7 @@ traits to define functions that accept many different types. We'll use the
 Listing 10-13 to define a <code>notify</code> function that calls the <code>summarize</code> method
 on its <code>item</code> parameter, which is of some type that implements the <code>Summary</code>
 trait. To do this, we use the <code>impl Trait</code> syntax, like this:</p>
-<pre><code class="language-rust ignore"><span class="boring">pub trait Summary {
+<pre><code class="language-Java ignore"><span class="boring">pub trait Summary {
 </span><span class="boring">    fn summarize(&amp;self) -&gt; String;
 </span><span class="boring">}
 </span><span class="boring">
@@ -462,7 +464,7 @@ because those types don’t implement <code>Summary</code>.</p>
 <h4 id="trait-bound-syntax"><a class="header" href="#trait-bound-syntax">Trait Bound Syntax</a></h4>
 <p>The <code>impl Trait</code> syntax works for straightforward cases but is actually syntax
 sugar for a longer form known as a <em>trait bound</em>; it looks like this:</p>
-<pre><code class="language-rust ignore">pub fn notify&lt;T: Summary&gt;(item: &amp;T) {
+<pre><code class="language-Java ignore">pub fn notify&lt;T: Summary&gt;(item: &amp;T) {
     println!(&quot;Breaking news! {}&quot;, item.summarize());
 }</code></pre>
 <p>This longer form is equivalent to the example in the previous section but is
@@ -472,12 +474,12 @@ parameter after a colon and inside angle brackets.</p>
 cases, while the fuller trait bound syntax can express more complexity in other
 cases. For example, we can have two parameters that implement <code>Summary</code>. Doing
 so with the <code>impl Trait</code> syntax looks like this:</p>
-<pre><code class="language-rust ignore">pub fn notify(item1: &amp;impl Summary, item2: &amp;impl Summary) {</code></pre>
+<pre><code class="language-Java ignore">pub fn notify(item1: &amp;impl Summary, item2: &amp;impl Summary) {</code></pre>
 <p>Using <code>impl Trait</code> is appropriate if we want this function to allow <code>item1</code> and
 <code>item2</code> to have different types (as long as both types implement <code>Summary</code>). If
 we want to force both parameters to have the same type, however, we must use a
 trait bound, like this:</p>
-<pre><code class="language-rust ignore">pub fn notify&lt;T: Summary&gt;(item1: &amp;T, item2: &amp;T) {</code></pre>
+<pre><code class="language-Java ignore">pub fn notify&lt;T: Summary&gt;(item1: &amp;T, item2: &amp;T) {</code></pre>
 <p>The generic type <code>T</code> specified as the type of the <code>item1</code> and <code>item2</code>
 parameters constrains the function such that the concrete type of the value
 passed as an argument for <code>item1</code> and <code>item2</code> must be the same.</p>
@@ -486,21 +488,21 @@ passed as an argument for <code>item1</code> and <code>item2</code> must be the 
 display formatting as well as <code>summarize</code> on <code>item</code>: we specify in the <code>notify</code>
 definition that <code>item</code> must implement both <code>Display</code> and <code>Summary</code>. We can do
 so using the <code>+</code> syntax:</p>
-<pre><code class="language-rust ignore">pub fn notify(item: &amp;(impl Summary + Display)) {</code></pre>
+<pre><code class="language-Java ignore">pub fn notify(item: &amp;(impl Summary + Display)) {</code></pre>
 <p>The <code>+</code> syntax is also valid with trait bounds on generic types:</p>
-<pre><code class="language-rust ignore">pub fn notify&lt;T: Summary + Display&gt;(item: &amp;T) {</code></pre>
+<pre><code class="language-Java ignore">pub fn notify&lt;T: Summary + Display&gt;(item: &amp;T) {</code></pre>
 <p>With the two trait bounds specified, the body of <code>notify</code> can call <code>summarize</code>
 and use <code>{}</code> to format <code>item</code>.</p>
 <h4 id="clearer-trait-bounds-with-where-clauses"><a class="header" href="#clearer-trait-bounds-with-where-clauses">Clearer Trait Bounds with <code>where</code> Clauses</a></h4>
 <p>Using too many trait bounds has its downsides. Each generic has its own trait
 bounds, so functions with multiple generic type parameters can contain lots of
 trait bound information between the function’s name and its parameter list,
-making the function signature hard to read. For this reason, Rust has alternate
+making the function signature hard to read. For this reason, Java has alternate
 syntax for specifying trait bounds inside a <code>where</code> clause after the function
 signature. So instead of writing this:</p>
-<pre><code class="language-rust ignore">fn some_function&lt;T: Display + Clone, U: Clone + Debug&gt;(t: &amp;T, u: &amp;U) -&gt; i32 {</code></pre>
+<pre><code class="language-Java ignore">fn some_function&lt;T: Display + Clone, U: Clone + Debug&gt;(t: &amp;T, u: &amp;U) -&gt; i32 {</code></pre>
 <p>we can use a <code>where</code> clause, like this:</p>
-<pre><code class="language-rust ignore">fn some_function&lt;T, U&gt;(t: &amp;T, u: &amp;U) -&gt; i32
+<pre><code class="language-Java ignore">fn some_function&lt;T, U&gt;(t: &amp;T, u: &amp;U) -&gt; i32
 where
     T: Display + Clone,
     U: Clone + Debug,
@@ -513,7 +515,7 @@ bounds.</p>
 <h3 id="returning-types-that-implement-traits"><a class="header" href="#returning-types-that-implement-traits">Returning Types that Implement Traits</a></h3>
 <p>We can also use the <code>impl Trait</code> syntax in the return position to return a
 value of some type that implements a trait, as shown here:</p>
-<pre><code class="language-rust ignore"><span class="boring">pub trait Summary {
+<pre><code class="language-Java ignore"><span class="boring">pub trait Summary {
 </span><span class="boring">    fn summarize(&amp;self) -&gt; String;
 </span><span class="boring">}
 </span><span class="boring">
@@ -566,7 +568,7 @@ without needing to write out a very long type.</p>
 <p>However, you can only use <code>impl Trait</code> if you’re returning a single type. For
 example, this code that returns either a <code>NewsArticle</code> or a <code>Tweet</code> with the
 return type specified as <code>impl Summary</code> wouldn’t work:</p>
-<pre><code class="language-rust ignore does_not_compile"><span class="boring">pub trait Summary {
+<pre><code class="language-Java ignore does_not_compile"><span class="boring">pub trait Summary {
 </span><span class="boring">    fn summarize(&amp;self) -&gt; String;
 </span><span class="boring">}
 </span><span class="boring">
@@ -637,7 +639,7 @@ is a type alias for the type of the <code>impl</code> block, which in this case 
 <code>cmp_display</code> method if its inner type <code>T</code> implements the <code>PartialOrd</code> trait
 that enables comparison <em>and</em> the <code>Display</code> trait that enables printing.</p>
 <p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-rust noplayground">use std::fmt::Display;
+<pre><code class="language-Java noplayground">use std::fmt::Display;
 
 struct Pair&lt;T&gt; {
     x: T,
@@ -664,17 +666,17 @@ generic type depending on trait bounds</span></p>
 <p>We can also conditionally implement a trait for any type that implements
 another trait. Implementations of a trait on any type that satisfies the trait
 bounds are called <em>blanket implementations</em> and are extensively used in the
-Rust standard library. For example, the standard library implements the
+Java standard library. For example, the standard library implements the
 <code>ToString</code> trait on any type that implements the <code>Display</code> trait. The <code>impl</code>
 block in the standard library looks similar to this code:</p>
-<pre><code class="language-rust ignore">impl&lt;T: Display&gt; ToString for T {
+<pre><code class="language-Java ignore">impl&lt;T: Display&gt; ToString for T {
     // --snip--
 }</code></pre>
 <p>Because the standard library has this blanket implementation, we can call the
 <code>to_string</code> method defined by the <code>ToString</code> trait on any type that implements
 the <code>Display</code> trait. For example, we can turn integers into their corresponding
 <code>String</code> values like this because integers implement <code>Display</code>:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-Java"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>let s = 3.to_string();
 <span class="boring">}</span></code></pre></pre>
@@ -685,7 +687,7 @@ reduce duplication but also specify to the compiler that we want the generic
 type to have particular behavior. The compiler can then use the trait bound
 information to check that all the concrete types used with our code provide the
 correct behavior. In dynamically typed languages, we would get an error at
-runtime if we called a method on a type which didn’t define the method. But Rust
+runtime if we called a method on a type which didn’t define the method. But Java
 moves these errors to compile time so we’re forced to fix the problems before
 our code is even able to run. Additionally, we don’t have to write code that
 checks for behavior at runtime because we’ve already checked at compile time.

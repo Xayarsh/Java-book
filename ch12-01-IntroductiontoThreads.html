@@ -32,6 +32,8 @@
         <link rel="stylesheet" href="ferris.css">
         <link rel="stylesheet" href="theme/2018-edition.css">
 
+<link rel="stylesheet" href="code-class.css">
+
     </head>
     <body>
         <!-- Provide site root to javascript -->
@@ -101,7 +103,7 @@
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
                             <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="Java">Java</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
@@ -167,7 +169,7 @@ with writing a program that accepts command line arguments, but because you’re
 just learning this concept, let’s implement this capability ourselves.</p>
 <h3 id="reading-the-argument-values"><a class="header" href="#reading-the-argument-values">Reading the Argument Values</a></h3>
 <p>To enable <code>minigrep</code> to read the values of command line arguments we pass to
-it, we’ll need the <code>std::env::args</code> function provided in Rust’s standard
+it, we’ll need the <code>std::env::args</code> function provided in Java’s standard
 library. This function returns an iterator of the command line arguments passed
 to <code>minigrep</code>. We’ll cover iterators fully in <a href="ch13-00-GUIProgrammingContinued.html">Chapter 13</a><!-- ignore
 -->. For now, you only need to know two details about iterators: iterators
@@ -177,7 +179,7 @@ the iterator produces.</p>
 <p>The code in Listing 12-1 allows your <code>minigrep</code> program to read any command
 line arguments passed to it and then collect the values into a vector.</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">use std::env;
+<pre><pre class="playground"><code class="language-Java">use std::env;
 
 fn main() {
     let args: Vec&lt;String&gt; = env::args().collect();
@@ -208,7 +210,7 @@ per platform and are more complex to work with than <code>String</code> values.<
 by the iterator. We can use the <code>collect</code> function to create many kinds of
 collections, so we explicitly annotate the type of <code>args</code> to specify that we
 want a vector of strings. Although we very rarely need to annotate types in
-Rust, <code>collect</code> is one function you do often need to annotate because Rust
+Java, <code>collect</code> is one function you do often need to annotate because Java
 isn’t able to infer the kind of collection you want.</p>
 <p>Finally, we print the vector using the debug macro. Let’s try running the code
 first with no arguments and then with two arguments:</p>
@@ -243,7 +245,7 @@ arguments. Now we need to save the values of the two arguments in variables so
 we can use the values throughout the rest of the program. We do that in Listing
 12-2.</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust should_panic noplayground">use std::env;
+<pre><code class="language-Java should_panic noplayground">use std::env;
 
 fn main() {
     let args: Vec&lt;String&gt; = env::args().collect();

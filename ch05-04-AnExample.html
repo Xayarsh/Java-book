@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Method Syntax - Introduction to Programming Using Java</title>
+        <title>Example: Card, Hand, Deck - Introduction to Programming Using Java</title>
 
 
         <!-- Custom HTML head -->
@@ -31,6 +31,8 @@
         <!-- Custom theme stylesheets -->
         <link rel="stylesheet" href="ferris.css">
         <link rel="stylesheet" href="theme/2018-edition.css">
+
+<link rel="stylesheet" href="code-class.css">
 
     </head>
     <body>
@@ -101,7 +103,7 @@
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
                             <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="Java">Java</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
@@ -146,340 +148,602 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h2 id="method-syntax"><a class="header" href="#method-syntax">Method Syntax</a></h2>
-<p><em>Methods</em> are similar to functions: we declare them with the <code>fn</code> keyword and a
-name, they can have parameters and a return value, and they contain some code
-that’s run when the method is called from somewhere else. Unlike functions,
-methods are defined within the context of a struct (or an enum or a trait
-object, which we cover in <a href="ch06-00-GUIProgramming.html">Chapter 6</a><!-- ignore --> and <a href="ch17-02-trait-objects.html">Chapter
-17</a><!-- ignore -->, respectively), and their first parameter is
-always <code>self</code>, which represents the instance of the struct the method is being
-called on.</p>
-<h3 id="defining-methods"><a class="header" href="#defining-methods">Defining Methods</a></h3>
-<p>Let’s change the <code>area</code> function that has a <code>Rectangle</code> instance as a parameter
-and instead make an <code>area</code> method defined on the <code>Rectangle</code> struct, as shown
-in Listing 5-13.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">#[derive(Debug)]
-struct Rectangle {
-    width: u32,
-    height: u32,
-}
+                        <h2 id="Example: Card, Hand, Deck"><a class="header" href="#Example: Card, Hand, Deck">Example: Card, Hand, Deck</a></h2>
+                        <p>In this section, we look at some specific examples of object-oriented design
+                            in a domain that is simple enough that we have a
+                            chance of coming up with something reasonably reusable. Consider card games
+                            that are played with a standard deck of playing cards (a so-called "poker"
+                            deck, since it is used in the game of poker).</p>
 
-impl Rectangle {
-    fn area(&amp;self) -&gt; u32 {
-        self.width * self.height
-    }
-}
+                       <h3 id="Designing the classes"><a class="header" href="#Designing the classes">Designing the classes</a></h3>
+                
 
-fn main() {
-    let rect1 = Rectangle {
-        width: 30,
-        height: 50,
-    };
+                        <p>In a typical card game, each
+                            player gets a hand of cards. The deck is shuffled and cards are dealt one at a
+                            time from the deck and added to the players' hands. In some games, cards can be
+                            removed from a hand, and new cards can be added. The game is won or lost
+                            depending on the value (ace, 2, 3, ..., king) and suit (spades, diamonds, clubs,
+                            hearts) of the cards that a player receives. If we look for nouns in this
+                            description, there are several candidates for objects: game, player, hand,
+                            card, deck, value, and suit. Of these, the value and the suit of a card are
+                            simple values, and they might just be represented as instance variables in a
+                            <span class="classname">Card</span> object. In a complete program, the other five nouns might be
+                            represented by classes. But let's work on the ones that are most obviously
+                            reusable: <i>card</i>, <i>hand</i>, and <i>deck</i>.</p>
 
-    println!(
-        &quot;The area of the rectangle is {} square pixels.&quot;,
-        rect1.area()
-    );
-}</code></pre></pre>
-<p><span class="caption">Listing 5-13: Defining an <code>area</code> method on the
-<code>Rectangle</code> struct</span></p>
-<p>To define the function within the context of <code>Rectangle</code>, we start an <code>impl</code>
-(implementation) block for <code>Rectangle</code>. Everything within this <code>impl</code> block
-will be associated with the <code>Rectangle</code> type. Then we move the <code>area</code> function
-within the <code>impl</code> curly brackets and change the first (and in this case, only)
-parameter to be <code>self</code> in the signature and everywhere within the body. In
-<code>main</code>, where we called the <code>area</code> function and passed <code>rect1</code> as an argument,
-we can instead use <em>method syntax</em> to call the <code>area</code> method on our <code>Rectangle</code>
-instance. The method syntax goes after an instance: we add a dot followed by
-the method name, parentheses, and any arguments.</p>
-<p>In the signature for <code>area</code>, we use <code>&amp;self</code> instead of <code>rectangle: &amp;Rectangle</code>.
-The <code>&amp;self</code> is actually short for <code>self: &amp;Self</code>. Within an <code>impl</code> block, the
-type <code>Self</code> is an alias for the type that the <code>impl</code> block is for. Methods must
-have a parameter named <code>self</code> of type <code>Self</code> for their first parameter, so Rust
-lets you abbreviate this with only the name <code>self</code> in the first parameter spot.
-Note that we still need to use the <code>&amp;</code> in front of the <code>self</code> shorthand to
-indicate that this method borrows the <code>Self</code> instance, just as we did in
-<code>rectangle: &amp;Rectangle</code>. Methods can take ownership of <code>self</code>, borrow <code>self</code>
-immutably, as we’ve done here, or borrow <code>self</code> mutably, just as they can any
-other parameter.</p>
-<p>We chose <code>&amp;self</code> here for the same reason we used <code>&amp;Rectangle</code> in the function
-version: we don’t want to take ownership, and we just want to read the data in
-the struct, not write to it. If we wanted to change the instance that we’ve
-called the method on as part of what the method does, we’d use <code>&amp;mut self</code> as
-the first parameter. Having a method that takes ownership of the instance by
-using just <code>self</code> as the first parameter is rare; this technique is usually
-used when the method transforms <code>self</code> into something else and you want to
-prevent the caller from using the original instance after the transformation.</p>
-<p>The main reason for using methods instead of functions, in addition to
-providing method syntax and not having to repeat the type of <code>self</code> in every
-method’s signature, is for organization. We’ve put all the things we can do
-with an instance of a type in one <code>impl</code> block rather than making future users
-of our code search for capabilities of <code>Rectangle</code> in various places in the
-library we provide.</p>
-<p>Note that we can choose to give a method the same name as one of the struct’s
-fields. For example, we can define a method on <code>Rectangle</code> that is also named
-<code>width</code>:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#[derive(Debug)]
-</span><span class="boring">struct Rectangle {
-</span><span class="boring">    width: u32,
-</span><span class="boring">    height: u32,
-</span><span class="boring">}
-</span><span class="boring">
-</span>impl Rectangle {
-    fn width(&amp;self) -&gt; bool {
-        self.width &gt; 0
-    }
-}
 
-fn main() {
-    let rect1 = Rectangle {
-        width: 30,
-        height: 50,
-    };
+                        <p>If we look for verbs in the description of a card game, we see that we can
+                            <i>shuffle</i> a deck and <i>deal</i> a card from a deck. This gives use us two candidates
+                            for instance methods in a <span class="classname">Deck</span> class: <span class="code">shuffle()</span>
+                            and <span class="code">dealCard()</span>. Cards can be added to and
+                            removed from hands. This gives two candidates for instance methods in a
+                            <span class="classname">Hand</span> class: <span class="code">addCard()</span> and <span class="code">removeCard()</span>.
+                            Cards are relatively passive things, but we at least need to be
+                            able to determine their suits and values. We will discover more instance
+                            methods as we go along.</p>
 
-    if rect1.width() {
-        println!(&quot;The rectangle has a nonzero width; it is {}&quot;, rect1.width);
-    }
-}</code></pre></pre>
-<p>Here, we’re choosing to make the <code>width</code> method return <code>true</code> if the value in
-the instance’s <code>width</code> field is greater than <code>0</code> and <code>false</code> if the value is
-<code>0</code>: we can use a field within a method of the same name for any purpose. In
-<code>main</code>, when we follow <code>rect1.width</code> with parentheses, Rust knows we mean the
-method <code>width</code>. When we don’t use parentheses, Rust knows we mean the field
-<code>width</code>.</p>
-<p>Often, but not always, when we give a method the same name as a field we want
-it to only return the value in the field and do nothing else. Methods like this
-are called <em>getters</em>, and Rust does not implement them automatically for struct
-fields as some other languages do. Getters are useful because you can make the
-field private but the method public, and thus enable read-only access to that
-field as part of the type’s public API. We will discuss what public and private
-are and how to designate a field or method as public or private in <a href="ch07-03-ArrayLists.html#exposing-paths-with-the-pub-keyword">Chapter
-7</a><!-- ignore -->.</p>
-<blockquote>
-<h3 id="wheres-the---operator"><a class="header" href="#wheres-the---operator">Where’s the <code>-&gt;</code> Operator?</a></h3>
-<p>In C and C++, two different operators are used for calling methods: you use
-<code>.</code> if you’re calling a method on the object directly and <code>-&gt;</code> if you’re
-calling the method on a pointer to the object and need to dereference the
-pointer first. In other words, if <code>object</code> is a pointer,
-<code>object-&gt;something()</code> is similar to <code>(*object).something()</code>.</p>
-<p>Rust doesn’t have an equivalent to the <code>-&gt;</code> operator; instead, Rust has a
-feature called <em>automatic referencing and dereferencing</em>. Calling methods is
-one of the few places in Rust that has this behavior.</p>
-<p>Here’s how it works: when you call a method with <code>object.something()</code>, Rust
-automatically adds in <code>&amp;</code>, <code>&amp;mut</code>, or <code>*</code> so <code>object</code> matches the signature of
-the method. In other words, the following are the same:</p>
-<!-- CAN'T EXTRACT SEE BUG https://github.com/rust-lang/mdBook/issues/1127 -->
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span><span class="boring">#[derive(Debug,Copy,Clone)]
-</span><span class="boring">struct Point {
-</span><span class="boring">    x: f64,
-</span><span class="boring">    y: f64,
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">impl Point {
-</span><span class="boring">   fn distance(&amp;self, other: &amp;Point) -&gt; f64 {
-</span><span class="boring">       let x_squared = f64::powi(other.x - self.x, 2);
-</span><span class="boring">       let y_squared = f64::powi(other.y - self.y, 2);
-</span><span class="boring">
-</span><span class="boring">       f64::sqrt(x_squared + y_squared)
-</span><span class="boring">   }
-</span><span class="boring">}
-</span><span class="boring">let p1 = Point { x: 0.0, y: 0.0 };
-</span><span class="boring">let p2 = Point { x: 5.0, y: 6.5 };
-</span>p1.distance(&amp;p2);
-(&amp;p1).distance(&amp;p2);
-<span class="boring">}</span></code></pre></pre>
-<p>The first one looks much cleaner. This automatic referencing behavior works
-because methods have a clear receiver—the type of <code>self</code>. Given the receiver
-and name of a method, Rust can figure out definitively whether the method is
-reading (<code>&amp;self</code>), mutating (<code>&amp;mut self</code>), or consuming (<code>self</code>). The fact
-that Rust makes borrowing implicit for method receivers is a big part of
-making ownership ergonomic in practice.</p>
-</blockquote>
-<h3 id="methods-with-more-parameters"><a class="header" href="#methods-with-more-parameters">Methods with More Parameters</a></h3>
-<p>Let’s practice using methods by implementing a second method on the <code>Rectangle</code>
-struct. This time we want an instance of <code>Rectangle</code> to take another instance
-of <code>Rectangle</code> and return <code>true</code> if the second <code>Rectangle</code> can fit completely
-within <code>self</code> (the first <code>Rectangle</code>); otherwise, it should return <code>false</code>.
-That is, once we’ve defined the <code>can_hold</code> method, we want to be able to write
-the program shown in Listing 5-14.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore">fn main() {
-    let rect1 = Rectangle {
-        width: 30,
-        height: 50,
-    };
-    let rect2 = Rectangle {
-        width: 10,
-        height: 40,
-    };
-    let rect3 = Rectangle {
-        width: 60,
-        height: 45,
-    };
 
-    println!(&quot;Can rect1 hold rect2? {}&quot;, rect1.can_hold(&amp;rect2));
-    println!(&quot;Can rect1 hold rect3? {}&quot;, rect1.can_hold(&amp;rect3));
-}</code></pre>
-<p><span class="caption">Listing 5-14: Using the as-yet-unwritten <code>can_hold</code>
-method</span></p>
-<p>The expected output would look like the following because both dimensions of
-<code>rect2</code> are smaller than the dimensions of <code>rect1</code>, but <code>rect3</code> is wider than
-<code>rect1</code>:</p>
-<pre><code class="language-text">Can rect1 hold rect2? true
-Can rect1 hold rect3? false
-</code></pre>
-<p>We know we want to define a method, so it will be within the <code>impl Rectangle</code>
-block. The method name will be <code>can_hold</code>, and it will take an immutable borrow
-of another <code>Rectangle</code> as a parameter. We can tell what the type of the
-parameter will be by looking at the code that calls the method:
-<code>rect1.can_hold(&amp;rect2)</code> passes in <code>&amp;rect2</code>, which is an immutable borrow to
-<code>rect2</code>, an instance of <code>Rectangle</code>. This makes sense because we only need to
-read <code>rect2</code> (rather than write, which would mean we’d need a mutable borrow),
-and we want <code>main</code> to retain ownership of <code>rect2</code> so we can use it again after
-calling the <code>can_hold</code> method. The return value of <code>can_hold</code> will be a
-Boolean, and the implementation will check whether the width and height of
-<code>self</code> are greater than the width and height of the other <code>Rectangle</code>,
-respectively. Let’s add the new <code>can_hold</code> method to the <code>impl</code> block from
-Listing 5-13, shown in Listing 5-15.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#[derive(Debug)]
-</span><span class="boring">struct Rectangle {
-</span><span class="boring">    width: u32,
-</span><span class="boring">    height: u32,
-</span><span class="boring">}
-</span><span class="boring">
-</span>impl Rectangle {
-    fn area(&amp;self) -&gt; u32 {
-        self.width * self.height
-    }
 
-    fn can_hold(&amp;self, other: &amp;Rectangle) -&gt; bool {
-        self.width &gt; other.width &amp;&amp; self.height &gt; other.height
-    }
-}
-<span class="boring">
-</span><span class="boring">fn main() {
-</span><span class="boring">    let rect1 = Rectangle {
-</span><span class="boring">        width: 30,
-</span><span class="boring">        height: 50,
-</span><span class="boring">    };
-</span><span class="boring">    let rect2 = Rectangle {
-</span><span class="boring">        width: 10,
-</span><span class="boring">        height: 40,
-</span><span class="boring">    };
-</span><span class="boring">    let rect3 = Rectangle {
-</span><span class="boring">        width: 60,
-</span><span class="boring">        height: 45,
-</span><span class="boring">    };
-</span><span class="boring">
-</span><span class="boring">    println!(&quot;Can rect1 hold rect2? {}&quot;, rect1.can_hold(&amp;rect2));
-</span><span class="boring">    println!(&quot;Can rect1 hold rect3? {}&quot;, rect1.can_hold(&amp;rect3));
-</span><span class="boring">}</span></code></pre></pre>
-<p><span class="caption">Listing 5-15: Implementing the <code>can_hold</code> method on
-<code>Rectangle</code> that takes another <code>Rectangle</code> instance as a parameter</span></p>
-<p>When we run this code with the <code>main</code> function in Listing 5-14, we’ll get our
-desired output. Methods can take multiple parameters that we add to the
-signature after the <code>self</code> parameter, and those parameters work just like
-parameters in functions.</p>
-<h3 id="associated-functions"><a class="header" href="#associated-functions">Associated Functions</a></h3>
-<p>All functions defined within an <code>impl</code> block are called <em>associated functions</em>
-because they’re associated with the type named after the <code>impl</code>. We can define
-associated functions that don’t have <code>self</code> as their first parameter (and thus
-are not methods) because they don’t need an instance of the type to work with.
-We’ve already used one function like this: the <code>String::from</code> function that’s
-defined on the <code>String</code> type.</p>
-<p>Associated functions that aren’t methods are often used for constructors that
-will return a new instance of the struct. These are often called <code>new</code>, but
-<code>new</code> isn’t a special name and isn’t built into the language. For example, we
-could choose to provide an associated function named <code>square</code> that would have
-one dimension parameter and use that as both width and height, thus making it
-easier to create a square <code>Rectangle</code> rather than having to specify the same
-value twice:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#[derive(Debug)]
-</span><span class="boring">struct Rectangle {
-</span><span class="boring">    width: u32,
-</span><span class="boring">    height: u32,
-</span><span class="boring">}
-</span><span class="boring">
-</span>impl Rectangle {
-    fn square(size: u32) -&gt; Self {
-        Self {
-            width: size,
-            height: size,
-        }
-    }
-}
-<span class="boring">
-</span><span class="boring">fn main() {
-</span><span class="boring">    let sq = Rectangle::square(3);
-</span><span class="boring">}</span></code></pre></pre>
-<p>The <code>Self</code> keywords in the return type and in the body of the function are
-aliases for the type that appears after the <code>impl</code> keyword, which in this case
-is <code>Rectangle</code>.</p>
-<p>To call this associated function, we use the <code>::</code> syntax with the struct name;
-<code>let sq = Rectangle::square(3);</code> is an example. This function is namespaced by
-the struct: the <code>::</code> syntax is used for both associated functions and
-namespaces created by modules. We’ll discuss modules in <a href="ch07-02-ArrayProcessing.html">Chapter
-7</a><!-- ignore -->.</p>
-<h3 id="multiple-impl-blocks"><a class="header" href="#multiple-impl-blocks">Multiple <code>impl</code> Blocks</a></h3>
-<p>Each struct is allowed to have multiple <code>impl</code> blocks. For example, Listing
-5-15 is equivalent to the code shown in Listing 5-16, which has each method in
-its own <code>impl</code> block.</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#[derive(Debug)]
-</span><span class="boring">struct Rectangle {
-</span><span class="boring">    width: u32,
-</span><span class="boring">    height: u32,
-</span><span class="boring">}
-</span><span class="boring">
-</span>impl Rectangle {
-    fn area(&amp;self) -&gt; u32 {
-        self.width * self.height
-    }
-}
+                        <p>First, we'll design the deck class in detail. When a deck of cards is first
+                            created, it contains 52 cards in some standard order. The <span class="classname">Deck</span> class
+                            will need a constructor to create a new deck. The constructor needs no
+                            parameters because any new deck is the same as any other. There will be an
+                            instance method called <span class="code">shuffle()</span> that will rearrange the 52 cards into
+                            a random order. The <span class="code">dealCard()</span> instance method will get the next card
+                            from the deck. This will be a function with a return type of <span class="code">Card</span>,
+                            since the caller needs to know what card is being dealt. It has no parameters&mdash;when
+                            you deal the next card from the deck, you don't provide any information to the
+                            deck; you just get the next card, whatever it is.
+                            What will happen if there are no more cards in the deck when its
+                            <span class="code">dealCard()</span> method is called? It should probably be considered an error
+                            to try to deal a card from an empty deck, so the deck can throw an exception in that case.
+                            But this raises another question: How
+                            will the rest of the program know whether the deck is empty? Of course, the
+                            program could keep track of how many cards it has used. But the deck itself
+                            should know how many cards it has left, so the program should just be able to
+                            ask the deck object. We can make this possible by specifying another instance
+                            method, <span class="code">cardsLeft()</span>, that returns the number of cards remaining in the
+                            deck. This leads to a full specification of all the subroutines in the
+                            <span class="classname">Deck</span> class:</p>
 
-impl Rectangle {
-    fn can_hold(&amp;self, other: &amp;Rectangle) -&gt; bool {
-        self.width &gt; other.width &amp;&amp; self.height &gt; other.height
-    }
-}
-<span class="boring">
-</span><span class="boring">fn main() {
-</span><span class="boring">    let rect1 = Rectangle {
-</span><span class="boring">        width: 30,
-</span><span class="boring">        height: 50,
-</span><span class="boring">    };
-</span><span class="boring">    let rect2 = Rectangle {
-</span><span class="boring">        width: 10,
-</span><span class="boring">        height: 40,
-</span><span class="boring">    };
-</span><span class="boring">    let rect3 = Rectangle {
-</span><span class="boring">        width: 60,
-</span><span class="boring">        height: 45,
-</span><span class="boring">    };
-</span><span class="boring">
-</span><span class="boring">    println!(&quot;Can rect1 hold rect2? {}&quot;, rect1.can_hold(&amp;rect2));
-</span><span class="boring">    println!(&quot;Can rect1 hold rect3? {}&quot;, rect1.can_hold(&amp;rect3));
-</span><span class="boring">}</span></code></pre></pre>
-<p><span class="caption">Listing 5-16: Rewriting Listing 5-15 using multiple <code>impl</code>
-blocks</span></p>
-<p>There’s no reason to separate these methods into multiple <code>impl</code> blocks here,
-but this is valid syntax. We’ll see a case in which multiple <code>impl</code> blocks are
-useful in Chapter 10, where we discuss generic types and traits.</p>
-<h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
-<p>Structs let you create custom types that are meaningful for your domain. By
-using structs, you can keep associated pieces of data connected to each other
-and name each piece to make your code clear. In <code>impl</code> blocks, you can define
-functions that are associated with your type, and methods are a kind of
-associated function that let you specify the behavior that instances of your
-structs have.</p>
-<p>But structs aren’t the only way you can create custom types: let’s turn to
-Rust’s enum feature to add another tool to your toolbox.</p>
+
+                        <pre><code class="console">
+<b>Constructor and instance methods in class Deck:</b>
+
+     /**
+      * Constructor.  Create an unshuffled deck of cards.
+      */
+     public Deck()
+
+     /**
+      * Put all the used cards back into the deck,
+      * and shuffle it into a random order.
+      */
+     public void shuffle()
+
+     /**
+      * As cards are dealt from the deck, the number of
+      * cards left decreases.  This function returns the
+      * number of cards that are still left in the deck.
+      */
+     public int cardsLeft()
+
+     /**
+      * Deals one card from the deck and returns it.
+      * @throws IllegalStateException if no more cards are left.
+      */
+     public Card dealCard()</code></pre>
+
+
+                        <p>This is everything you need to know in order to <b>use</b> the <span class="code">Deck</span> class.
+                            Of course, it doesn't tell us how to write the class. This has been an exercise
+                            in design, not in coding.  You can look at the source
+                            code, <span class="sourceref"><a href="./source/chapter5/Deck.java">Deck.java</a></span>, if you want.
+                            It should not be a surprise that the class includes
+                            an array of <span class="classname">Cards</span> as an instance variable, but there
+                            are a few things you might not understand at this point.  Of course,
+                            you can use the class in your programs as a black box,
+                            without understanding the implementation.</p>
+
+
+                        <p>We can do a similar analysis for the <span class="classname">Hand</span> class. When a hand object
+                            is first created, it has no cards in it. An <span class="code">addCard()</span> instance method
+                            will add a card to the hand. This method needs a parameter of type
+                            <span class="classname">Card</span> to specify which card is being added. For the
+                            <span class="code">removeCard()</span> method, a parameter is needed to specify which card to
+                            remove. But should we specify the card itself ("Remove the ace of spades"), or
+                            should we specify the card by its position in the hand ("Remove the third card
+                            in the hand")? Actually, we don't have to decide, since we can allow for both
+                            options. We'll have two <span class="code">removeCard()</span> instance methods, one with a
+                            parameter of type <span class="classname">Card</span> specifying the card to be removed and one with
+                            a parameter of type <span class="ptype">int</span> specifying the position of the card in the
+                            hand. (Remember that you can have two methods in a class with the same name,
+                            provided they have different numbers or types of parameters.) Since a hand can contain a
+                            variable number of cards, it's convenient to be able to ask a hand object how
+                            many cards it contains. So, we need an instance method <span class="code">getCardCount()</span>
+                            that returns the number of cards in the hand. When I play cards, I like to
+                            arrange the cards in my hand so that cards of the same value are next to each
+                            other. Since this is a generally useful thing to be able to do, we can provide
+                            instance methods for sorting the cards in the hand. Here is a full
+                            specification for a reusable <span class="classname">Hand</span> class:</p>
+
+
+                        <pre><code class="console">
+
+<b>Constructor and instance methods in class Hand:</b>
+
+    /**
+     * Constructor. Create a Hand object that is initially empty.
+     */
+    public Hand()
+
+    /**
+     * Discard all cards from the hand, making the hand empty.
+     */
+    public void clear()
+
+    /**
+     * Add the card c to the hand.  c should be non-null.
+     * @throws NullPointerException if c is null.
+     */
+    public void addCard(Card c)
+
+    /**
+     * If the specified card is in the hand, it is removed.
+     */
+    public void removeCard(Card c)
+
+    /**
+     * Remove the card in the specified position from the
+     * hand.  Cards are numbered counting from zero.
+     * @throws IllegalArgumentException if the specified
+     *    position does not exist in the hand.
+     */
+    public void removeCard(int position)
+
+    /**
+     * Return the number of cards in the hand.
+     */
+    public int getCardCount()
+
+    /**
+     * Get the card from the hand in given position, where
+     * positions are numbered starting from 0.
+     * @throws IllegalArgumentException if the specified
+     *    position does not exist in the hand.
+     */
+    public Card getCard(int position)
+
+    /**
+     * Sorts the cards in the hand so that cards of the same
+     * suit are grouped together, and within a suit the cards
+     * are sorted by value.
+     */
+    public void sortBySuit()
+
+    /**
+     * Sorts the cards in the hand so that cards are sorted into
+     * order of increasing value.  Cards with the same value
+     * are sorted by suit. Note that aces are considered
+     * to have the lowest value.
+     */
+    public void sortByValue()</code></pre>
+
+
+                        <p>Again, there are a few things in the implementation of the class that
+                            you won't understand at this point, but that doesn't stop you from
+                            using the class in your projects.   The source code can be found in
+                            the file <span class="sourceref"><a href="./source/chapter5/Hand.java">Hand.java</a></span>
+                        </p>
+                        
+
+                       <h3 id="The Card Class"><a class="header" href="#The Card Class">The Card Class</a></h3>
+                 
+
+                        <p>We will look at the design and implementation of a <span class="classname">Card</span>
+                            class in full detail. The class will have a constructor that specifies the value and suit of
+                            the card that is being created. There are four suits, which can be represented
+                            by the integers 0, 1, 2, and 3. It would be tough to remember which number
+                            represents which suit, so I've defined named constants in the <span class="classname">Card</span>
+                            class to represent the four possibilities. For example, <span class="code">Card.SPADES</span> is
+                            a constant that represents the suit, "spades." (These constants are declared to
+                            be <span class="code">public</span> <span class="code">final</span> <span class="code">static</span> <span class="code">ints</span>.
+                            It might be better to use an enumerated type, but I will stick here to
+                            integer-valued constants.)  The possible
+                            values of a card are the numbers 1, 2, ..., 13, with 1 standing for an ace, 11
+                            for a jack, 12 for a queen, and 13 for a king. Again, I've defined some named
+                            constants to represent the values of aces and face cards.  (When you read the
+                            <span class="classname">Card</span> class, you'll see that I've also added support for
+                            Jokers.)</p>
+
+
+                        <p>A <span class="classname">Card</span> object can be constructed knowing the value and
+                            the suit of the card.  For example, we can call the constructor with statements
+                            such as:</p>
+
+
+                        <pre><code class="java">card1 = new Card( Card.ACE, Card.SPADES );  // Construct ace of spades.
+card2 = new Card( 10, Card.DIAMONDS );   // Construct 10 of diamonds.
+card3 = new Card( v, s );  // This is OK, as long as v and s
+                           //               are integer expressions.</code></pre>
+
+
+                        <p>A <span class="classname">Card</span> object needs instance variables to represent its value and
+                            suit. I've made these <span class="code">private</span> so that they cannot be changed from
+                            outside the class, and I've provided getter methods <span class="code">getSuit()</span> and
+                            <span class="code">getValue()</span> so that it will be possible to discover the suit and value
+                            from outside the class. The instance variables are initialized in the
+                            constructor, and are never changed after that. In fact, I've declared the
+                            instance variables <span class="code">suit</span> and <span class="code">value</span> to be <span class="code">final</span>, since
+                            they are never changed after they are initialized. An instance variable can be
+                            declared <span class="code">final</span> provided it is either given an initial value in its
+                            declaration or is initialized in every constructor in the class.  Since all its
+                            instance variables are <span class="code">final</span>, a <span class="classname">Card</span> is
+                            an immutable object.</p>
+
+
+                        <p>Finally, I've added a few convenience methods to the class to make it easier
+                            to print out cards in a human-readable form. For example, I want to be able to
+                            print out the suit of a card as the word "Diamonds", rather than as the
+                            meaningless code number 2, which is used in the class to represent diamonds.
+                            Since this is something that I'll probably have to do in many programs, it
+                            makes sense to include support for it in the class. So, I've provided instance
+                            methods <span class="code">getSuitAsString()</span> and <span class="code">getValueAsString()</span> to return
+                            string representations of the suit and value of a card. Finally, I've defined the
+                            instance method <span class="code">toString()</span> to return a string with both the value
+                            and suit, such as "Queen of Hearts".  Recall that this method will be used automatically
+                            whenever a <span class="classname">Card</span> needs to be converted into a <span class="classname">String</span>, such as
+                            when the card is concatenated onto a string with the <span class="code">+</span> operator.
+                            Thus, the statement</p>
+
+
+                        <pre><code class="java">System.out.println( "Your card is the " + card );</code></pre>
+
+
+                        <p>is equivalent to</p>
+
+
+                        <pre><code class="java">System.out.println( "Your card is the " + card.toString() );</code></pre>
+
+
+                        <p>If the card is the queen of hearts, either of these will print out "Your
+                            card is the Queen of Hearts".</p>
+
+
+                        <p>Here is the complete <span class="classname">Card</span> class, which can also
+                            be found in <span class="sourceref"><a href="./source/chapter5/Card.java">Card.java</a></span>.  This class is general enough to be highly
+                            reusable, so the work that went into designing, writing, and testing it pays
+                            off handsomely in the long run.</p>
+
+
+                        <pre><code class="java">
+/**
+ * An object of type Card represents a playing card from a
+ * standard Poker deck, including Jokers.  The card has a suit, which
+ * can be spades, hearts, diamonds, clubs, or joker.  A spade, heart,
+ * diamond, or club has one of the 13 values: ace, 2, 3, 4, 5, 6, 7,
+ * 8, 9, 10, jack, queen, or king.  Note that "ace" is considered to be
+ * the smallest value.  A joker can also have an associated value;
+ * this value can be anything and can be used to keep track of several
+ * different jokers.
+ */
+public class Card {
+
+   public final static int SPADES = 0;   // Codes for the 4 suits, plus Joker.
+   public final static int HEARTS = 1;
+   public final static int DIAMONDS = 2;
+   public final static int CLUBS = 3;
+   public final static int JOKER = 4;
+
+   public final static int ACE = 1;      // Codes for the non-numeric cards.
+   public final static int JACK = 11;    //   Cards 2 through 10 have their
+   public final static int QUEEN = 12;   //   numerical values for their codes.
+   public final static int KING = 13;
+
+   /**
+    * This card's suit, one of the constants SPADES, HEARTS, DIAMONDS,
+    * CLUBS, or JOKER.  The suit cannot be changed after the card is
+    * constructed.
+    */
+   private final int suit;
+
+   /**
+    * The card's value.  For a normal card, this is one of the values
+    * 1 through 13, with 1 representing ACE.  For a JOKER, the value
+    * can be anything.  The value cannot be changed after the card
+    * is constructed.
+    */
+   private final int value;
+
+   /**
+    * Creates a Joker, with 1 as the associated value.  (Note that
+    * "new Card()" is equivalent to "new Card(1,Card.JOKER)".)
+    */
+   public Card() {
+      suit = JOKER;
+      value = 1;
+   }
+
+   /**
+    * Creates a card with a specified suit and value.
+    * @param theValue the value of the new card.  For a regular card (non-joker),
+    * the value must be in the range 1 through 13, with 1 representing an Ace.
+    * You can use the constants Card.ACE, Card.JACK, Card.QUEEN, and Card.KING.
+    * For a Joker, the value can be anything.
+    * @param theSuit the suit of the new card.  This must be one of the values
+    * Card.SPADES, Card.HEARTS, Card.DIAMONDS, Card.CLUBS, or Card.JOKER.
+    * @throws IllegalArgumentException if the parameter values are not in the
+    * permissible ranges
+    */
+   public Card(int theValue, int theSuit) {
+      if (theSuit != SPADES &amp;&amp; theSuit != HEARTS &amp;&amp; theSuit != DIAMONDS &amp;&amp;
+            theSuit != CLUBS &amp;&amp; theSuit != JOKER)
+         throw new IllegalArgumentException("Illegal playing card suit");
+      if (theSuit != JOKER &amp;&amp; (theValue &lt; 1 || theValue &gt; 13))
+         throw new IllegalArgumentException("Illegal playing card value");
+      value = theValue;
+      suit = theSuit;
+   }
+
+   /**
+    * Returns the suit of this card.
+    * @returns the suit, which is one of the constants Card.SPADES,
+    * Card.HEARTS, Card.DIAMONDS, Card.CLUBS, or Card.JOKER
+    */
+   public int getSuit() {
+      return suit;
+   }
+
+   /**
+    * Returns the value of this card.
+    * @return the value, which is one of the numbers 1 through 13, inclusive for
+    * a regular card, and which can be any value for a Joker.
+    */
+   public int getValue() {
+      return value;
+   }
+
+   /**
+    * Returns a String representation of the card's suit.
+    * @return one of the strings "Spades", "Hearts", "Diamonds", "Clubs"
+    * or "Joker".
+    */
+   public String getSuitAsString() {
+      switch ( suit ) {
+      case SPADES:   return "Spades";
+      case HEARTS:   return "Hearts";
+      case DIAMONDS: return "Diamonds";
+      case CLUBS:    return "Clubs";
+      default:       return "Joker";
+      }
+   }
+
+   /**
+    * Returns a String representation of the card's value.
+    * @return for a regular card, one of the strings "Ace", "2",
+    * "3", ..., "10", "Jack", "Queen", or "King".  For a Joker, the
+    * string is always numerical.
+    */
+   public String getValueAsString() {
+      if (suit == JOKER)
+         return "" + value;
+      else { // (Note use of traditional syntax for the switch statement.)
+         switch ( value ) {
+         case 1:   return "Ace";
+         case 2:   return "2";
+         case 3:   return "3";
+         case 4:   return "4";
+         case 5:   return "5";
+         case 6:   return "6";
+         case 7:   return "7";
+         case 8:   return "8";
+         case 9:   return "9";
+         case 10:  return "10";
+         case 11:  return "Jack";
+         case 12:  return "Queen";
+         default:  return "King";
+         }
+      }
+   }
+
+   /**
+    * Returns a string representation of this card, including both
+    * its suit and its value (except that for a Joker with value 1,
+    * the return value is just "Joker").  Sample return values
+    * are: "Queen of Hearts", "10 of Diamonds", "Ace of Spades",
+    * "Joker", "Joker #2"
+    */
+   public String toString() {
+      if (suit == JOKER) {
+         if (value == 1)
+            return "Joker";
+         else
+            return "Joker #" + value;
+      }
+      else
+         return getValueAsString() + " of " + getSuitAsString();
+   }
+
+
+} // end class Card</code></pre>
+
+
+                       <h3 id="Example: A Simple Card Game"><a class="header" href="#Example: A Simple Card Game">Example: A Simple Card Game</a></h3>
+                   
+                        <p>I will finish this section by presenting a complete program that uses the
+                            <span class="classname">Card</span> and <span class="classname">Deck</span> classes. The program lets the user play a very
+                            simple card game called HighLow. A deck of cards is shuffled, and one card is
+                            dealt from the deck and shown to the user. The user predicts whether the next
+                            card from the deck will be higher or lower than the current card. If the user
+                            predicts correctly, then the next card from the deck becomes the current card,
+                            and the user makes another prediction. This continues until the user makes an
+                            incorrect prediction. The number of correct predictions is the user's
+                            score.</p>
+
+
+                        <p>My program has a static method that plays one game of HighLow. The
+                            <span class="code">main()</span> routine lets the user play several games of HighLow. At the
+                            end, it reports the user's average score.</p>
+
+
+                        <p>I won't go through the development of the algorithms used in this program,
+                            but I encourage you to read it carefully and make sure that you understand how
+                            it works.  Note in particular that the subroutine that plays one game
+                            of HighLow returns the user's score in the game as its return value.
+                            This gets the score back to the main program, where it is needed.
+                            Here is the program:</p>
+
+
+                        <pre><code class="java">import textio.TextIO;
+
+/**
+ * This program lets the user play HighLow, a simple card game
+ * that is described in the output statement at the beginning of
+ * the main() routine.  After the user plays several games,
+ * the user's average score is reported.
+ */
+public class HighLow {
+
+
+   public static void main(String[] args) {
+
+      System.out.println("""
+          This program lets you play the simple card game,
+          HighLow.  A card is dealt from a deck of cards.
+          You have to predict whether the next card will be
+          higher or lower.  Your score in the game is the
+          number of correct predictions you make before
+          you guess wrong.
+          """);
+
+      int gamesPlayed = 0;     // Number of games user has played.
+      int sumOfScores = 0;     // The sum of all the scores from
+                               //      all the games played.
+      double averageScore;     // Average score, computed by dividing
+                               //      sumOfScores by gamesPlayed.
+      boolean playAgain;       // Record user's response when user is
+                               //   asked whether he wants to play
+                               //   another game.
+
+      do {
+         int scoreThisGame;        // Score for one game.
+         scoreThisGame = play();   // Play the game and get the score.
+         sumOfScores += scoreThisGame;
+         gamesPlayed++;
+         System.out.print("Play again? ");
+         playAgain = TextIO.getlnBoolean();
+      } while (playAgain);
+
+      averageScore = ((double)sumOfScores) / gamesPlayed;
+
+      System.out.println();
+      System.out.println("You played " + gamesPlayed + " games.");
+      System.out.printf("Your average score was %1.3f.\n", averageScore);
+
+   }  // end main()
+
+
+   /**
+    * Lets the user play one game of HighLow, and returns the
+    * user's score in that game.  The score is the number of
+    * correct guesses that the user makes.
+    */
+   private static int play() {
+
+      Deck deck = new Deck();  // Get a new deck of cards, and
+                               //   store a reference to it in
+                               //   the variable, deck.
+
+      Card currentCard;  // The current card, which the user sees.
+
+      Card nextCard;   // The next card in the deck.  The user tries
+                       //    to predict whether this is higher or lower
+                       //    than the current card.
+
+      int correctGuesses ;  // The number of correct predictions the
+                            //   user has made.  At the end of the game,
+                            //   this will be the user's score.
+
+      char guess;   // The user's guess.  'H' if the user predicts that
+                    //   the next card will be higher, 'L' if the user
+                    //   predicts that it will be lower.
+
+      deck.shuffle();  // Shuffle the deck into a random order before
+                       //    starting the game.
+
+      correctGuesses = 0;
+      currentCard = deck.dealCard();
+      System.out.println("The first card is the " + currentCard);
+
+      while (true) {  // Loop ends when user's prediction is wrong.
+
+         /* Get the user's prediction, 'H' or 'L' (or 'h' or 'l'). */
+
+         System.out.print("Will the next card be higher (H) or lower (L)?  ");
+         do {
+             guess = TextIO.getlnChar();
+             guess = Character.toUpperCase(guess);
+             if (guess != 'H' &amp;&amp; guess != 'L')
+                System.out.print("Please respond with H or L:  ");
+         } while (guess != 'H' &amp;&amp; guess != 'L');
+
+         /* Get the next card and show it to the user. */
+
+         nextCard = deck.dealCard();
+         System.out.println("The next card is " + nextCard);
+
+         /* Check the user's prediction. */
+
+         if (nextCard.getValue() == currentCard.getValue()) {
+            System.out.println("The value is the same as the previous card.");
+            System.out.println("You lose on ties.  Sorry!");
+            break;  // End the game.
+         }
+         else if (nextCard.getValue() &gt; currentCard.getValue()) {
+            if (guess == 'H') {
+                System.out.println("Your prediction was correct.");
+                correctGuesses++;
+            }
+            else {
+                System.out.println("Your prediction was incorrect.");
+                break;  // End the game.
+            }
+         }
+         else {  // nextCard is lower
+            if (guess == 'L') {
+                System.out.println("Your prediction was correct.");
+                correctGuesses++;
+            }
+            else {
+                System.out.println("Your prediction was incorrect.");
+                break;  // End the game.
+            }
+         }
+
+         /* To set up for the next iteration of the loop, the nextCard
+            becomes the currentCard, since the currentCard has to be
+            the card that the user sees, and the nextCard will be
+            set to the next card in the deck after the user makes
+            his prediction.  */
+
+         currentCard = nextCard;
+         System.out.println();
+         System.out.println("The card is " + currentCard);
+
+      } // end of while loop
+
+      System.out.println();
+      System.out.println("The game is over.");
+      System.out.println("You made " + correctGuesses
+                                           + " correct predictions.");
+      System.out.println();
+
+      return correctGuesses;
+
+   }  // end play()
+
+
+} // end class HighLow</code></pre>
 
                     </main>
 

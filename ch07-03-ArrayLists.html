@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Paths for Referring to an Item in the Module Tree - Introduction to Programming Using Java</title>
+        <title>ArrayLists - Introduction to Programming Using Java</title>
 
 
         <!-- Custom HTML head -->
@@ -31,6 +31,8 @@
         <!-- Custom theme stylesheets -->
         <link rel="stylesheet" href="ferris.css">
         <link rel="stylesheet" href="theme/2018-edition.css">
+
+<link rel="stylesheet" href="code-class.css">
 
     </head>
     <body>
@@ -101,7 +103,7 @@
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
                             <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="Java">Java</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
@@ -146,363 +148,607 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h2 id="paths-for-referring-to-an-item-in-the-module-tree"><a class="header" href="#paths-for-referring-to-an-item-in-the-module-tree">Paths for Referring to an Item in the Module Tree</a></h2>
-<p>To show Rust where to find an item in a module tree, we use a path in the same
-way we use a path when navigating a filesystem. To call a function, we need to
-know its path.</p>
-<p>A path can take two forms:</p>
-<ul>
-<li>An <em>absolute path</em> is the full path starting from a crate root; for code
-from an external crate, the absolute path begins with the crate name, and for
-code from the current crate, it starts with the literal <code>crate</code>.</li>
-<li>A <em>relative path</em> starts from the current module and uses <code>self</code>, <code>super</code>, or
-an identifier in the current module.</li>
-</ul>
-<p>Both absolute and relative paths are followed by one or more identifiers
-separated by double colons (<code>::</code>).</p>
-<p>Returning to Listing 7-1, say we want to call the <code>add_to_waitlist</code> function.
-This is the same as asking: what’s the path of the <code>add_to_waitlist</code> function?
-Listing 7-3 contains Listing 7-1 with some of the modules and functions
-removed.</p>
-<p>We’ll show two ways to call the <code>add_to_waitlist</code> function from a new function
-<code>eat_at_restaurant</code> defined in the crate root. These paths are correct, but
-there’s another problem remaining that will prevent this example from compiling
-as-is. We’ll explain why in a bit.</p>
-<p>The <code>eat_at_restaurant</code> function is part of our library crate’s public API, so
-we mark it with the <code>pub</code> keyword. In the <a href="ch07-03-ArrayLists.html#exposing-paths-with-the-pub-keyword">“Exposing Paths with the <code>pub</code>
-Keyword”</a><!-- ignore --> section, we’ll go into more detail about <code>pub</code>.</p>
-<p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-rust ignore does_not_compile">mod front_of_house {
-    mod hosting {
-        fn add_to_waitlist() {}
-    }
-}
+                        <h2 id="ArrayLists"><a class="header" href="#ArrayLists">ArrayLists</a></h2>
+                        <p>
+                            As we have just seen in <a href="ch07-02-ArrayProcessing.html">Subsection&nbsp;7.2.4</a>,
+                            we can easily encode the dynamic array pattern into a class, but it looks like
+                            we need a different class for each data type.  In fact, Java has a feature called
+                            "parameterized types" that makes it possible to avoid the multitude of classes, and
+                            Java has a single class named <span class="classname">ArrayList</span> that implements the
+                            dynamic array pattern for all data types that are defined as classes (but not,
+                            directly, for primitive types).</p>
 
-pub fn eat_at_restaurant() {
-    // Absolute path
-    crate::front_of_house::hosting::add_to_waitlist();
+                        
+                        <h3 id="ArrayList and Parameterized Types"><a class="header" href="#ArrayList and Parameterized Types">ArrayList and Parameterized Types</a></h3>
+                     
 
-    // Relative path
-    front_of_house::hosting::add_to_waitlist();
-}</code></pre>
-<p><span class="caption">Listing 7-3: Calling the <code>add_to_waitlist</code> function using
-absolute and relative paths</span></p>
-<p>The first time we call the <code>add_to_waitlist</code> function in <code>eat_at_restaurant</code>,
-we use an absolute path. The <code>add_to_waitlist</code> function is defined in the same
-crate as <code>eat_at_restaurant</code>, which means we can use the <code>crate</code> keyword to
-start an absolute path. We then include each of the successive modules until we
-make our way to <code>add_to_waitlist</code>. You can imagine a filesystem with the same
-structure: we’d specify the path <code>/front_of_house/hosting/add_to_waitlist</code> to
-run the <code>add_to_waitlist</code> program; using the <code>crate</code> name to start from the
-crate root is like using <code>/</code> to start from the filesystem root in your shell.</p>
-<p>The second time we call <code>add_to_waitlist</code> in <code>eat_at_restaurant</code>, we use a
-relative path. The path starts with <code>front_of_house</code>, the name of the module
-defined at the same level of the module tree as <code>eat_at_restaurant</code>. Here the
-filesystem equivalent would be using the path
-<code>front_of_house/hosting/add_to_waitlist</code>. Starting with a module name means
-that the path is relative.</p>
-<p>Choosing whether to use a relative or absolute path is a decision you’ll make
-based on your project, and depends on whether you’re more likely to move item
-definition code separately from or together with the code that uses the item.
-For example, if we move the <code>front_of_house</code> module and the <code>eat_at_restaurant</code>
-function into a module named <code>customer_experience</code>, we’d need to update the
-absolute path to <code>add_to_waitlist</code>, but the relative path would still be valid.
-However, if we moved the <code>eat_at_restaurant</code> function separately into a module
-named <code>dining</code>, the absolute path to the <code>add_to_waitlist</code> call would stay the
-same, but the relative path would need to be updated. Our preference in general
-is to specify absolute paths because it’s more likely we’ll want to move code
-definitions and item calls independently of each other.</p>
-<p>Let’s try to compile Listing 7-3 and find out why it won’t compile yet! The
-error we get is shown in Listing 7-4.</p>
-<pre><code class="language-console">$ cargo build
-   Compiling restaurant v0.1.0 (file:///projects/restaurant)
-error[E0603]: module `hosting` is private
- --&gt; src/lib.rs:9:28
-  |
-9 |     crate::front_of_house::hosting::add_to_waitlist();
-  |                            ^^^^^^^ private module
-  |
-note: the module `hosting` is defined here
- --&gt; src/lib.rs:2:5
-  |
-2 |     mod hosting {
-  |     ^^^^^^^^^^^
+                        <p>Java has a standard type with the rather odd name <span class="atype">ArrayList&lt;String&gt;</span> that represents
+                            dynamic arrays of <span class="classname">Strings</span>.  Similarly, there is a type <span class="atype">ArrayList&lt;Color&gt;</span>
+                            that can be used to represent dynamic arrays of <span class="classname">Colors</span>.  And if
+                            <span class="classname">Player</span> is a class representing players in a game, then
+                            the type <span class="atype">ArrayList&lt;Player&gt;</span> can be used to represent a dynamic
+                            array of <span class="classname">Players</span>.</p>
 
-error[E0603]: module `hosting` is private
-  --&gt; src/lib.rs:12:21
-   |
-12 |     front_of_house::hosting::add_to_waitlist();
-   |                     ^^^^^^^ private module
-   |
-note: the module `hosting` is defined here
-  --&gt; src/lib.rs:2:5
-   |
-2  |     mod hosting {
-   |     ^^^^^^^^^^^
 
-For more information about this error, try `rustc --explain E0603`.
-error: could not compile `restaurant` due to 2 previous errors
-</code></pre>
-<p><span class="caption">Listing 7-4: Compiler errors from building the code in
-Listing 7-3</span></p>
-<p>The error messages say that module <code>hosting</code> is private. In other words, we
-have the correct paths for the <code>hosting</code> module and the <code>add_to_waitlist</code>
-function, but Rust won’t let us use them because it doesn’t have access to the
-private sections. In Rust, all items (functions, methods, structs, enums,
-modules, and constants) are private to parent modules by default. If you want
-to make an item like a function or struct private, you put it in a module.</p>
-<p>Items in a parent module can’t use the private items inside child modules, but
-items in child modules can use the items in their ancestor modules. This is
-because child modules wrap and hide their implementation details, but the child
-modules can see the context in which they’re defined. To continue with our
-metaphor, think of the privacy rules as being like the back office of a
-restaurant: what goes on in there is private to restaurant customers, but
-office managers can see and do everything in the restaurant they operate.</p>
-<p>Rust chose to have the module system function this way so that hiding inner
-implementation details is the default. That way, you know which parts of the
-inner code you can change without breaking outer code. However, Rust does give
-you the option to expose inner parts of child modules’ code to outer ancestor
-modules by using the <code>pub</code> keyword to make an item public.</p>
-<h3 id="exposing-paths-with-the-pub-keyword"><a class="header" href="#exposing-paths-with-the-pub-keyword">Exposing Paths with the <code>pub</code> Keyword</a></h3>
-<p>Let’s return to the error in Listing 7-4 that told us the <code>hosting</code> module is
-private. We want the <code>eat_at_restaurant</code> function in the parent module to have
-access to the <code>add_to_waitlist</code> function in the child module, so we mark the
-<code>hosting</code> module with the <code>pub</code> keyword, as shown in Listing 7-5.</p>
-<p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-rust ignore does_not_compile">mod front_of_house {
-    pub mod hosting {
-        fn add_to_waitlist() {}
-    }
-}
+                        <p>It might look like we still have a multitude of classes here, but in fact there
+                            is only one class, the <span class="classname">ArrayList</span> class, defined in the package
+                            <span class="code">java.util</span>.  But <span class="classname">ArrayList</span> is a
+                            <span class="newword">parameterized type</span>.  A parameterized type can take a type
+                            parameter, so that from the single class <span class="classname">ArrayList</span>,
+                            we get a multitude of types including <span class="atype">ArrayList&lt;String&gt;</span>,
+                            <span class="atype">ArrayList&lt;Color&gt;</span>, and in fact <span class="atype">ArrayList&lt;T&gt;</span>
+                            for any object type <span class="classname">T</span>.  The type parameter <span class="classname">T</span>
+                            must be an object type such as a class name or an interface name.  It cannot be
+                            a primitive type.  This means that, unfortunately, you can not have an ArrayList of
+                            <span class="ptype">int</span> or an ArrayList of <span class="ptype">char</span>.</p>
 
-pub fn eat_at_restaurant() {
-    // Absolute path
-    crate::front_of_house::hosting::add_to_waitlist();
 
-    // Relative path
-    front_of_house::hosting::add_to_waitlist();
-}</code></pre>
-<p><span class="caption">Listing 7-5: Declaring the <code>hosting</code> module as <code>pub</code> to
-use it from <code>eat_at_restaurant</code></span></p>
-<p>Unfortunately, the code in Listing 7-5 still results in an error, as shown in
-Listing 7-6.</p>
-<pre><code class="language-console">$ cargo build
-   Compiling restaurant v0.1.0 (file:///projects/restaurant)
-error[E0603]: function `add_to_waitlist` is private
- --&gt; src/lib.rs:9:37
-  |
-9 |     crate::front_of_house::hosting::add_to_waitlist();
-  |                                     ^^^^^^^^^^^^^^^ private function
-  |
-note: the function `add_to_waitlist` is defined here
- --&gt; src/lib.rs:3:9
-  |
-3 |         fn add_to_waitlist() {}
-  |         ^^^^^^^^^^^^^^^^^^^^
+                        <p>Consider the type <span class="atype">ArrayList&lt;String&gt;</span>.  As a type, it can
+                            be used to declare variables, such as</p>
 
-error[E0603]: function `add_to_waitlist` is private
-  --&gt; src/lib.rs:12:30
-   |
-12 |     front_of_house::hosting::add_to_waitlist();
-   |                              ^^^^^^^^^^^^^^^ private function
-   |
-note: the function `add_to_waitlist` is defined here
-  --&gt; src/lib.rs:3:9
-   |
-3  |         fn add_to_waitlist() {}
-   |         ^^^^^^^^^^^^^^^^^^^^
 
-For more information about this error, try `rustc --explain E0603`.
-error: could not compile `restaurant` due to 2 previous errors
-</code></pre>
-<p><span class="caption">Listing 7-6: Compiler errors from building the code in
-Listing 7-5</span></p>
-<p>What happened? Adding the <code>pub</code> keyword in front of <code>mod hosting</code> makes the
-module public. With this change, if we can access <code>front_of_house</code>, we can
-access <code>hosting</code>. But the <em>contents</em> of <code>hosting</code> are still private; making the
-module public doesn’t make its contents public. The <code>pub</code> keyword on a module
-only lets code in its ancestor modules refer to it, not access its inner code.
-Because modules are containers, there’s not much we can do by only making the
-module public; we need to go further and choose to make one or more of the
-items within the module public as well.</p>
-<p>The errors in Listing 7-6 say that the <code>add_to_waitlist</code> function is private.
-The privacy rules apply to structs, enums, functions, and methods as well as
-modules.</p>
-<p>Let’s also make the <code>add_to_waitlist</code> function public by adding the <code>pub</code>
-keyword before its definition, as in Listing 7-7.</p>
-<p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-rust noplayground test_harness">mod front_of_house {
-    pub mod hosting {
-        pub fn add_to_waitlist() {}
-    }
-}
+                        <pre><code class="java">ArrayList&lt;String&gt; namelist;</code></pre>
 
-pub fn eat_at_restaurant() {
-    // Absolute path
-    crate::front_of_house::hosting::add_to_waitlist();
 
-    // Relative path
-    front_of_house::hosting::add_to_waitlist();
-}</code></pre>
-<p><span class="caption">Listing 7-7: Adding the <code>pub</code> keyword to <code>mod hosting</code>
-and <code>fn add_to_waitlist</code> lets us call the function from
-<code>eat_at_restaurant</code></span></p>
-<p>Now the code will compile! To see why adding the <code>pub</code> keyword lets us use
-these paths in <code>add_to_waitlist</code> with respect to the privacy rules, let’s look
-at the absolute and the relative paths.</p>
-<p>In the absolute path, we start with <code>crate</code>, the root of our crate’s module
-tree. The <code>front_of_house</code> module is defined in the crate root. While
-<code>front_of_house</code> isn’t public, because the <code>eat_at_restaurant</code> function is
-defined in the same module as <code>front_of_house</code> (that is, <code>eat_at_restaurant</code>
-and <code>front_of_house</code> are siblings), we can refer to <code>front_of_house</code> from
-<code>eat_at_restaurant</code>. Next is the <code>hosting</code> module marked with <code>pub</code>. We can
-access the parent module of <code>hosting</code>, so we can access <code>hosting</code>. Finally, the
-<code>add_to_waitlist</code> function is marked with <code>pub</code> and we can access its parent
-module, so this function call works!</p>
-<p>In the relative path, the logic is the same as the absolute path except for the
-first step: rather than starting from the crate root, the path starts from
-<code>front_of_house</code>. The <code>front_of_house</code> module is defined within the same module
-as <code>eat_at_restaurant</code>, so the relative path starting from the module in which
-<code>eat_at_restaurant</code> is defined works. Then, because <code>hosting</code> and
-<code>add_to_waitlist</code> are marked with <code>pub</code>, the rest of the path works, and this
-function call is valid!</p>
-<p>If you plan on sharing your library crate so other projects can use your code,
-your public API is your contract with users of your crate that determines how
-they can interact with your code. There are many considerations around managing
-changes to your public API to make it easier for people to depend on your
-crate. These considerations are out of the scope of this book; if you’re
-interested in this topic, see <a href="https://rust-lang.github.io/api-guidelines/">The Rust API Guidelines</a>.</p>
-<blockquote>
-<h4 id="best-practices-for-packages-with-a-binary-and-a-library"><a class="header" href="#best-practices-for-packages-with-a-binary-and-a-library">Best Practices for Packages with a Binary and a Library</a></h4>
-<p>We mentioned a package can contain both a <em>src/main.rs</em> binary crate root as
-well as a <em>src/lib.rs</em> library crate root, and both crates will have the
-package name by default. Typically, packages with this pattern of containing
-both a library and a binary crate will have just enough code in the binary
-crate to start an executable that calls code with the library crate. This
-lets other projects benefit from the most functionality that the package
-provides, because the library crate’s code can be shared.</p>
-<p>The module tree should be defined in <em>src/lib.rs</em>. Then, any public items can
-be used in the binary crate by starting paths with the name of the package.
-The binary crate becomes a user of the library crate just like a completely
-external crate would use the library crate: it can only use the public API.
-This helps you design a good API; not only are you the author, you’re also a
-client!</p>
-<p>In <a href="ch12-00-ThreadsandMultiprocessing.html">Chapter 12</a><!-- ignore -->, we’ll demonstrate this organizational
-practice with a command-line program that will contain both a binary crate
-and a library crate.</p>
-</blockquote>
-<h3 id="starting-relative-paths-with-super"><a class="header" href="#starting-relative-paths-with-super">Starting Relative Paths with <code>super</code></a></h3>
-<p>We can construct relative paths that begin in the parent module, rather than
-the current module or the crate root, by using <code>super</code> at the start of the
-path. This is like starting a filesystem path with the <code>..</code> syntax. Using
-<code>super</code> allows us to reference an item that we know is in the parent module,
-which can make rearranging the module tree easier when the module is closely
-related to the parent, but the parent might be moved elsewhere in the module
-tree someday.</p>
-<p>Consider the code in Listing 7-8 that models the situation in which a chef
-fixes an incorrect order and personally brings it out to the customer. The
-function <code>fix_incorrect_order</code> defined in the <code>back_of_house</code> module calls the
-function <code>deliver_order</code> defined in the parent module by specifying the path to
-<code>deliver_order</code> starting with <code>super</code>:</p>
-<p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-rust noplayground test_harness">fn deliver_order() {}
+                        <p>It can also be used as the type of a formal parameter in a subroutine definition,
+                            or as the return type of a subroutine.  It can be used with the <span class="code">new</span>
+                            operator to create objects:</p>
 
-mod back_of_house {
-    fn fix_incorrect_order() {
-        cook_order();
-        super::deliver_order();
-    }
 
-    fn cook_order() {}
-}</code></pre>
-<p><span class="caption">Listing 7-8: Calling a function using a relative path
-starting with <code>super</code></span></p>
-<p>The <code>fix_incorrect_order</code> function is in the <code>back_of_house</code> module, so we can
-use <code>super</code> to go to the parent module of <code>back_of_house</code>, which in this case
-is <code>crate</code>, the root. From there, we look for <code>deliver_order</code> and find it.
-Success! We think the <code>back_of_house</code> module and the <code>deliver_order</code> function
-are likely to stay in the same relationship to each other and get moved
-together should we decide to reorganize the crate’s module tree. Therefore, we
-used <code>super</code> so we’ll have fewer places to update code in the future if this
-code gets moved to a different module.</p>
-<h3 id="making-structs-and-enums-public"><a class="header" href="#making-structs-and-enums-public">Making Structs and Enums Public</a></h3>
-<p>We can also use <code>pub</code> to designate structs and enums as public, but there are a
-few details extra to the usage of <code>pub</code> with structs and enums. If we use <code>pub</code>
-before a struct definition, we make the struct public, but the struct’s fields
-will still be private. We can make each field public or not on a case-by-case
-basis. In Listing 7-9, we’ve defined a public <code>back_of_house::Breakfast</code> struct
-with a public <code>toast</code> field but a private <code>seasonal_fruit</code> field. This models
-the case in a restaurant where the customer can pick the type of bread that
-comes with a meal, but the chef decides which fruit accompanies the meal based
-on what’s in season and in stock. The available fruit changes quickly, so
-customers can’t choose the fruit or even see which fruit they’ll get.</p>
-<p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-rust noplayground">mod back_of_house {
-    pub struct Breakfast {
-        pub toast: String,
-        seasonal_fruit: String,
-    }
+                        <pre><code class="java">namelist = new ArrayList&lt;String&gt;();</code></pre>
 
-    impl Breakfast {
-        pub fn summer(toast: &amp;str) -&gt; Breakfast {
-            Breakfast {
-                toast: String::from(toast),
-                seasonal_fruit: String::from(&quot;peaches&quot;),
-            }
+
+                        <p>The object created in this way is of type <span class="atype">ArrayList&lt;String&gt;</span> and
+                            represents a dynamic list of strings.  It has instance methods such as
+                            <span class="code">namelist.add(str)</span> for adding a <span class="classname">String</span> to the list,
+                            <span class="code">namelist.get(i)</span> for getting the string at index <span class="code">i</span>,
+                            and <span class="code">namelist.size()</span> for getting the number of items currently in the list.</p>
+
+
+                        <p>But we can also use <span class="classname">ArrayList</span> with other types.
+                            If <span class="classname">Player</span> is a class representing players in a game, we can
+                            create a list of players with</p>
+
+
+                        <pre><code class="java">ArrayList&lt;Player&gt; playerList = new ArrayList&lt;Player&gt;();</code></pre>
+
+
+                        <p>Then to add a player, <span class="code">plr</span>, to the game, we just have to say
+                            <span class="code">playerList.add(plr)</span>.  And we can remove player number <span class="code">k</span>
+                            with <span class="code">playerList.remove(k)</span>.</p>
+
+
+                        <p>Furthermore if <span class="code">playerList</span> is a local variable, then
+                            its declaration can be abbreviated to</p>
+
+
+                        <pre><code class="java">var playlerList = new ArrayList&lt;Player&gt;();</code></pre>
+
+
+                        <p>using the alternative declaration syntax that was covered in
+                            <a href="ch04-08-TruthAboutDeclarations.html">Subsection&nbsp;4.8.2</a>.  The Java compiler uses the
+                            initial value that is assigned to <span class="code">playerList</span> to deduce that
+                            its type is <span class="atype">ArrayList&lt;Player&gt;</span>.</p>
+
+
+                        <p>When you use a type such as <span class="atype">ArrayList&lt;T&gt;</span>, the compiler will
+                            ensure that only objects of type <span class="classname">T</span> can be added to the list.
+                            An attempt to add an object that is not of type <span class="classname">T</span> will be
+                            a syntax error, and the program will not compile.  However, note that objects
+                            belonging to a subclass of <span class="classname">T</span> can be added to the list, since
+                            objects belonging to a subclass of <span class="classname">T</span> are still considered to
+                            be of type <span class="classname">T</span>. Thus, if class <span class="classname">Shape</span>
+                            has subclasses <span class="classname">Rectangle</span>, <span class="classname">Oval</span>
+                            and <span class="classname">RounRect</span>, then a variable of type
+                            <span class="atype">ArrayList&lt;Shape&gt;</span> can be used to hold objects of type
+                            <span class="classname">Rectangle</span>, <span class="classname">Oval</span>, and <span class="classname">RoundRect</span>.
+                            (Of course, this is the same way arrays work:  An array of type <span class="atype">T[]</span>
+                            can hold objects belonging to any subclass of <span class="classname">T</span>.)
+                            Similarly, if <span class="classname">T</span> is an interface, then any object that
+                            implements interface <span class="classname">T</span> can be added to the list.</p>
+
+
+                        <p>An object of type <span class="atype">ArrayList&lt;T&gt;</span> has all of the instance methods
+                            that you would expect in a dynamic array implementation.  Here are some of the most
+                            useful.  Suppose that <span class="code">list</span> is a variable of type <span class="atype">ArrayList&lt;T&gt;</span>.
+                            Then we have:</p>
+
+
+                        <ul>
+
+                            <li>
+                                <span class="codedef">list.size()</span> &mdash; This function returns
+                                the current size of the list, that is, the number of items currently in the list.
+                                The only valid positions in the
+                                list are numbers in the range <span class="code">0</span> to <span class="code">list.size()-1</span>. Note that
+                                the size can be zero. A call to the default constructor <span class="code">new&nbsp;ArrayList&lt;T&gt;()</span>
+                                creates a list of size zero.</li>
+
+                            <li>
+                                <span class="codedef">list.add(obj)</span> &mdash; Adds an object onto
+                                the end of the list, increasing the size by&nbsp;1. The parameter,
+                                <span class="code">obj</span>, can refer to an object of type <span class="classname">T</span>,
+                                or it can be <span class="code">null</span>.</li>
+
+                            <li>
+                                <span class="codedef">list.get(N)</span> &mdash; This function returns
+                                the value stored at position <span class="code">N</span> in the list.  The return type of
+                                this function is&nbsp;<span class="classname">T</span>.&nbsp; <span class="code">N</span>
+                                must be an integer in the range <span class="code">0</span> to <span class="code">list.size()-1</span>. If
+                                <span class="code">N</span> is outside this range, an error of type <span class="classname">IndexOutOfBoundsException</span>
+                                occurs. Calling this function is
+                                similar to referring to <span class="code">A[N]</span> for an array, <span class="code">A</span>, except that you
+                                can't use <span class="code">list.get(N)</span> on the left side of an assignment statement.</li>
+
+                            <li>
+                                <span class="codedef">list.set(N, obj)</span> &mdash; Assigns the
+                                object, <span class="code">obj</span>, to position <span class="code">N</span> in the <span class="classname">ArrayList</span>,
+                                replacing the item previously stored at position <span class="code">N</span>. The parameter <span class="code">obj</span>
+                                must be of type <span class="classname">T</span>.  The integer
+                                <span class="code">N</span> must be in the range from <span class="code">0</span> to <span class="code">list.size()-1</span>. A
+                                call to this function is equivalent to the command <span class="code">A[N]&nbsp;=&nbsp;obj</span> for an
+                                array&nbsp;<span class="code">A</span>.</li>
+
+                            <li>
+                                <span class="codedef">list.clear()</span> &mdash; Removes all items from the list, setting its size
+                                to zero.</li>
+
+                            <li>
+                                <span class="codedef">list.remove(N)</span> &mdash; For an integer,
+                                <span class="code">N</span>, this removes the <span class="code">N-th</span> item in the <span class="classname">ArrayList</span>.
+                                <span class="code">N</span> must be in the range <span class="code">0</span> to <span class="code">list.size()-1</span>. Any items
+                                in the list that come after the removed item are moved up one position. The
+                                size of the list decreases by 1.  This method returns the removed item.</li>
+
+                            <li>
+                                <span class="codedef">list.remove(obj)</span> &mdash; If the specified
+                                object occurs somewhere in the list, it is removed from the list.
+                                Any items in the list that come after the removed item are moved up one
+                                position. The size of the <span class="classname">ArrayList</span> decreases by 1. If <span class="code">obj</span>
+                                occurs more than once in the list, only the first copy is removed.  If <span class="code">obj</span>
+                                does not occur in the list, nothing happens; this is not an error. This method
+                                returns a <span class="ptype">boolean</span> value that says whether or not an item was
+                                actually removed.</li>
+
+                            <li>
+                                <span class="codedef">list.indexOf(obj)</span> &mdash; A function that
+                                searches for the object, <span class="code">obj</span>, in the list. If the object
+                                is found in the list, then the first position number where it is found is returned.
+                                If the object is not found, then <span class="code">-1</span> is returned.</li>
+
+                        </ul>
+
+
+                        <p>For the last two methods listed here, <span class="code">obj</span> is compared to
+                            an item in the list by calling <span class="code">obj.equals(item)</span>, unless <span class="code">obj</span>
+                            is null.  This means, for example, that strings are tested for equality by checking
+                            the contents of the strings, not their location in memory.</p>
+
+
+                        <p>Java comes with several parameterized classes representing different data structures.
+                            Those classes make up the <span class="newword">Java Collection Framework</span>.  Here we consider
+                            only <span class="classname">ArrayList</span>, but we will return to this important topic in
+                            much more detail in <a href="ch10-00-GenericProgrammingandCollectionClasses.html">Chapter&nbsp;10</a>.</p>
+
+
+                        <p>By the way, <span class="classname">ArrayList</span> can also be used as a non-parametrized
+                            type.  This means that you can declare variables and create objects of type <span class="classname">ArrayList</span>
+                            such as</p>
+
+
+                        <pre><code class="java">ArrayList list = new ArrayList();</code></pre>
+
+
+                        <p>The effect of this is similar to declaring <span class="code">list</span> to be of type
+                            <span class="atype">ArrayList&lt;Object&gt;</span>.  That is, <span class="code">list</span> can hold
+                            any object that belongs to a subclass of <span class="classname">Object</span>.  Since every
+                            class is a subclass of <span class="classname">Object</span>, this means that <b>any</b>
+                            object can be stored in <span class="code">list</span>.</p>
+
+
+                        <h3 id="Wrapper Classes"><a class="header" href="#Wrapper Classes">Wrapper Classes</a></h3>
+                      
+                        <p>As I have already noted, parameterized types don't work with the primitive types.
+                            There is no such thing as "<span class="atype">ArrayList&lt;int&gt;</span>".  However, this limitation
+                            turns out not to be very limiting after all, because of the so-called
+                            <span class="newword">wrapper classes</span> such as <span class="classname">Integer</span>
+                            and <span class="classname">Character</span>.</p>
+
+
+                        <p>We have already briefly encountered the classes <span class="classname">Double</span> and
+                            <span class="classname">Integer</span> in <a href="ch02-05-DetailsOfExpressions.html">Section&nbsp;2.5</a>.  These classes
+                            contain the <span class="code">static</span> methods <span class="code">Double.parseDouble()</span>
+                            and <span class="code">Integer.parseInteger()</span> that are used to convert strings to
+                            numerical values, and they contain constants such as <span class="code">Integer.MAX_VALUE</span> and <span class="code">Double.NaN</span>.
+                            We have also encountered the <span class="classname">Character</span>
+                            class in some examples, with the static method <span class="code">Character.isLetter()</span>,
+                            that can be used to test whether a given value of type <span class="code">char</span> is a
+                            letter.  There is a similar class for each of the other primitive types,
+                            <span class="classname">Long</span>, <span class="classname">Short</span>, <span class="classname">Byte</span>,
+                            <span class="classname">Float</span>, and <span class="classname">Boolean</span>.
+                            These classes are wrapper classes.  Although they
+                            contain useful <span class="code">static</span> members, they have another use as
+                            well:  They are used for representing primitive type
+                            values as objects.</p>
+
+
+                        <p>Remember that the primitive types are not classes, and values of primitive type
+                            are not objects.  However, sometimes it's useful to treat a primitive value
+                            as if it were an object.  This is true, for example, when you would like to store
+                            primitive type values in an <span class="classname">ArrayList</span>.
+                            You can't do that literally, but you can "wrap" the
+                            primitive type value in an object belonging to one of the wrapper classes.</p>
+
+
+                        <p>For example, an object of type <span class="classname">Integer</span> contains a single instance
+                            variable, of type <span class="ptype">int</span>.  The object is a "wrapper"
+                            for the <span class="ptype">int</span> value.  You can get an object that
+                            wraps the <span class="ptype">int</span> value <span class="code">42</span> with</p>
+
+
+                        <pre><code class="java">Integer n = Integer.valueOf(42);</code></pre>
+
+
+                        <p>The value of <span class="code">n</span> has the same information as the value of type
+                            <span class="ptype">int</span>, but it is an object. If you want to retrieve the <span class="ptype">int</span>
+                            value that is wrapped in the object, you can call the function <span class="code">n.intValue()</span>.
+                            Similarly, you can wrap a <span class="ptype">double</span>
+                            in an object of type <span class="classname">Double</span>, a <span class="ptype">boolean</span> value
+                            in an object of type <span class="classname">Boolean</span>, and so on.  Each wrapper
+                            class has a static <span class="code">valueOf</span>() method for wrapping a primitive type
+                            value in an object.</p>
+
+
+                        <p>The method <span class="code">Integer.valueOf()</span> is a <span class="code">static</span> factory method
+                            that returns an object of type <span class="classname">Integer</span>.
+                            The <span class="classname">Integer</span> class also has a constructor for creating
+                            objects, but it has been <span class="newword">deprecated</span>, meaning that it should not be used in new
+                            code and might be removed from the language in the future.  The static factory
+                            method has the advantage that if <span class="code">Integer.valueOf()</span>
+                            is called more than once with the same parameter value, it has the option
+                            of returning the same object each time.
+                            This is OK because objects of type <span class="classname">Integer</span> are
+                            <span class="newword">immutable</span>, that is, the content of the object cannot
+                            be modified after the object has been created.  Someone who gets their
+                            hands on an <span class="classname">Integer</span> will not be able to
+                            change the primitive <span class="ptype">int</span> value that it represents. We saw something
+                            similar for the <span class="classname">Color</span>
+                            class in <a href="ch06-02-BasicClasses.html">Subsection&nbsp;6.2.1</a>, which also has static factory methods for
+                            creating immutable objects.</p>
+                        
+
+                        <p>To make the wrapper classes even easier to use, there is automatic
+                            conversion between a primitive type and the corresponding wrapper class.  For example,
+                            if you use a value of type <span class="ptype">int</span> in a context that requires an object
+                            of type <span class="classname">Integer</span>, the <span class="ptype">int</span> will automatically be
+                            wrapped in an <span class="classname">Integer</span> object. If you say</p>
+
+
+                        <pre><code class="java">Integer answer = 42;</code></pre>
+
+
+                        <p>the computer will silently read this as if it were</p>
+
+
+                        <pre><code class="java">Integer answer = Integer.valueOf(42);</code></pre>
+
+
+                        <p>This is called <span class="newword">autoboxing</span>.   It works in the other direction, too. For example, if
+                            <span class="code">d</span> refers to an object of type <span class="code">Double</span>, you can use <span class="code">d</span>
+                            in a numerical expression such as <span class="code">2*d</span>.  The <span class="ptype">double</span> value inside
+                            <span class="code">d</span> is automatically <span class="newword">unboxed</span> and multiplied by&nbsp;2.  Autoboxing
+                            and unboxing also apply to subroutine calls.  For example, you can pass an actual parameter of type
+                            <span class="ptype">int</span> to a subroutine that has a formal parameter of type <span class="classname">Integer</span>,
+                            and vice versa.  In fact, autoboxing and unboxing make it possible in many circumstances to ignore the difference
+                            between primitive types and objects.</p>
+
+
+                        <p>This is true in particular for parameterized types.  Although there is no such thing
+                            as "<span class="atype">ArrayList&lt;int&gt;</span>", there is <span class="atype">ArrayList&lt;Integer&gt;</span>.
+                            An <span class="atype">ArrayList&lt;Integer&gt;</span> holds objects of type <span class="classname">Integer</span>,
+                            but any object of type <span class="classname">Integer</span> really just represents an <span class="ptype">int</span>
+                            value in a rather thin wrapper.  Suppose that we have an object of type
+                            <span class="atype">ArrayList&lt;Integer&gt;</span>:</p>
+
+
+                        <pre><code class="java">ArrayList&lt;Integer&gt; integerList;
+integerList = new ArrayList&lt;Integer&gt;();</code></pre>
+
+
+                        <p>Then we can, for example, add an object to <span class="code">integerList</span> that represents the number 42:</p>
+
+
+                        <pre><code class="java">integerList.add( Integer.valueOf(42) );</code></pre>
+
+
+                        <p>but because of autoboxing, we can actually say</p>
+
+
+                        <pre><code class="java">integerList.add( 42 );</code></pre>
+
+
+                        <p>and the compiler will automatically wrap 42 in an object of type <span class="classname">Integer</span>
+                            before adding it to the list.  Similarly, we can say</p>
+
+
+                        <pre><code class="java">int num = integerList.get(3);</code></pre>
+
+
+                        <p>The value returned by <span class="code">integerList.get(3)</span> is of type <span class="classname">Integer</span>
+                            but because of unboxing, the compiler will automatically convert the return value into an
+                            <span class="ptype">int</span>, as if we had said</p>
+
+
+                        <pre><code class="java">int num = integerList.get(3)<span class="newcode">.intValue()</span>;</code></pre>
+
+
+                        <p>So, in effect, we can pretty much use <span class="code">integerList</span> as if it were
+                            a dynamic array of <span class="ptype">int</span> rather than a dynamic array of <span class="classname">Integer</span>.
+                            Of course, a similar statement holds for lists of other wrapper classes such as
+                            <span class="atype">ArrayList&lt;Double&gt;</span> and <span class="atype">ArrayList&lt;Character&gt;</span>.</p>
+
+
+                        <p>There is one issue that sometimes causes problems:  A list can hold <span class="code">null</span>
+                            values, and a <span class="code">null</span> does not correspond to any primitive type value.  This
+                            means, for example, that the statement "<span class="code">int num = integerList.get(3);</span>"
+                            can produce a null pointer exception in the case where <span class="code">integerList.get(3)</span>
+                            returns <span class="code">null</span>.  Unless you are sure that all the values in your list are
+                            non-null, you need to take this possibility into account.</p>
+                        
+
+                        <h3 id="Programming With ArrayList"><a class="header" href="#Programming With ArrayList">Programming With ArrayList</a></h3>
+
+                        <p>As a simple first example, we can redo <span class="sourceref"><a href="./source/chapter7/ReverseWithDynamicArray.java">ReverseWithDynamicArray.java</a></span>,
+                            from the <a href="ch07-02-ArrayProcessing.html">previous section</a>, using an
+                            ArrayList instead of a custom dynamic array class.  In this case, we want
+                            to store integers in the list, so we should use <span class="atype">ArrayList&lt;Integer&gt;</span>.
+                            Here is the complete program:</p>
+
+
+                        <pre><code class="java">import textio.TextIO;
+import java.util.ArrayList;
+
+/**
+ * Reads a list of non-zero numbers from the user, then prints
+ * out the input numbers in the reverse of the order in which
+ * the were entered.  There is no limit on the number of inputs.
+ */
+public class ReverseWithArrayList {
+
+    public static void main(String[] args) {
+        <span class="newcode">ArrayList&lt;Integer&gt; list;
+        list = new ArrayList&lt;Integer&gt;();</span>
+        System.out.println("Enter some non-zero integers.  Enter 0 to end.");
+        while (true) {
+            System.out.print("? ");
+            int number = TextIO.getlnInt();
+            if (number == 0)
+                break;
+            <span class="newcode">list.add(number);</span>
+        }
+        System.out.println();
+        System.out.println("Your numbers in reverse are:");
+        for (int i = <span class="newcode">list.size()</span> - 1; i &gt;= 0; i--) {
+            System.out.printf("%10d%n", <span class="newcode">list.get(i)</span>);
         }
     }
-}
 
-pub fn eat_at_restaurant() {
-    // Order a breakfast in the summer with Rye toast
-    let mut meal = back_of_house::Breakfast::summer(&quot;Rye&quot;);
-    // Change our mind about what bread we'd like
-    meal.toast = String::from(&quot;Wheat&quot;);
-    println!(&quot;I'd like {} toast please&quot;, meal.toast);
-
-    // The next line won't compile if we uncomment it; we're not allowed
-    // to see or modify the seasonal fruit that comes with the meal
-    // meal.seasonal_fruit = String::from(&quot;blueberries&quot;);
 }</code></pre>
-<p><span class="caption">Listing 7-9: A struct with some public fields and some
-private fields</span></p>
-<p>Because the <code>toast</code> field in the <code>back_of_house::Breakfast</code> struct is public,
-in <code>eat_at_restaurant</code> we can write and read to the <code>toast</code> field using dot
-notation. Notice that we can’t use the <code>seasonal_fruit</code> field in
-<code>eat_at_restaurant</code> because <code>seasonal_fruit</code> is private. Try uncommenting the
-line modifying the <code>seasonal_fruit</code> field value to see what error you get!</p>
-<p>Also, note that because <code>back_of_house::Breakfast</code> has a private field, the
-struct needs to provide a public associated function that constructs an
-instance of <code>Breakfast</code> (we’ve named it <code>summer</code> here). If <code>Breakfast</code> didn’t
-have such a function, we couldn’t create an instance of <code>Breakfast</code> in
-<code>eat_at_restaurant</code> because we couldn’t set the value of the private
-<code>seasonal_fruit</code> field in <code>eat_at_restaurant</code>.</p>
-<p>In contrast, if we make an enum public, all of its variants are then public. We
-only need the <code>pub</code> before the <code>enum</code> keyword, as shown in Listing 7-10.</p>
-<p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-rust noplayground">mod back_of_house {
-    pub enum Appetizer {
-        Soup,
-        Salad,
+
+
+                        <p>As illustrated in this example, ArrayLists are commonly processed using
+                            <span class="code">for</span> loops, in much the same way that arrays are processed.
+                            for example, the following loop prints out all the items for a variable <span class="code">namelist</span> of type
+                            <span class="atype">ArrayList&lt;String&gt;</span>:</p>
+
+
+                        <pre><code class="java">for ( int i = 0; i &lt; namelist.size(); i++ ) {
+    String item = namelist.get(i);
+    System.out.println(item);
+}</code></pre>
+
+
+                        <p>You can also use for-each loops with ArrayLists, so this example could also be written</p>
+
+
+                        <pre><code class="java">for ( String item : namelist ) {
+    System.out.println(item);
+}</code></pre>
+
+
+                        <p>When working with wrapper classes, the loop control variable in the for-each loop
+                            can be a primitive type variable.  This works because of unboxing.  For example,
+                            if <span class="code">numbers</span> is of type <span class="atype">ArrayList&lt;Double&gt;</span>, then
+                            the following loop can be used to add up all the values in the list:</p>
+
+
+                        <pre><code class="java">double sum = 0;
+for ( double num : numbers ) {
+   sum = sum + num;
+}</code></pre>
+
+
+                        <p>This will work as long as none of the items in the list are <span class="code">null</span>.
+                            If there is a possibility of null values, then you will want to use a loop control
+                            variable of type <span class="classname">Double</span> and test for nulls.  For example,
+                            to add up all the non-null values in the list:</p>
+
+
+                        <pre><code class="java">double sum;
+for ( Double num : numbers ) {
+    if ( num != null ) {
+        sum = sum + num;  // Here, num is SAFELY unboxed to get a double.
     }
-}
-
-pub fn eat_at_restaurant() {
-    let order1 = back_of_house::Appetizer::Soup;
-    let order2 = back_of_house::Appetizer::Salad;
 }</code></pre>
-<p><span class="caption">Listing 7-10: Designating an enum as public makes all its
-variants public</span></p>
-<p>Because we made the <code>Appetizer</code> enum public, we can use the <code>Soup</code> and <code>Salad</code>
-variants in <code>eat_at_restaurant</code>.</p>
-<p>Enums aren’t very useful unless their variants are public; it would be annoying
-to have to annotate all enum variants with <code>pub</code> in every case, so the default
-for enum variants is to be public. Structs are often useful without their
-fields being public, so struct fields follow the general rule of everything
-being private by default unless annotated with <code>pub</code>.</p>
-<p>There’s one more situation involving <code>pub</code> that we haven’t covered, and that is
-our last module system feature: the <code>use</code> keyword. We’ll cover <code>use</code> by itself
-first, and then we’ll show how to combine <code>pub</code> and <code>use</code>.</p>
+                        
+
+                        <p>For a more complete and useful example, we will look at the program
+                            <span class="sourceref"><a href="./source/chapter7/SimplePaint2.java">SimplePaint2.java</a></span>.  This is a much improved version of
+                            <span class="sourceref"><a href="./source/chapter6/SimplePaint.java">SimplePaint.java</a></span> from
+                            <a href="ch06-03-BasicEvents.html">Subsection&nbsp;6.3.3</a>.
+                            In the new program, the user can sketch curves in a drawing area
+                            by clicking and dragging with the mouse.
+                            The user can select the drawing color using a menu.  The background color of the
+                            drawing area can also be selected using a menu.  And there is a "Control"
+                            menu that contains several commands:  An "Undo" command, which removes the
+                            most recently drawn curve from the screen, a "Clear" command that removes
+                            all the curves, and a "Use Symmetry" checkbox that turns a symmetry feature
+                            on and off. Curves that are drawn by the user when the symmetry option is on
+                            are reflected horizontally and vertically to produce a symmetric pattern.
+                            (Symmetry is there just to look pretty.)</p>
+
+
+                        <p>Unlike the original SimplePaint program, this new version
+                            uses a data structure to store information about the picture that has been
+                            drawn by the user. When the user selects a new background color, the canvas
+                            is filled with the new background color, and all of the curves that were
+                            there previously are redrawn on the new background.  To do that, we need to
+                            store enough data to redraw all of the curves.  Similarly, the Undo
+                            command is implemented by deleting the data for most recently drawn curve,
+                            and then redrawing the entire picture using the remaining data.</p>
+
+
+                        <p>The data structure that we need is implemented using <span class="classname">ArrayLists</span>.
+                            The main data for an individual curve consists of a list of the points on the curve.  This
+                            data is stored in an object of type
+                            <span class="atype">ArrayList&lt;Point2D&gt;</span>.
+                            (<span class="classname">Point2D</span>
+                            is standard class in package <span class="code">javafx.geometry</span>:
+                            A&nbsp;<span class="classname">Point2D</span>
+                            can be constructed from two <span class="ptype">double</span>
+                            values, giving the (x,y) coordinates of the point.  And
+                            a&nbsp;<span class="classname">Point2D</span>
+                            object, <span class="code">pt</span>, has
+                            getter methods <span class="code">pt.getX()</span> and <span class="code">pt.getY()</span>
+                            that return the x and y coordinates.)  But in addition to a list of points
+                            on a curve, to redraw the curve, we also need to know its color,
+                            and we need to know whether the symmetry option should be applied to the curve.
+                            All the data that is needed to redraw the curve is grouped into
+                            an object of type <span class="classname">CurveData</span> that is defined
+                            as a nested class in the program:</p>
+
+
+                        <pre><code class="java">private static class CurveData {
+   Color color;  // The color of the curve.
+   boolean symmetric;  // Are horizontal and vertical reflections also drawn?
+   ArrayList&lt;Point2D&gt; points;  // The points on the curve.
+}</code></pre>
+
+
+                        <p>However, a picture can contain many curves, not just one, so to store
+                            all the data necessary to redraw the entire picture, we need a <b>list</b>
+                            of objects of type <span class="classname">CurveData</span>.  For this list,
+                            the program uses an <span class="classname">ArrayList</span>, <span class="code">curves</span>, declared as</p>
+
+
+                        <pre><code class="java">ArrayList&lt;CurveData&gt; curves = new ArrayList&lt;CurveData&gt;();</code></pre>
+
+
+                        <p>Here we have a list of objects, where each object contains a list of
+                            points as part of its data!  Let's look at a few examples of processing
+                            this data structure.  When the user clicks the mouse on the drawing surface,
+                            it's the start of a new curve, and a new <span class="classname">CurveData</span>
+                            object must be created to represent that curve.  The instance
+                            variables in the new <span class="classname">CurveData</span> object must
+                            also be initialized.  Here is the code from the <span class="code">mousePressed()</span>
+                            routine that does this, where <span class="code">currentCurve</span> is a global
+                            variable of type <span class="code">CurveData</span>:</p>
+
+
+                        <pre><code class="java">currentCurve = new CurveData();       // Create a new CurveData object.
+
+currentCurve.color = currentColor;    // The color of a curve is taken from an
+                                      // instance variable that represents the
+                                      // currently selected drawing color.
+
+currentCurve.symmetric = useSymmetry; // The "symmetric" property of the curve
+                                      // is also copied from the current value
+                                      // of an instance variable, useSymmetry.
+
+currentCurve.points = new ArrayList&lt;Point2D&gt;();  // A new point list object.</code></pre>
+
+
+                        <p>As the user drags the mouse, new points are added to <span class="code">currentCurve</span>,
+                            and line segments of the curve are drawn between points as they are added.  When the
+                            user releases the mouse, the curve is complete, and it is added to
+                            the list of curves by calling</p>
+
+
+                        <pre><code class="java">curves.add( currentCurve );</code></pre>
+
+
+                        <p>When the user changes the background color or selects the "Undo" command,
+                            the picture has to be redrawn.  The program has a
+                            <span class="code">redraw()</span>
+                            method that completely redraws the picture. That method uses the data in the
+                            list of <span class="classname">CurveData</span>
+                            to draw all the curves.  The basic structure is a for-each loop that processes
+                            the data for each individual curve in turn.  This has the form:</p>
+
+
+                        <pre><code class="java">for ( CurveData curve : curves ) {
+   .
+   .  // Draw the curve represented by the object, curve, of type CurveData.
+   .
+}</code></pre>
+
+
+                        <p>In the body of this loop, <span class="code">curve.points</span> is a variable of
+                            type <span class="atype">ArrayList&lt;Point2D&gt;</span>
+                            that holds the list of
+                            points on the curve.  The <span class="code">i-th</span> point on the curve can be
+                            obtained by calling the <span class="code">get()</span> method of this list:
+                            <span class="code">curve.points.get(i)</span>.  This returns a value of type
+                            <span class="classname">Point2D</span> which has
+                            getter methods named <span class="code">getX()</span> and <span class="code">getY()</span>.  We can refer directly to the
+                            x-coordinate of the <span class="code">i-th</span> point as:</p>
+
+
+                        <pre><code class="java">curve.points.get(i).getX()</code></pre>
+
+
+                        <p>This might seem rather complicated, but it's a nice example of a complex name
+                            that specifies a path to a desired piece of data: Go to the object, <span class="code">curve</span>.
+                            Inside <span class="code">curve</span>, go to <span class="code">points</span>.  Inside <span class="code">points</span>,
+                            get the <span class="code">i-th</span> item.  And from that item, get the x coordinate
+                            by calling its <span class="code">getX()</span> method.  Here is the complete definition of the
+                            method that redraws the picture:</p>
+
+
+
+                        <pre><code class="java">private void redraw() {
+    g.setFill(backgroundColor);
+    g.fillRect(0,0,canvas.getWidth(),canvas.getHeight());
+    for ( CurveData curve : curves ) {
+        g.setStroke(curve.color);
+        for (int i = 1; i &lt; curve.points.size(); i++) {
+                // Draw a line segment from point number i-1 to point number i.
+            double x1 = curve.points.get(i-1).getX();
+            double y1 = curve.points.get(i-1).getY();
+            double x2 = curve.points.get(i).getX();
+            double y2 = curve.points.get(i).getY();
+            drawSegment(curve.symmetric,x1,y1,x2,y2);
+        }
+    }
+}</code></pre>
+
+
+                        <p>
+                            <span class="code">drawSegment()</span> is a method that strokes the line segment
+                            from <span class="code">(x1,y1)</span> to <span class="code">(x2,y2)</span>.  If the first parameter is
+                            <span class="code">true</span>, it also draws the horizontal and vertical reflections of
+                            that segment.</p>
+
+
+
+
+                        <p>I have mostly been interested here in discussing how the program uses
+                            <span class="classname">ArrayList</span>, but
+                            I encourage you to read the full source code, <span class="sourceref"><a href="./source/chapter7/SimplePaint2.java">SimplePaint2.java</a></span>,
+                            and to try out the program.
+                            In addition to serving as an example of using parameterized types, it also serves
+                            as another example of creating and using menus.  You should be able to understand
+                            the entire program.</p>
 
                     </main>
 

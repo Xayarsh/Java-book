@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Method Syntax - Introduction to Programming Using Java</title>
+        <title>Exercises - Introduction to Programming Using Java</title>
 
 
         <!-- Custom HTML head -->
@@ -31,6 +31,8 @@
         <!-- Custom theme stylesheets -->
         <link rel="stylesheet" href="ferris.css">
         <link rel="stylesheet" href="theme/2018-edition.css">
+
+<link rel="stylesheet" href="code-class.css">
 
     </head>
     <body>
@@ -101,7 +103,7 @@
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
                             <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="Java">Java</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
@@ -146,340 +148,263 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h2 id="method-syntax"><a class="header" href="#method-syntax">Method Syntax</a></h2>
-<p><em>Methods</em> are similar to functions: we declare them with the <code>fn</code> keyword and a
-name, they can have parameters and a return value, and they contain some code
-that’s run when the method is called from somewhere else. Unlike functions,
-methods are defined within the context of a struct (or an enum or a trait
-object, which we cover in <a href="ch06-00-GUIProgramming.html">Chapter 6</a><!-- ignore --> and <a href="ch17-02-trait-objects.html">Chapter
-17</a><!-- ignore -->, respectively), and their first parameter is
-always <code>self</code>, which represents the instance of the struct the method is being
-called on.</p>
-<h3 id="defining-methods"><a class="header" href="#defining-methods">Defining Methods</a></h3>
-<p>Let’s change the <code>area</code> function that has a <code>Rectangle</code> instance as a parameter
-and instead make an <code>area</code> method defined on the <code>Rectangle</code> struct, as shown
-in Listing 5-13.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">#[derive(Debug)]
-struct Rectangle {
-    width: u32,
-    height: u32,
-}
+                        <h2 id="Exercises"><a class="header" href="#Exercises">Exercises</a></h2>
+                        <h3 class="exercise">Exercise 5.1:</h3>
+                        <p>In all versions of the
+                            <span class="classname">PairOfDice</span> class in <a href="ch05-02-ConstructorObjectInit.html">Section&nbsp;5.2</a>, the instance
+                            variables <span class="code">die1</span> and <span class="code">die2</span> are declared to be <span class="code">public</span>.
+                            They really should be <span class="code">private</span>, so that they would be protected from being changed
+                            from outside the class. Write another version of the <span class="classname">PairOfDice</span> class
+                            in which the instance variables <span class="code">die1</span> and <span class="code">die2</span> are
+                            <span class="code">private</span>. Your class will need "getter" methods that can be used to find out the
+                            values of <span class="code">die1</span> and <span class="code">die2</span>. (The idea is to protect their values
+                            from being changed from outside the class, but still to allow the values to be
+                            read.) Include other improvements in the class, including at least a <span class="code">toString()</span> method.
+                            Test your class with a short program that counts how many times a pair of dice is
+                            rolled, before the total of the two dice is equal to two.</p>
 
-impl Rectangle {
-    fn area(&amp;self) -&gt; u32 {
-        self.width * self.height
+                        <h3 class="exercise">Exercise 5.2:</h3>
+                        <p>A common programming task
+                            is computing statistics of a set of numbers. (A statistic is a number that
+                            summarizes some property of a set of data.) Common statistics include the mean
+                            (also known as the average) and the standard deviation (which tells how spread
+                            out the data are from the mean). I have written a little class called
+                            <span class="classname">StatCalc</span> that can be used to compute these statistics, as well as the
+                            sum of the items in the dataset and the number of items in the dataset. You can
+                            read the source code for this class in the file <span class="sourceref"><a href="./source/chapter5/StatCalc.java">StatCalc.java</a></span>.
+                            If <span class="code">calc</span> is a variable of
+                            type <span class="classname">StatCalc</span>, then the following instance methods are available:</p>
+
+
+                        <ul>
+
+                            <li>
+                                <span class="code">calc.enter(item)&nbsp;</span> where
+                                <span class="code">item</span> is a number, adds the item to the dataset.</li>
+
+
+                            <li>
+                                <span class="code">calc.getCount()&nbsp;</span> is a function
+                                that returns the number of items that have been added to the dataset.</li>
+
+
+                            <li>
+                                <span class="code">calc.getSum()&nbsp;</span> is a function
+                                that returns the sum of all the items that have been added to the dataset.</li>
+
+
+                            <li>
+                                <span class="code">calc.getMean()&nbsp;</span> is a function
+                                that returns the average of all the items.</li>
+
+
+                            <li>
+                                <span class="code">calc.getStandardDeviation()&nbsp;</span> is
+                                a function that returns the standard deviation of the items.</li>
+
+                        </ul>
+
+
+                        <p>Typically, all the data are added one after the other by calling the
+                            <span class="code">enter()</span> method over and over, as the data become available. After all
+                            the data have been entered, any of the other methods can be called to get
+                            statistical information about the data. The methods <span class="code">getMean()</span> and
+                            <span class="code">getStandardDeviation()</span> should only be called if the number of items is
+                            greater than zero.</p>
+
+
+                        <p>Modify the current source code, <span class="sourceref"><a href="./source/chapter5/StatCalc.java">StatCalc.java</a></span>, to add instance
+                            methods <span class="code">getMax()</span> and <span class="code">getMin()</span>. The <span class="code">getMax()</span> method
+                            should return the largest of all the items that have been added to the dataset,
+                            and <span class="code">getMin()</span> should return the smallest. You will need to add two new
+                            instance variables to keep track of the largest and smallest items that have
+                            been seen so far.</p>
+
+
+                        <p>Test your new class by using it in a program to compute statistics for a set
+                            of non-zero numbers entered by the user. Start by creating an object of type
+                            <span class="classname">StatCalc</span>:</p>
+
+
+                        <pre><code class="java">StatCalc  calc;   // Object to be used to process the data.
+calc = new StatCalc();</code></pre>
+
+
+                        <p>Read numbers from the user and add them to the dataset. Use 0 as a sentinel
+                            value (that is, stop reading numbers when the user enters 0). After all the
+                            user's non-zero numbers have been entered, print out each of the six statistics
+                            that are available from <span class="code">calc</span>.</p>
+
+                        <h3 class="exercise">Exercise 5.3:</h3>
+                        <p>This problem uses the
+                            <span class="classname">PairOfDice</span> class from Exercise&nbsp;5.1
+                            and the <span class="classname">StatCalc</span> class from Exercise&nbsp;5.2.</p>
+
+
+                        <p>The program in Exercise&nbsp;4.4 performs
+                            the experiment of counting how many times a pair of dice is rolled before a
+                            given total comes up. It repeats this experiment 10000 times and then reports
+                            the average number of rolls. It does this whole process for each possible total
+                            (2, 3, ..., 12).</p>
+
+
+                        <p>Redo that exercise. But instead of just reporting the average number of
+                            rolls, you should also report the standard deviation and the maximum number of
+                            rolls. Use a <span class="classname">PairOfDice</span> object to represent the dice. Use a
+                            <span class="classname">StatCalc</span> object to compute the statistics. (You'll need a new
+                            <span class="classname">StatCalc</span> object for each possible total, 2, 3, ..., 12. You can use a
+                            new pair of dice if you want, but it's not required.)</p>
+
+                        <h3 class="exercise">Exercise 5.4:</h3>
+                        <p>The <span class="classname">BlackjackHand</span>
+                            class from <a href="ch05-05-InheritanceAndPolymorphism.html">Subsection&nbsp;5.5.1</a> is an extension of the
+                            <span class="classname">Hand</span> class from <a href="ch05-04-AnExample.html">Section&nbsp;5.4</a>. The instance
+                            methods in the <span class="classname">Hand</span> class are discussed in that section. In addition to
+                            those methods, <span class="classname">BlackjackHand</span> includes an instance method,
+                            <span class="code">getBlackjackValue()</span>, which returns the value of the hand for the game
+                            of Blackjack. For this exercise, you will also need the <span class="classname">Deck</span> and
+                            <span class="classname">Card</span> classes from <a href="ch05-04-AnExample.html">Section&nbsp;5.4</a>.</p>
+
+
+                        <p>A Blackjack hand typically contains from two to six cards. Write a program
+                            to test the <span class="classname">BlackjackHand</span> class. You should create a
+                            <span class="classname">BlackjackHand</span> object and a <span class="classname">Deck</span> object. Pick a random number
+                            between 2 and 6. Deal that many cards from the deck and add them to the hand.
+                            Print out all the cards in the hand, and then print out the value computed for
+                            the hand by <span class="code">getBlackjackValue()</span>. Repeat this as long as the user wants
+                            to continue.</p>
+
+
+                        <p>In addition to <span class="sourceref"><a href="./source/chapter5/textio/TextIO.java">TextIO.java</a></span>, your program will depend on
+                            <span class="sourceref"><a href="./source/chapter5/Card.java">Card.java</a></span>, <span class="sourceref"><a href="./source/chapter5/Deck.java">Deck.java</a></span>,
+                            <span class="sourceref"><a href="./source/chapter5/Hand.java">Hand.java</a></span>, and <span class="sourceref"><a href="./source/chapter5/BlackjackHand.java">BlackjackHand.java</a></span>.</p>
+
+
+                        <h3 class="exercise">Exercise 5.5:</h3>
+                        <p>Write a program that lets
+                            the user play Blackjack. The game will be a simplified version of Blackjack as
+                            it is played in a casino. The computer will act as the dealer. As in the
+                            previous exercise, your program will need the classes defined in
+                            <span class="sourceref"><a href="./source/chapter5/Card.java">Card.java</a></span>, <span class="sourceref"><a href="./source/chapter5/Deck.java">Deck.java</a></span>,
+                            <span class="sourceref"><a href="./source/chapter5/Hand.java">Hand.java</a></span>, and <span class="sourceref"><a href="./source/chapter5/BlackjackHand.java">BlackjackHand.java</a></span>.
+                            (This is the longest and
+                            most complex program that has come up so far in the exercises.)</p>
+
+
+                        <p>You should first write a subroutine in which the user plays one game. The
+                            subroutine should return a <span class="ptype">boolean</span> value to indicate whether the user
+                            wins the game or not. Return <span class="code">true</span> if the user wins, <span class="code">false</span> if
+                            the dealer wins. The program needs an object of class <span class="classname">Deck</span> and two
+                            objects of type <span class="classname">BlackjackHand</span>, one for the dealer and one for the
+                            user. The general object in Blackjack is to get a hand of cards whose value is
+                            as close to 21 as possible, without going over. The game goes like this.</p>
+
+
+                        <ul>
+
+                            <li>First, two cards are dealt into each player's hand. If the dealer's hand has
+                                a value of 21 at this point, then the dealer wins. Otherwise, if the user has
+                                21, then the user wins. (This is called a "Blackjack".) Note that the dealer
+                                wins on a tie, so if both players have Blackjack, then the dealer wins.</li>
+
+
+                            <li>Now, if the game has not ended, the user gets a chance to add some cards to
+                                her hand. In this phase, the user sees her own cards and sees
+                                <b>one</b> of the dealer's two cards. (In a casino, the dealer deals
+                                himself one card face up and one card face down. All the user's cards are dealt
+                                face up.) The user makes a decision whether to "Hit", which means to add
+                                another card to her hand, or to "Stand", which means to stop taking cards.</li>
+
+
+                            <li>If the user Hits, there is a possibility that the user will go over 21. In
+                                that case, the game is over and the user loses. If not, then the process
+                                continues. The user gets to decide again whether to Hit or Stand.</li>
+
+
+                            <li>If the user Stands, the game will end, but first the dealer gets a chance to
+                                draw cards. The dealer only follows rules, without any choice. The rule is that
+                                as long as the value of the dealer's hand is less than or equal to 16, the
+                                dealer Hits (that is, takes another card). The user should see all the dealer's
+                                cards at this point. Now, the winner can be determined: If the dealer has gone
+                                over 21, the user wins. Otherwise, if the dealer's total is greater than or
+                                equal to the user's total, then the dealer wins. Otherwise, the user wins.</li>
+
+                        </ul>
+
+
+
+                        <p>Two notes on programming: At any point in the subroutine, as soon as you
+                            know who the winner is, you can say "<span class="code">return true</span>;" or "<span class="code">return
+false</span>;" to end the subroutine and return to the main program. To avoid
+                            having an overabundance of variables in your subroutine, remember that a
+                            function call such as <span class="code">userHand.getBlackjackValue()</span> can be used
+                            anywhere that a number could be used, including in an output statement or in
+                            the condition of an <span class="code">if</span> statement.</p>
+
+
+                        <p>Write a main program that lets the user play several games of Blackjack. To
+                            make things interesting, give the user 100 dollars, and let the user make bets
+                            on the game. If the user loses, subtract the bet from the user's money. If the
+                            user wins, add an amount equal to the bet to the user's money. End the program
+                            when the user wants to quit or when she runs out of money.</p>
+
+                        <h3 class="exercise">Exercise 5.6:</h3>
+                        <p>
+                            Exercise&nbsp;4.8 asked you to write
+                            a program that administers a 10-question addition quiz.  Rewrite that program
+                            so that it uses the following class to represent addition questions:</p>
+
+                        <pre><code class="java">public class AdditionQuestion {
+
+    private int a, b;  // The numbers in the problem.
+
+    public AdditionQuestion() { // constructor
+        a = (int)(Math.random() * 50 + 1);
+        b = (int)(Math.random() * 50);
     }
-}
 
-fn main() {
-    let rect1 = Rectangle {
-        width: 30,
-        height: 50,
-    };
-
-    println!(
-        &quot;The area of the rectangle is {} square pixels.&quot;,
-        rect1.area()
-    );
-}</code></pre></pre>
-<p><span class="caption">Listing 5-13: Defining an <code>area</code> method on the
-<code>Rectangle</code> struct</span></p>
-<p>To define the function within the context of <code>Rectangle</code>, we start an <code>impl</code>
-(implementation) block for <code>Rectangle</code>. Everything within this <code>impl</code> block
-will be associated with the <code>Rectangle</code> type. Then we move the <code>area</code> function
-within the <code>impl</code> curly brackets and change the first (and in this case, only)
-parameter to be <code>self</code> in the signature and everywhere within the body. In
-<code>main</code>, where we called the <code>area</code> function and passed <code>rect1</code> as an argument,
-we can instead use <em>method syntax</em> to call the <code>area</code> method on our <code>Rectangle</code>
-instance. The method syntax goes after an instance: we add a dot followed by
-the method name, parentheses, and any arguments.</p>
-<p>In the signature for <code>area</code>, we use <code>&amp;self</code> instead of <code>rectangle: &amp;Rectangle</code>.
-The <code>&amp;self</code> is actually short for <code>self: &amp;Self</code>. Within an <code>impl</code> block, the
-type <code>Self</code> is an alias for the type that the <code>impl</code> block is for. Methods must
-have a parameter named <code>self</code> of type <code>Self</code> for their first parameter, so Rust
-lets you abbreviate this with only the name <code>self</code> in the first parameter spot.
-Note that we still need to use the <code>&amp;</code> in front of the <code>self</code> shorthand to
-indicate that this method borrows the <code>Self</code> instance, just as we did in
-<code>rectangle: &amp;Rectangle</code>. Methods can take ownership of <code>self</code>, borrow <code>self</code>
-immutably, as we’ve done here, or borrow <code>self</code> mutably, just as they can any
-other parameter.</p>
-<p>We chose <code>&amp;self</code> here for the same reason we used <code>&amp;Rectangle</code> in the function
-version: we don’t want to take ownership, and we just want to read the data in
-the struct, not write to it. If we wanted to change the instance that we’ve
-called the method on as part of what the method does, we’d use <code>&amp;mut self</code> as
-the first parameter. Having a method that takes ownership of the instance by
-using just <code>self</code> as the first parameter is rare; this technique is usually
-used when the method transforms <code>self</code> into something else and you want to
-prevent the caller from using the original instance after the transformation.</p>
-<p>The main reason for using methods instead of functions, in addition to
-providing method syntax and not having to repeat the type of <code>self</code> in every
-method’s signature, is for organization. We’ve put all the things we can do
-with an instance of a type in one <code>impl</code> block rather than making future users
-of our code search for capabilities of <code>Rectangle</code> in various places in the
-library we provide.</p>
-<p>Note that we can choose to give a method the same name as one of the struct’s
-fields. For example, we can define a method on <code>Rectangle</code> that is also named
-<code>width</code>:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#[derive(Debug)]
-</span><span class="boring">struct Rectangle {
-</span><span class="boring">    width: u32,
-</span><span class="boring">    height: u32,
-</span><span class="boring">}
-</span><span class="boring">
-</span>impl Rectangle {
-    fn width(&amp;self) -&gt; bool {
-        self.width &gt; 0
+    public String getQuestion() {
+        return "What is " + a + " + " + b + " ?";
     }
-}
 
-fn main() {
-    let rect1 = Rectangle {
-        width: 30,
-        height: 50,
-    };
-
-    if rect1.width() {
-        println!(&quot;The rectangle has a nonzero width; it is {}&quot;, rect1.width);
+    public int getCorrectAnswer() {
+        return a + b;
     }
-}</code></pre></pre>
-<p>Here, we’re choosing to make the <code>width</code> method return <code>true</code> if the value in
-the instance’s <code>width</code> field is greater than <code>0</code> and <code>false</code> if the value is
-<code>0</code>: we can use a field within a method of the same name for any purpose. In
-<code>main</code>, when we follow <code>rect1.width</code> with parentheses, Rust knows we mean the
-method <code>width</code>. When we don’t use parentheses, Rust knows we mean the field
-<code>width</code>.</p>
-<p>Often, but not always, when we give a method the same name as a field we want
-it to only return the value in the field and do nothing else. Methods like this
-are called <em>getters</em>, and Rust does not implement them automatically for struct
-fields as some other languages do. Getters are useful because you can make the
-field private but the method public, and thus enable read-only access to that
-field as part of the type’s public API. We will discuss what public and private
-are and how to designate a field or method as public or private in <a href="ch07-03-ArrayLists.html#exposing-paths-with-the-pub-keyword">Chapter
-7</a><!-- ignore -->.</p>
-<blockquote>
-<h3 id="wheres-the---operator"><a class="header" href="#wheres-the---operator">Where’s the <code>-&gt;</code> Operator?</a></h3>
-<p>In C and C++, two different operators are used for calling methods: you use
-<code>.</code> if you’re calling a method on the object directly and <code>-&gt;</code> if you’re
-calling the method on a pointer to the object and need to dereference the
-pointer first. In other words, if <code>object</code> is a pointer,
-<code>object-&gt;something()</code> is similar to <code>(*object).something()</code>.</p>
-<p>Rust doesn’t have an equivalent to the <code>-&gt;</code> operator; instead, Rust has a
-feature called <em>automatic referencing and dereferencing</em>. Calling methods is
-one of the few places in Rust that has this behavior.</p>
-<p>Here’s how it works: when you call a method with <code>object.something()</code>, Rust
-automatically adds in <code>&amp;</code>, <code>&amp;mut</code>, or <code>*</code> so <code>object</code> matches the signature of
-the method. In other words, the following are the same:</p>
-<!-- CAN'T EXTRACT SEE BUG https://github.com/rust-lang/mdBook/issues/1127 -->
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span><span class="boring">#[derive(Debug,Copy,Clone)]
-</span><span class="boring">struct Point {
-</span><span class="boring">    x: f64,
-</span><span class="boring">    y: f64,
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">impl Point {
-</span><span class="boring">   fn distance(&amp;self, other: &amp;Point) -&gt; f64 {
-</span><span class="boring">       let x_squared = f64::powi(other.x - self.x, 2);
-</span><span class="boring">       let y_squared = f64::powi(other.y - self.y, 2);
-</span><span class="boring">
-</span><span class="boring">       f64::sqrt(x_squared + y_squared)
-</span><span class="boring">   }
-</span><span class="boring">}
-</span><span class="boring">let p1 = Point { x: 0.0, y: 0.0 };
-</span><span class="boring">let p2 = Point { x: 5.0, y: 6.5 };
-</span>p1.distance(&amp;p2);
-(&amp;p1).distance(&amp;p2);
-<span class="boring">}</span></code></pre></pre>
-<p>The first one looks much cleaner. This automatic referencing behavior works
-because methods have a clear receiver—the type of <code>self</code>. Given the receiver
-and name of a method, Rust can figure out definitively whether the method is
-reading (<code>&amp;self</code>), mutating (<code>&amp;mut self</code>), or consuming (<code>self</code>). The fact
-that Rust makes borrowing implicit for method receivers is a big part of
-making ownership ergonomic in practice.</p>
-</blockquote>
-<h3 id="methods-with-more-parameters"><a class="header" href="#methods-with-more-parameters">Methods with More Parameters</a></h3>
-<p>Let’s practice using methods by implementing a second method on the <code>Rectangle</code>
-struct. This time we want an instance of <code>Rectangle</code> to take another instance
-of <code>Rectangle</code> and return <code>true</code> if the second <code>Rectangle</code> can fit completely
-within <code>self</code> (the first <code>Rectangle</code>); otherwise, it should return <code>false</code>.
-That is, once we’ve defined the <code>can_hold</code> method, we want to be able to write
-the program shown in Listing 5-14.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore">fn main() {
-    let rect1 = Rectangle {
-        width: 30,
-        height: 50,
-    };
-    let rect2 = Rectangle {
-        width: 10,
-        height: 40,
-    };
-    let rect3 = Rectangle {
-        width: 60,
-        height: 45,
-    };
 
-    println!(&quot;Can rect1 hold rect2? {}&quot;, rect1.can_hold(&amp;rect2));
-    println!(&quot;Can rect1 hold rect3? {}&quot;, rect1.can_hold(&amp;rect3));
 }</code></pre>
-<p><span class="caption">Listing 5-14: Using the as-yet-unwritten <code>can_hold</code>
-method</span></p>
-<p>The expected output would look like the following because both dimensions of
-<code>rect2</code> are smaller than the dimensions of <code>rect1</code>, but <code>rect3</code> is wider than
-<code>rect1</code>:</p>
-<pre><code class="language-text">Can rect1 hold rect2? true
-Can rect1 hold rect3? false
-</code></pre>
-<p>We know we want to define a method, so it will be within the <code>impl Rectangle</code>
-block. The method name will be <code>can_hold</code>, and it will take an immutable borrow
-of another <code>Rectangle</code> as a parameter. We can tell what the type of the
-parameter will be by looking at the code that calls the method:
-<code>rect1.can_hold(&amp;rect2)</code> passes in <code>&amp;rect2</code>, which is an immutable borrow to
-<code>rect2</code>, an instance of <code>Rectangle</code>. This makes sense because we only need to
-read <code>rect2</code> (rather than write, which would mean we’d need a mutable borrow),
-and we want <code>main</code> to retain ownership of <code>rect2</code> so we can use it again after
-calling the <code>can_hold</code> method. The return value of <code>can_hold</code> will be a
-Boolean, and the implementation will check whether the width and height of
-<code>self</code> are greater than the width and height of the other <code>Rectangle</code>,
-respectively. Let’s add the new <code>can_hold</code> method to the <code>impl</code> block from
-Listing 5-13, shown in Listing 5-15.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#[derive(Debug)]
-</span><span class="boring">struct Rectangle {
-</span><span class="boring">    width: u32,
-</span><span class="boring">    height: u32,
-</span><span class="boring">}
-</span><span class="boring">
-</span>impl Rectangle {
-    fn area(&amp;self) -&gt; u32 {
-        self.width * self.height
-    }
 
-    fn can_hold(&amp;self, other: &amp;Rectangle) -&gt; bool {
-        self.width &gt; other.width &amp;&amp; self.height &gt; other.height
-    }
-}
-<span class="boring">
-</span><span class="boring">fn main() {
-</span><span class="boring">    let rect1 = Rectangle {
-</span><span class="boring">        width: 30,
-</span><span class="boring">        height: 50,
-</span><span class="boring">    };
-</span><span class="boring">    let rect2 = Rectangle {
-</span><span class="boring">        width: 10,
-</span><span class="boring">        height: 40,
-</span><span class="boring">    };
-</span><span class="boring">    let rect3 = Rectangle {
-</span><span class="boring">        width: 60,
-</span><span class="boring">        height: 45,
-</span><span class="boring">    };
-</span><span class="boring">
-</span><span class="boring">    println!(&quot;Can rect1 hold rect2? {}&quot;, rect1.can_hold(&amp;rect2));
-</span><span class="boring">    println!(&quot;Can rect1 hold rect3? {}&quot;, rect1.can_hold(&amp;rect3));
-</span><span class="boring">}</span></code></pre></pre>
-<p><span class="caption">Listing 5-15: Implementing the <code>can_hold</code> method on
-<code>Rectangle</code> that takes another <code>Rectangle</code> instance as a parameter</span></p>
-<p>When we run this code with the <code>main</code> function in Listing 5-14, we’ll get our
-desired output. Methods can take multiple parameters that we add to the
-signature after the <code>self</code> parameter, and those parameters work just like
-parameters in functions.</p>
-<h3 id="associated-functions"><a class="header" href="#associated-functions">Associated Functions</a></h3>
-<p>All functions defined within an <code>impl</code> block are called <em>associated functions</em>
-because they’re associated with the type named after the <code>impl</code>. We can define
-associated functions that don’t have <code>self</code> as their first parameter (and thus
-are not methods) because they don’t need an instance of the type to work with.
-We’ve already used one function like this: the <code>String::from</code> function that’s
-defined on the <code>String</code> type.</p>
-<p>Associated functions that aren’t methods are often used for constructors that
-will return a new instance of the struct. These are often called <code>new</code>, but
-<code>new</code> isn’t a special name and isn’t built into the language. For example, we
-could choose to provide an associated function named <code>square</code> that would have
-one dimension parameter and use that as both width and height, thus making it
-easier to create a square <code>Rectangle</code> rather than having to specify the same
-value twice:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#[derive(Debug)]
-</span><span class="boring">struct Rectangle {
-</span><span class="boring">    width: u32,
-</span><span class="boring">    height: u32,
-</span><span class="boring">}
-</span><span class="boring">
-</span>impl Rectangle {
-    fn square(size: u32) -&gt; Self {
-        Self {
-            width: size,
-            height: size,
-        }
-    }
-}
-<span class="boring">
-</span><span class="boring">fn main() {
-</span><span class="boring">    let sq = Rectangle::square(3);
-</span><span class="boring">}</span></code></pre></pre>
-<p>The <code>Self</code> keywords in the return type and in the body of the function are
-aliases for the type that appears after the <code>impl</code> keyword, which in this case
-is <code>Rectangle</code>.</p>
-<p>To call this associated function, we use the <code>::</code> syntax with the struct name;
-<code>let sq = Rectangle::square(3);</code> is an example. This function is namespaced by
-the struct: the <code>::</code> syntax is used for both associated functions and
-namespaces created by modules. We’ll discuss modules in <a href="ch07-02-ArrayProcessing.html">Chapter
-7</a><!-- ignore -->.</p>
-<h3 id="multiple-impl-blocks"><a class="header" href="#multiple-impl-blocks">Multiple <code>impl</code> Blocks</a></h3>
-<p>Each struct is allowed to have multiple <code>impl</code> blocks. For example, Listing
-5-15 is equivalent to the code shown in Listing 5-16, which has each method in
-its own <code>impl</code> block.</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#[derive(Debug)]
-</span><span class="boring">struct Rectangle {
-</span><span class="boring">    width: u32,
-</span><span class="boring">    height: u32,
-</span><span class="boring">}
-</span><span class="boring">
-</span>impl Rectangle {
-    fn area(&amp;self) -&gt; u32 {
-        self.width * self.height
-    }
-}
 
-impl Rectangle {
-    fn can_hold(&amp;self, other: &amp;Rectangle) -&gt; bool {
-        self.width &gt; other.width &amp;&amp; self.height &gt; other.height
+                        <h3 class="exercise">Exercise 5.7:</h3>
+                        <p>Rewrite the program from the previous exercise
+                            so that it administers a quiz with several different kinds of questions.
+                            In the previous exercise, you used
+                            a class to represent addition questions.  For this exercise, you will use the following <span class="code">interface</span>,
+                            or an equivalent abstract class, to represent the more general idea of a question that has
+                            an integer as its answer:</p>
+
+                        <pre><code class="java">public interface IntQuestion {
+    public String getQuestion();
+    public int getCorrectAnswer();
+}</code></pre>
+
+                        <p>You can make the <span class="classname">AdditionQuestion</span> class implement the interface
+                            simply by adding "<span class="code">implements IntQuestion</span>" to its definition.  Write a similar
+                            class to represent subtraction questions.  When creating a subtraction problem, you should make
+                            sure that the answer is not negative.</p>
+
+                        <p>For the new program, use an array of type <span class="atype">IntQuestion[]</span> to hold the quiz
+                            questions.  Include some addition questions and some subtraction questions in the quiz.
+                            You can also add a couple non-math questions, including this one, created as an anonymous class:</p>
+
+                        <pre><code class="java">IntQuestion bigQuestion = new IntQuestion() {
+    public String getQuestion() {
+        return "What is the answer to the ultimate question " +
+                 " of life, the universe, and everything?";
     }
-}
-<span class="boring">
-</span><span class="boring">fn main() {
-</span><span class="boring">    let rect1 = Rectangle {
-</span><span class="boring">        width: 30,
-</span><span class="boring">        height: 50,
-</span><span class="boring">    };
-</span><span class="boring">    let rect2 = Rectangle {
-</span><span class="boring">        width: 10,
-</span><span class="boring">        height: 40,
-</span><span class="boring">    };
-</span><span class="boring">    let rect3 = Rectangle {
-</span><span class="boring">        width: 60,
-</span><span class="boring">        height: 45,
-</span><span class="boring">    };
-</span><span class="boring">
-</span><span class="boring">    println!(&quot;Can rect1 hold rect2? {}&quot;, rect1.can_hold(&amp;rect2));
-</span><span class="boring">    println!(&quot;Can rect1 hold rect3? {}&quot;, rect1.can_hold(&amp;rect3));
-</span><span class="boring">}</span></code></pre></pre>
-<p><span class="caption">Listing 5-16: Rewriting Listing 5-15 using multiple <code>impl</code>
-blocks</span></p>
-<p>There’s no reason to separate these methods into multiple <code>impl</code> blocks here,
-but this is valid syntax. We’ll see a case in which multiple <code>impl</code> blocks are
-useful in Chapter 10, where we discuss generic types and traits.</p>
-<h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
-<p>Structs let you create custom types that are meaningful for your domain. By
-using structs, you can keep associated pieces of data connected to each other
-and name each piece to make your code clear. In <code>impl</code> blocks, you can define
-functions that are associated with your type, and methods are a kind of
-associated function that let you specify the behavior that instances of your
-structs have.</p>
-<p>But structs aren’t the only way you can create custom types: let’s turn to
-Rust’s enum feature to add another tool to your toolbox.</p>
+    public int getCorrectAnswer() {
+        return 42;
+    }
+};</code></pre>
 
                     </main>
 

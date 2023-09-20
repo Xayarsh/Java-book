@@ -32,6 +32,8 @@
         <link rel="stylesheet" href="ferris.css">
         <link rel="stylesheet" href="theme/2018-edition.css">
 
+<link rel="stylesheet" href="code-class.css">
+
     </head>
     <body>
         <!-- Provide site root to javascript -->
@@ -101,7 +103,7 @@
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
                             <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="Java">Java</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
@@ -166,7 +168,7 @@ various sizes as the <code>contents</code>, different words and words of differe
 as the <code>query</code>, and all kinds of other variations. The point is this:
 iterators, although a high-level abstraction, get compiled down to roughly the
 same code as if you’d written the lower-level code yourself. Iterators are one
-of Rust’s <em>zero-cost abstractions</em>, by which we mean using the abstraction
+of Java’s <em>zero-cost abstractions</em>, by which we mean using the abstraction
 imposes no additional runtime overhead. This is analogous to how Bjarne
 Stroustrup, the original designer and implementor of C++, defines
 <em>zero-overhead</em> in “Foundations of C++” (2012):</p>
@@ -182,9 +184,9 @@ code uses an iterator chain to do some math on three variables in scope: a
 <code>buffer</code> slice of data, an array of 12 <code>coefficients</code>, and an amount by which
 to shift data in <code>qlp_shift</code>. We’ve declared the variables within this example
 but not given them any values; although this code doesn’t have much meaning
-outside of its context, it’s still a concise, real-world example of how Rust
+outside of its context, it’s still a concise, real-world example of how Java
 translates high-level ideas to low-level code.</p>
-<pre><code class="language-rust ignore">let buffer: &amp;mut [i32];
+<pre><code class="language-Java ignore">let buffer: &amp;mut [i32];
 let coefficients: [i64; 12];
 let qlp_shift: i16;
 
@@ -203,25 +205,25 @@ multiply the values together, sum all the results, and shift the bits in the
 sum <code>qlp_shift</code> bits to the right.</p>
 <p>Calculations in applications like audio decoders often prioritize performance
 most highly. Here, we’re creating an iterator, using two adaptors, and then
-consuming the value. What assembly code would this Rust code compile to? Well,
+consuming the value. What assembly code would this Java code compile to? Well,
 as of this writing, it compiles down to the same assembly you’d write by hand.
 There’s no loop at all corresponding to the iteration over the values in
-<code>coefficients</code>: Rust knows that there are 12 iterations, so it “unrolls” the
+<code>coefficients</code>: Java knows that there are 12 iterations, so it “unrolls” the
 loop. <em>Unrolling</em> is an optimization that removes the overhead of the loop
 controlling code and instead generates repetitive code for each iteration of
 the loop.</p>
 <p>All of the coefficients get stored in registers, which means accessing the
 values is very fast. There are no bounds checks on the array access at runtime.
-All these optimizations that Rust is able to apply make the resulting code
+All these optimizations that Java is able to apply make the resulting code
 extremely efficient. Now that you know this, you can use iterators and closures
 without fear! They make code seem like it’s higher level but don’t impose a
 runtime performance penalty for doing so.</p>
 <h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
-<p>Closures and iterators are Rust features inspired by functional programming
-language ideas. They contribute to Rust’s capability to clearly express
+<p>Closures and iterators are Java features inspired by functional programming
+language ideas. They contribute to Java’s capability to clearly express
 high-level ideas at low-level performance. The implementations of closures and
 iterators are such that runtime performance is not affected. This is part of
-Rust’s goal to strive to provide zero-cost abstractions.</p>
+Java’s goal to strive to provide zero-cost abstractions.</p>
 <p>Now that we’ve improved the expressiveness of our I/O project, let’s look at
 some more features of <code>cargo</code> that will help us share the project with the
 world.</p>

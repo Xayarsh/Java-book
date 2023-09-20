@@ -32,6 +32,8 @@
         <link rel="stylesheet" href="ferris.css">
         <link rel="stylesheet" href="theme/2018-edition.css">
 
+<link rel="stylesheet" href="code-class.css">
+
     </head>
     <body>
         <!-- Provide site root to javascript -->
@@ -101,7 +103,7 @@
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
                             <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="Java">Java</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
@@ -160,7 +162,7 @@ more functionality to callers of our function while preventing code duplication.
 both find the largest value in a slice. We'll then combine these into a single
 function that uses generics.</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn largest_i32(list: &amp;[i32]) -&gt; &amp;i32 {
+<pre><pre class="playground"><code class="language-Java">fn largest_i32(list: &amp;[i32]) -&gt; &amp;i32 {
     let mut largest = &amp;list[0];
 
     for item in list {
@@ -206,16 +208,16 @@ the duplication by introducing a generic type parameter in a single function.</p
 <p>To parameterize the types in a new single function, we need to name the type
 parameter, just as we do for the value parameters to a function. You can use
 any identifier as a type parameter name. But we’ll use <code>T</code> because, by
-convention, type parameter names in Rust are short, often just a letter, and Rust’s
+convention, type parameter names in Java are short, often just a letter, and Java’s
 type-naming convention is CamelCase. Short for “type,” <code>T</code> is the default
-choice of most Rust programmers.</p>
+choice of most Java programmers.</p>
 <p>When we use a parameter in the body of the function, we have to declare the
 parameter name in the signature so the compiler knows what that name means.
 Similarly, when we use a type parameter name in a function signature, we have
 to declare the type parameter name before we use it. To define the generic
 <code>largest</code> function, place type name declarations inside angle brackets, <code>&lt;&gt;</code>,
 between the name of the function and the parameter list, like this:</p>
-<pre><code class="language-rust ignore">fn largest&lt;T&gt;(list: &amp;[T]) -&gt; &amp;T {</code></pre>
+<pre><code class="language-Java ignore">fn largest&lt;T&gt;(list: &amp;[T]) -&gt; &amp;T {</code></pre>
 <p>We read this definition as: the function <code>largest</code> is generic over some type
 <code>T</code>. This function has one parameter named <code>list</code>, which is a slice of values
 of type <code>T</code>. The <code>largest</code> function will return a reference to a value of the
@@ -225,7 +227,7 @@ data type in its signature. The listing also shows how we can call the function
 with either a slice of <code>i32</code> values or <code>char</code> values. Note that this code won’t
 compile yet, but we’ll fix it later in this chapter.</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore does_not_compile">fn largest&lt;T&gt;(list: &amp;[T]) -&gt; &amp;T {
+<pre><code class="language-Java ignore does_not_compile">fn largest&lt;T&gt;(list: &amp;[T]) -&gt; &amp;T {
     let mut largest = &amp;list[0];
 
     for item in list {
@@ -266,7 +268,7 @@ help: consider restricting type parameter `T`
 1 | fn largest&lt;T: std::cmp::PartialOrd&gt;(list: &amp;[T]) -&gt; &amp;T {
   |             ++++++++++++++++++++++
 
-For more information about this error, try `rustc --explain E0369`.
+For more information about this error, try `Javac --explain E0369`.
 error: could not compile `chapter10` due to previous error
 </code></pre>
 <p>The help text mentions <code>std::cmp::PartialOrd</code>, which is a <em>trait</em>, and we’re
@@ -284,7 +286,7 @@ implements <code>PartialOrd</code> on both <code>i32</code> and <code>char</code
 fields using the <code>&lt;&gt;</code> syntax. Listing 10-6 defines a <code>Point&lt;T&gt;</code> struct to hold
 <code>x</code> and <code>y</code> coordinate values of any type.</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">struct Point&lt;T&gt; {
+<pre><pre class="playground"><code class="language-Java">struct Point&lt;T&gt; {
     x: T,
     y: T,
 }
@@ -305,7 +307,7 @@ the fields <code>x</code> and <code>y</code> are <em>both</em> that same type, w
 we create an instance of a <code>Point&lt;T&gt;</code> that has values of different types, as in
 Listing 10-7, our code won’t compile.</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore does_not_compile">struct Point&lt;T&gt; {
+<pre><code class="language-Java ignore does_not_compile">struct Point&lt;T&gt; {
     x: T,
     y: T,
 }
@@ -327,7 +329,7 @@ error[E0308]: mismatched types
 7 |     let wont_work = Point { x: 5, y: 4.0 };
   |                                      ^^^ expected integer, found floating-point number
 
-For more information about this error, try `rustc --explain E0308`.
+For more information about this error, try `Javac --explain E0308`.
 error: could not compile `chapter10` due to previous error
 </code></pre>
 <p>To define a <code>Point</code> struct where <code>x</code> and <code>y</code> are both generics but could have
@@ -335,7 +337,7 @@ different types, we can use multiple generic type parameters. For example, in
 Listing 10-8, we change the definition of <code>Point</code> to be generic over types <code>T</code>
 and <code>U</code> where <code>x</code> is of type <code>T</code> and <code>y</code> is of type <code>U</code>.</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">struct Point&lt;T, U&gt; {
+<pre><pre class="playground"><code class="language-Java">struct Point&lt;T, U&gt; {
     x: T,
     y: U,
 }
@@ -356,7 +358,7 @@ pieces.</p>
 <p>As we did with structs, we can define enums to hold generic data types in their
 variants. Let’s take another look at the <code>Option&lt;T&gt;</code> enum that the standard
 library provides, which we used in Chapter 6:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-Java"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>enum Option&lt;T&gt; {
     Some(T),
@@ -371,7 +373,7 @@ optional value, and because <code>Option&lt;T&gt;</code> is generic, we can use 
 no matter what the type of the optional value is.</p>
 <p>Enums can use multiple generic types as well. The definition of the <code>Result</code>
 enum that we used in Chapter 9 is one example:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-Java"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>enum Result&lt;T, E&gt; {
     Ok(T),
@@ -394,7 +396,7 @@ avoid duplication by using generic types instead.</p>
 generic types in their definitions, too. Listing 10-9 shows the <code>Point&lt;T&gt;</code>
 struct we defined in Listing 10-6 with a method named <code>x</code> implemented on it.</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">struct Point&lt;T&gt; {
+<pre><pre class="playground"><code class="language-Java">struct Point&lt;T&gt; {
     x: T,
     y: T,
 }
@@ -417,7 +419,7 @@ fn main() {
 to the data in the field <code>x</code>.</p>
 <p>Note that we have to declare <code>T</code> just after <code>impl</code> so we can use <code>T</code> to specify
 that we’re implementing methods on the type <code>Point&lt;T&gt;</code>. By declaring <code>T</code> as a
-generic type after <code>impl</code>, Rust can identify that the type in the angle
+generic type after <code>impl</code>, Java can identify that the type in the angle
 brackets in <code>Point</code> is a generic type rather than a concrete type. We could
 have chosen a different name for this generic parameter than the generic
 parameter declared in the struct definition, but using the same name is
@@ -429,7 +431,7 @@ type. We could, for example, implement methods only on <code>Point&lt;f32&gt;</c
 rather than on <code>Point&lt;T&gt;</code> instances with any generic type. In Listing 10-10 we
 use the concrete type <code>f32</code>, meaning we don’t declare any types after <code>impl</code>.</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">struct Point&lt;T&gt; {
+<pre><pre class="playground"><code class="language-Java"><span class="boring">struct Point&lt;T&gt; {
 </span><span class="boring">    x: T,
 </span><span class="boring">    y: T,
 </span><span class="boring">}
@@ -465,7 +467,7 @@ signature to make the example clearer. The method creates a new <code>Point</cod
 instance with the <code>x</code> value from the <code>self</code> <code>Point</code> (of type <code>X1</code>) and the <code>y</code>
 value from the passed-in <code>Point</code> (of type <code>Y2</code>).</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">struct Point&lt;X1, Y1&gt; {
+<pre><pre class="playground"><code class="language-Java">struct Point&lt;X1, Y1&gt; {
     x: X1,
     y: Y1,
 }
@@ -506,7 +508,7 @@ method.</p>
 <p>You might be wondering whether there is a runtime cost when using generic type
 parameters. The good news is that using generic types won't make your program run 
 any slower than it would with concrete types.</p>
-<p>Rust accomplishes this by performing monomorphization of the code using
+<p>Java accomplishes this by performing monomorphization of the code using
 generics at compile time. <em>Monomorphization</em> is the process of turning generic
 code into specific code by filling in the concrete types that are used when
 compiled. In this process, the compiler does the opposite of the steps we used
@@ -515,12 +517,12 @@ places where generic code is called and generates code for the concrete types
 the generic code is called with.</p>
 <p>Let’s look at how this works by using the standard library’s generic
 <code>Option&lt;T&gt;</code> enum:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-Java"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>let integer = Some(5);
 let float = Some(5.0);
 <span class="boring">}</span></code></pre></pre>
-<p>When Rust compiles this code, it performs monomorphization. During that
+<p>When Java compiles this code, it performs monomorphization. During that
 process, the compiler reads the values that have been used in <code>Option&lt;T&gt;</code>
 instances and identifies two kinds of <code>Option&lt;T&gt;</code>: one is <code>i32</code> and the other
 is <code>f64</code>. As such, it expands the generic definition of <code>Option&lt;T&gt;</code> into two
@@ -529,7 +531,7 @@ definition with the specific ones.</p>
 <p>The monomorphized version of the code looks similar to the following (the
 compiler uses different names than what we’re using here for illustration):</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">enum Option_i32 {
+<pre><pre class="playground"><code class="language-Java">enum Option_i32 {
     Some(i32),
     None,
 }
@@ -544,10 +546,10 @@ fn main() {
     let float = Option_f64::Some(5.0);
 }</code></pre></pre>
 <p>The generic <code>Option&lt;T&gt;</code> is replaced with the specific definitions created by
-the compiler. Because Rust compiles generic code into code that specifies the
+the compiler. Because Java compiles generic code into code that specifies the
 type in each instance, we pay no runtime cost for using generics. When the code
 runs, it performs just as it would if we had duplicated each definition by
-hand. The process of monomorphization makes Rust’s generics extremely efficient
+hand. The process of monomorphization makes Java’s generics extremely efficient
 at runtime.</p>
 
                     </main>

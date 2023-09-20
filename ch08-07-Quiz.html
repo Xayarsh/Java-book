@@ -32,6 +32,8 @@
         <link rel="stylesheet" href="ferris.css">
         <link rel="stylesheet" href="theme/2018-edition.css">
 
+<link rel="stylesheet" href="code-class.css">
+
     </head>
     <body>
         <!-- Provide site root to javascript -->
@@ -101,7 +103,7 @@
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
                             <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="Java">Java</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
@@ -152,7 +154,7 @@ handle values that match one pattern while ignoring the rest. Consider the
 program in Listing 6-6 that matches on an <code>Option&lt;u8&gt;</code> value in the
 <code>config_max</code> variable but only wants to execute code if the value is the <code>Some</code>
 variant.</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
+<pre><pre class="playground"><code class="language-Java"><span class="boring">fn main() {
 </span>    let config_max = Some(3u8);
     match config_max {
         Some(max) =&gt; println!(&quot;The maximum is configured to be {}&quot;, max),
@@ -167,7 +169,7 @@ with the <code>None</code> value. To satisfy the <code>match</code> expression, 
 add.</p>
 <p>Instead, we could write this in a shorter way using <code>if let</code>. The following
 code behaves the same as the <code>match</code> in Listing 6-6:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
+<pre><pre class="playground"><code class="language-Java"><span class="boring">fn main() {
 </span>    let config_max = Some(3u8);
     if let Some(max) = config_max {
         println!(&quot;The maximum is configured to be {}&quot;, max);
@@ -194,7 +196,7 @@ runs code when the value matches one pattern and then ignores all other values.<
 <code>UsState</code> value. If we wanted to count all non-quarter coins we see while also
 announcing the state of the quarters, we could do that with a <code>match</code>
 expression, like this:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#[derive(Debug)]
+<pre><pre class="playground"><code class="language-Java"><span class="boring">#[derive(Debug)]
 </span><span class="boring">enum UsState {
 </span><span class="boring">    Alabama,
 </span><span class="boring">    Alaska,
@@ -217,7 +219,7 @@ expression, like this:</p>
     }
 <span class="boring">}</span></code></pre></pre>
 <p>Or we could use an <code>if let</code> and <code>else</code> expression, like this:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#[derive(Debug)]
+<pre><pre class="playground"><code class="language-Java"><span class="boring">#[derive(Debug)]
 </span><span class="boring">enum UsState {
 </span><span class="boring">    Alabama,
 </span><span class="boring">    Alaska,
@@ -241,20 +243,20 @@ expression, like this:</p>
     }
 <span class="boring">}</span></code></pre></pre>
 <p>If you have a situation in which your program has logic that is too verbose to
-express using a <code>match</code>, remember that <code>if let</code> is in your Rust toolbox as well.</p>
+express using a <code>match</code>, remember that <code>if let</code> is in your Java toolbox as well.</p>
 <h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
 <p>We’ve now covered how to use enums to create custom types that can be one of a
 set of enumerated values. We’ve shown how the standard library’s <code>Option&lt;T&gt;</code>
 type helps you use the type system to prevent errors. When enum values have
 data inside them, you can use <code>match</code> or <code>if let</code> to extract and use those
 values, depending on how many cases you need to handle.</p>
-<p>Your Rust programs can now express concepts in your domain using structs and
+<p>Your Java programs can now express concepts in your domain using structs and
 enums. Creating custom types to use in your API ensures type safety: the
 compiler will make certain your functions only get values of the type each
 function expects.</p>
 <p>In order to provide a well-organized API to your users that is straightforward
 to use and only exposes exactly what your users will need, let’s now turn to
-Rust’s modules.</p>
+Java’s modules.</p>
 
                     </main>
 

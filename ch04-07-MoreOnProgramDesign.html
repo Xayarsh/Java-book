@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>The Slice Type - Introduction to Programming Using Java</title>
+        <title>More on Program Design - Introduction to Programming Using Java</title>
 
 
         <!-- Custom HTML head -->
@@ -31,6 +31,8 @@
         <!-- Custom theme stylesheets -->
         <link rel="stylesheet" href="ferris.css">
         <link rel="stylesheet" href="theme/2018-edition.css">
+
+<link rel="stylesheet" href="code-class.css">
 
     </head>
     <body>
@@ -101,7 +103,7 @@
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
                             <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="Java">Java</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
@@ -146,408 +148,492 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h2 id="the-slice-type"><a class="header" href="#the-slice-type">The Slice Type</a></h2>
-<p><em>Slices</em> let you reference a contiguous sequence of elements in a collection
-rather than the whole collection. A slice is a kind of reference, so it does
-not have ownership.</p>
-<p>Here’s a small programming problem: write a function that takes a string of
-words separated by spaces and returns the first word it finds in that string.
-If the function doesn’t find a space in the string, the whole string must be
-one word, so the entire string should be returned.</p>
-<p>Let’s work through how we’d write the signature of this function without using
-slices, to understand the problem that slices will solve:</p>
-<pre><code class="language-rust ignore">fn first_word(s: &amp;String) -&gt; ?</code></pre>
-<p>The <code>first_word</code> function has a <code>&amp;String</code> as a parameter. We don’t want
-ownership, so this is fine. But what should we return? We don’t really have a
-way to talk about <em>part</em> of a string. However, we could return the index of the
-end of the word, indicated by a space. Let’s try that, as shown in Listing 4-7.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn first_word(s: &amp;String) -&gt; usize {
-    let bytes = s.as_bytes();
+                        <h2 id="More on Program Design"><a class="header" href="#More on Program Design">More on Program Design</a></h2>
+                        <p>
+                            Understanding how programs work is one thing.
+                            Designing a program to perform some particular task is another thing
+                            altogether. In <a href="ch03-02-AlgorithmDevelopment.html">Section&nbsp;3.2</a>, I discussed how pseudocode and
+                            stepwise refinement can be used to methodically develop an algorithm. We can
+                            now see how subroutines can fit into the process.</p>
 
-    for (i, &amp;item) in bytes.iter().enumerate() {
-        if item == b' ' {
-            return i;
-        }
-    }
 
-    s.len()
-}
-<span class="boring">
-</span><span class="boring">fn main() {}</span></code></pre></pre>
-<p><span class="caption">Listing 4-7: The <code>first_word</code> function that returns a
-byte index value into the <code>String</code> parameter</span></p>
-<p>Because we need to go through the <code>String</code> element by element and check whether
-a value is a space, we’ll convert our <code>String</code> to an array of bytes using the
-<code>as_bytes</code> method.</p>
-<pre><code class="language-rust ignore"><span class="boring">fn first_word(s: &amp;String) -&gt; usize {
-</span>    let bytes = s.as_bytes();
-<span class="boring">
-</span><span class="boring">    for (i, &amp;item) in bytes.iter().enumerate() {
-</span><span class="boring">        if item == b' ' {
-</span><span class="boring">            return i;
-</span><span class="boring">        }
-</span><span class="boring">    }
-</span><span class="boring">
-</span><span class="boring">    s.len()
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">fn main() {}</span></code></pre>
-<p>Next, we create an iterator over the array of bytes using the <code>iter</code> method:</p>
-<pre><code class="language-rust ignore"><span class="boring">fn first_word(s: &amp;String) -&gt; usize {
-</span><span class="boring">    let bytes = s.as_bytes();
-</span><span class="boring">
-</span>    for (i, &amp;item) in bytes.iter().enumerate() {
-<span class="boring">        if item == b' ' {
-</span><span class="boring">            return i;
-</span><span class="boring">        }
-</span><span class="boring">    }
-</span><span class="boring">
-</span><span class="boring">    s.len()
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">fn main() {}</span></code></pre>
-<p>We’ll discuss iterators in more detail in <a href="ch13-02-FancierGraphics.html">Chapter 13</a><!-- ignore -->.
-For now, know that <code>iter</code> is a method that returns each element in a collection
-and that <code>enumerate</code> wraps the result of <code>iter</code> and returns each element as
-part of a tuple instead. The first element of the tuple returned from
-<code>enumerate</code> is the index, and the second element is a reference to the element.
-This is a bit more convenient than calculating the index ourselves.</p>
-<p>Because the <code>enumerate</code> method returns a tuple, we can use patterns to
-destructure that tuple. We’ll be discussing patterns more in <a href="ch06-02-BasicClasses.html#patterns-that-bind-to-values">Chapter
-6</a><!-- ignore -->. In the <code>for</code> loop, we specify a pattern that has <code>i</code>
-for the index in the tuple and <code>&amp;item</code> for the single byte in the tuple.
-Because we get a reference to the element from <code>.iter().enumerate()</code>, we use
-<code>&amp;</code> in the pattern.</p>
-<p>Inside the <code>for</code> loop, we search for the byte that represents the space by
-using the byte literal syntax. If we find a space, we return the position.
-Otherwise, we return the length of the string by using <code>s.len()</code>.</p>
-<pre><code class="language-rust ignore"><span class="boring">fn first_word(s: &amp;String) -&gt; usize {
-</span><span class="boring">    let bytes = s.as_bytes();
-</span><span class="boring">
-</span><span class="boring">    for (i, &amp;item) in bytes.iter().enumerate() {
-</span>        if item == b' ' {
-            return i;
-        }
-    }
+                        <p>Stepwise refinement is inherently a top-down process, but the process does
+                            have a "bottom," that is, a point at which you stop refining the pseudocode
+                            algorithm and translate what you have directly into proper program code.
+                            In the absence of subroutines, the process would not bottom out until
+                            you get down to the level of assignment statements and very primitive
+                            input/output operations. But if you have subroutines lying around to perform
+                            certain useful tasks, you can stop refining as soon as you've managed to
+                            express your algorithm in terms of those tasks.</p>
 
-    s.len()
-<span class="boring">}
-</span><span class="boring">
-</span><span class="boring">fn main() {}</span></code></pre>
-<p>We now have a way to find out the index of the end of the first word in the
-string, but there’s a problem. We’re returning a <code>usize</code> on its own, but it’s
-only a meaningful number in the context of the <code>&amp;String</code>. In other words,
-because it’s a separate value from the <code>String</code>, there’s no guarantee that it
-will still be valid in the future. Consider the program in Listing 4-8 that
-uses the <code>first_word</code> function from Listing 4-7.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn first_word(s: &amp;String) -&gt; usize {
-</span><span class="boring">    let bytes = s.as_bytes();
-</span><span class="boring">
-</span><span class="boring">    for (i, &amp;item) in bytes.iter().enumerate() {
-</span><span class="boring">        if item == b' ' {
-</span><span class="boring">            return i;
-</span><span class="boring">        }
-</span><span class="boring">    }
-</span><span class="boring">
-</span><span class="boring">    s.len()
-</span><span class="boring">}
-</span><span class="boring">
-</span>fn main() {
-    let mut s = String::from(&quot;hello world&quot;);
 
-    let word = first_word(&amp;s); // word will get the value 5
+                        <p>This allows you to add a bottom-up element to the top-down approach of
+                            stepwise refinement. Given a problem, you might start by writing some
+                            subroutines that perform tasks relevant to the problem domain. The subroutines
+                            become a toolbox of ready-made tools that you can integrate into your algorithm
+                            as you develop it. (Alternatively, you might be able to buy or find a software
+                            toolbox written by someone else, containing subroutines that you can use in
+                            your project as black boxes.)</p>
 
-    s.clear(); // this empties the String, making it equal to &quot;&quot;
 
-    // word still has the value 5 here, but there's no more string that
-    // we could meaningfully use the value 5 with. word is now totally invalid!
-}</code></pre></pre>
-<p><span class="caption">Listing 4-8: Storing the result from calling the
-<code>first_word</code> function and then changing the <code>String</code> contents</span></p>
-<p>This program compiles without any errors and would also do so if we used <code>word</code>
-after calling <code>s.clear()</code>. Because <code>word</code> isn’t connected to the state of <code>s</code>
-at all, <code>word</code> still contains the value <code>5</code>. We could use that value <code>5</code> with
-the variable <code>s</code> to try to extract the first word out, but this would be a bug
-because the contents of <code>s</code> have changed since we saved <code>5</code> in <code>word</code>.</p>
-<p>Having to worry about the index in <code>word</code> getting out of sync with the data in
-<code>s</code> is tedious and error prone! Managing these indices is even more brittle if
-we write a <code>second_word</code> function. Its signature would have to look like this:</p>
-<pre><code class="language-rust ignore">fn second_word(s: &amp;String) -&gt; (usize, usize) {</code></pre>
-<p>Now we’re tracking a starting <em>and</em> an ending index, and we have even more
-values that were calculated from data in a particular state but aren’t tied to
-that state at all. We have three unrelated variables floating around that need
-to be kept in sync.</p>
-<p>Luckily, Rust has a solution to this problem: string slices.</p>
-<h3 id="string-slices"><a class="header" href="#string-slices">String Slices</a></h3>
-<p>A <em>string slice</em> is a reference to part of a <code>String</code>, and it looks like this:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
-</span>    let s = String::from(&quot;hello world&quot;);
+                        <p>Subroutines can also be helpful even in a strict top-down approach. As you
+                            refine your algorithm, you are free at any point to take any sub-task in the
+                            algorithm and make it into a subroutine. Developing that subroutine then
+                            becomes a separate problem, which you can work on separately. Your main
+                            algorithm will merely call the subroutine. This, of course, is just a way of
+                            breaking your problem down into separate, smaller problems. It is still a
+                            top-down approach because the top-down analysis of the problem tells you what
+                            subroutines to write. In the bottom-up approach, you start by writing or
+                            obtaining subroutines that are relevant to the problem domain, and you build
+                            your solution to the problem on top of that foundation of subroutines.</p>
 
-    let hello = &amp;s[0..5];
-    let world = &amp;s[6..11];
-<span class="boring">}</span></code></pre></pre>
-<p>Rather than a reference to the entire <code>String</code>, <code>hello</code> is a reference to a
-portion of the <code>String</code>, specified in the extra <code>[0..5]</code> bit. We create slices
-using a range within brackets by specifying <code>[starting_index..ending_index]</code>,
-where <code>starting_index</code> is the first position in the slice and <code>ending_index</code> is
-one more than the last position in the slice. Internally, the slice data
-structure stores the starting position and the length of the slice, which
-corresponds to <code>ending_index</code> minus <code>starting_index</code>. So, in the case of <code>let world = &amp;s[6..11];</code>, <code>world</code> would be a slice that contains a pointer to the
-byte at index 6 of <code>s</code> with a length value of <code>5</code>.</p>
-<p>Figure 4-6 shows this in a diagram.</p>
-<p><img alt="Three tables: a table representing the stack data of s, which points
-to the byte at index 0 in a table of the string data &quot;hello world&quot; on
-the heap. The third table rep-resents the stack data of the slice world, which
-has a length value of 5 and points to byte 6 of the heap data table."
-src="img/trpl04-06.svg" class="center" style="width: 50%;" /></p>
-<p><span class="caption">Figure 4-6: String slice referring to part of a
-<code>String</code></span></p>
-<p>With Rust’s <code>..</code> range syntax, if you want to start at index 0, you can drop
-the value before the two periods. In other words, these are equal:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>let s = String::from(&quot;hello&quot;);
+                        <h3 id="Preconditions and Postconditions"><a class="header" href="#Preconditions and Postconditions">Preconditions and Postconditions</a></h3>
 
-let slice = &amp;s[0..2];
-let slice = &amp;s[..2];
-<span class="boring">}</span></code></pre></pre>
-<p>By the same token, if your slice includes the last byte of the <code>String</code>, you
-can drop the trailing number. That means these are equal:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>let s = String::from(&quot;hello&quot;);
+                        <p>When working with subroutines as building blocks, it is important to be
+                            clear about how a subroutine interacts with the rest of the program. This
+                            interaction is specified by the <span class="newword">contract</span> of the
+                            subroutine, as discussed in <a href="ch04-01-BlackBoxes.html">Section&nbsp;4.1</a>. A convenient
+                            way to express the contract of a subroutine is in terms of
+                            <span class="newword">preconditions</span> and <span class="newword">postconditions</span>.</p>
 
-let len = s.len();
 
-let slice = &amp;s[3..len];
-let slice = &amp;s[3..];
-<span class="boring">}</span></code></pre></pre>
-<p>You can also drop both values to take a slice of the entire string. So these
-are equal:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>let s = String::from(&quot;hello&quot;);
+                        <p>A precondition of a subroutine is something that must be true when the
+                            subroutine is called, if the subroutine is to work correctly. For example, for
+                            the built-in function <span class="code">Math.sqrt(x)</span>, a precondition is that the
+                            parameter, <span class="code">x</span>, is greater than or equal to zero, since it is not
+                            possible to take the square root of a negative number. In terms of a contract,
+                            a precondition represents an obligation of the <i>caller</i> of the subroutine.
+                            If you call a subroutine without meeting its precondition, then there is no
+                            reason to expect it to work properly. The program might crash or give incorrect
+                            results, but you can only blame yourself, not the subroutine, because you
+                            haven't lived up to your side of the deal.</p>
 
-let len = s.len();
 
-let slice = &amp;s[0..len];
-let slice = &amp;s[..];
-<span class="boring">}</span></code></pre></pre>
-<blockquote>
-<p>Note: String slice range indices must occur at valid UTF-8 character
-boundaries. If you attempt to create a string slice in the middle of a
-multibyte character, your program will exit with an error. For the purposes
-of introducing string slices, we are assuming ASCII only in this section; a
-more thorough discussion of UTF-8 handling is in the <a href="ch08-02-WritingCorrectPrograms.html#storing-utf-8-encoded-text-with-strings">“Storing UTF-8 Encoded
-Text with Strings”</a><!-- ignore --> section of Chapter 8.</p>
-</blockquote>
-<p>With all this information in mind, let’s rewrite <code>first_word</code> to return a
-slice. The type that signifies “string slice” is written as <code>&amp;str</code>:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">fn first_word(s: &amp;String) -&gt; &amp;str {
-    let bytes = s.as_bytes();
+                        <p>A postcondition of a subroutine represents the other side of the contract.
+                            It represents an obligation of the subroutine.
+                            It is something that will be true after the subroutine has run (assuming that
+                            its preconditions were met&mdash;and that there are no bugs in the subroutine).
+                            The postcondition of the function <span class="code">Math.sqrt()</span> is that the square of
+                            the value that is returned by this function is equal to the parameter that is
+                            provided when the subroutine is called. Of course, this will only be true if
+                            the precondition&mdash;that the parameter is greater than or equal to zero&mdash;is
+                            met. A postcondition of the built-in subroutine <span class="code">System.out.print(x)</span> is
+                            that the value of the parameter has been displayed on the screen.</p>
 
-    for (i, &amp;item) in bytes.iter().enumerate() {
-        if item == b' ' {
-            return &amp;s[0..i];
-        }
-    }
 
-    &amp;s[..]
-}
-<span class="boring">
-</span><span class="boring">fn main() {}</span></code></pre></pre>
-<p>We get the index for the end of the word the same way we did in Listing 4-7, by
-looking for the first occurrence of a space. When we find a space, we return a
-string slice using the start of the string and the index of the space as the
-starting and ending indices.</p>
-<p>Now when we call <code>first_word</code>, we get back a single value that is tied to the
-underlying data. The value is made up of a reference to the starting point of
-the slice and the number of elements in the slice.</p>
-<p>Returning a slice would also work for a <code>second_word</code> function:</p>
-<pre><code class="language-rust ignore">fn second_word(s: &amp;String) -&gt; &amp;str {</code></pre>
-<p>We now have a straightforward API that’s much harder to mess up because the
-compiler will ensure the references into the <code>String</code> remain valid. Remember
-the bug in the program in Listing 4-8, when we got the index to the end of the
-first word but then cleared the string so our index was invalid? That code was
-logically incorrect but didn’t show any immediate errors. The problems would
-show up later if we kept trying to use the first word index with an emptied
-string. Slices make this bug impossible and let us know we have a problem with
-our code much sooner. Using the slice version of <code>first_word</code> will throw a
-compile-time error:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore does_not_compile"><span class="boring">fn first_word(s: &amp;String) -&gt; &amp;str {
-</span><span class="boring">    let bytes = s.as_bytes();
-</span><span class="boring">
-</span><span class="boring">    for (i, &amp;item) in bytes.iter().enumerate() {
-</span><span class="boring">        if item == b' ' {
-</span><span class="boring">            return &amp;s[0..i];
-</span><span class="boring">        }
-</span><span class="boring">    }
-</span><span class="boring">
-</span><span class="boring">    &amp;s[..]
-</span><span class="boring">}
-</span><span class="boring">
-</span>fn main() {
-    let mut s = String::from(&quot;hello world&quot;);
+                        <p>Preconditions most often give restrictions on the acceptable values of
+                            parameters, as in the example of <span class="code">Math.sqrt(x)</span>. However, they can also
+                            refer to global variables that are used in the subroutine.  Or, if it only makes
+                            sense to call the subroutine at certain times, the precondition might refer to
+                            the state that the program must be in when the subroutine is called.</p>
 
-    let word = first_word(&amp;s);
 
-    s.clear(); // error!
+                        <p>The postcondition of a subroutine, on the other hand,
+                            specifies the task that it performs. For a function, the
+                            postcondition should specify the value that the function returns.</p>
 
-    println!(&quot;the first word is: {}&quot;, word);
-}</code></pre>
-<p>Here’s the compiler error:</p>
-<pre><code class="language-console">$ cargo run
-   Compiling ownership v0.1.0 (file:///projects/ownership)
-error[E0502]: cannot borrow `s` as mutable because it is also borrowed as immutable
-  --&gt; src/main.rs:18:5
-   |
-16 |     let word = first_word(&amp;s);
-   |                           -- immutable borrow occurs here
-17 |
-18 |     s.clear(); // error!
-   |     ^^^^^^^^^ mutable borrow occurs here
-19 |
-20 |     println!(&quot;the first word is: {}&quot;, word);
-   |                                       ---- immutable borrow later used here
 
-For more information about this error, try `rustc --explain E0502`.
-error: could not compile `ownership` due to previous error
+                        <p>Subroutines are sometimes described by comments that explicitly specify their
+                            preconditions and postconditions. When you are given a pre-written subroutine,
+                            a statement of its preconditions and postconditions tells you how to use it and
+                            what it does. When you are assigned to write a subroutine, the preconditions
+                            and postconditions give you an exact specification of what the subroutine is
+                            expected to do. I will use this approach in the example that constitutes the
+                            rest of this section. The comments are given in the form of
+                            <a href="ch04-06-APIPackagesModulesJavadoc.html">Javadoc comments</a>, but I will explicitly
+                            label the preconditions and postconditions.  (Many computer scientists think that new doc
+                            tags <span class="code">@precondition</span> and <span class="code">@postcondition</span> should
+                            be added to the Javadoc system for explicit labeling of preconditions
+                            and postconditions, but that has not yet been done.)</p>
+
+                        <h3 id="A Design Example"><a class="header" href="#A Design Example">A Design Example</a></h3>
+
+                        <p>Let's work through an example of program design using subroutines. In this
+                            example, we will use pre-written subroutines as building blocks and we will also design
+                            new subroutines that we need to complete the project.  The API that I will use here
+                            is defined in two classes that I have written: <span class="sourceref"><a href="./source/chapter4/Mosaic.java">Mosaic.java</a></span>, which in turn depends on
+                            <span class="sourceref"><a href="./source/chapter4/MosaicCanvas.java">MosaicCanvas.java</a></span>.  To compile and run a program that uses the
+                            API, the classes <span class="classname">Mosaic</span> and <span class="classname">MosaicCanvas</span>
+                            must be available.  That is, the files <span class="code">Mosaic.java</span> and
+                            <span class="code">MosaicCanvas.java</span>, or the corresponding compiled class files,
+                            must be in the same folder as the class that defines the program.</p>
+
+
+                        <p>So, suppose that I have access to an already-written class called <span class="code">Mosaic</span>.
+                            This class allows a program to work with a window that displays little colored
+                            rectangles arranged in rows and columns. The window can be opened, closed, and
+                            otherwise manipulated with static member subroutines defined in the
+                            <span class="code">Mosaic</span> class.  In fact, the class defines a toolbox or API
+                            that can be used for working with such windows.  Here are some of the
+                            available routines in the API, with Javadoc-style comments. (Remember that
+                            a Javadoc comment comes before the thing that it is commenting on.)</p>
+
+
+                        <pre><code class="java">/**
+ * Opens a "mosaic" window on the screen.  This subroutine should be called
+ * before any of the other Mosaic subroutines are used.  The program will end
+ * when the user closes the window.
+ *
+ * Precondition:   The parameters rows, cols, h, and w are positive integers.
+ * Postcondition:  A window is open on the screen that can display rows and
+ *                   columns of colored rectangles.  Each rectangle is w pixels
+ *                   wide and h pixels high.  The number of rows is given by
+ *                   the first parameter and the number of columns by the
+ *                   second.  Initially, all rectangles are black.
+ *
+ * Note:  The rows are numbered from 0 to rows - 1, and the columns are
+ * numbered from 0 to cols - 1.
+ */
+<span class="newcode">public static void open(int rows, int cols, int w, int h)</span>
+
+
+/**
+ * Sets the color of one of the rectangles in the window.
+ *
+ * Precondition:   row and col are in the valid range of row and column numbers,
+ *                   and r, g, and b are in the range 0 to 255, inclusive.
+ * Postcondition:  The color of the rectangle in row number row and column
+ *                   number col has been set to the color specified by r, g,
+ *                   and b.  r gives the amount of red in the color with 0
+ *                   representing no red and 255 representing the maximum
+ *                   possible amount of red.  The larger the value of r, the
+ *                   more red in the color.  g and b work similarly for the
+ *                   green and blue color components.
+ */
+<span class="newcode">public static void setColor(int row, int col, int r, int g, int b)</span>
+
+
+/**
+ * Gets the red component of the color of one of the rectangles.
+ *
+ * Precondition:   row and col are in the valid range of row and column numbers.
+ * Postcondition:  The red component of the color of the specified rectangle is
+ *                   returned as an integer in the range 0 to 255 inclusive.
+ */
+<span class="newcode">public static int getRed(int row, int col)</span>
+
+
+/**
+ * Like getRed, but returns the green component of the color.
+ */
+<span class="newcode">public static int getGreen(int row, int col)</span>
+
+
+/**
+ * Like getRed, but returns the blue component of the color.
+ */
+<span class="newcode">public static int getBlue(int row, int col)</span>
+
+
+/**
+ * Inserts a delay in the program (to regulate the speed at which the colors
+ * are changed, for example).
+ *
+ * Precondition:   milliseconds is a positive integer.
+ * Postcondition:  The program has paused for at least the specified number
+ *                   of milliseconds, where one second is equal to 1000
+ *                   milliseconds.
+ */
+<span class="newcode">public static void delay(int milliseconds)</span>
 </code></pre>
-<p>Recall from the borrowing rules that if we have an immutable reference to
-something, we cannot also take a mutable reference. Because <code>clear</code> needs to
-truncate the <code>String</code>, it needs to get a mutable reference. The <code>println!</code>
-after the call to <code>clear</code> uses the reference in <code>word</code>, so the immutable
-reference must still be active at that point. Rust disallows the mutable
-reference in <code>clear</code> and the immutable reference in <code>word</code> from existing at the
-same time, and compilation fails. Not only has Rust made our API easier to use,
-but it has also eliminated an entire class of errors at compile time!</p>
-<!-- Old heading. Do not remove or links may break. -->
-<p><a id="string-literals-are-slices"></a></p>
-<h4 id="string-literals-as-slices"><a class="header" href="#string-literals-as-slices">String Literals as Slices</a></h4>
-<p>Recall that we talked about string literals being stored inside the binary. Now
-that we know about slices, we can properly understand string literals:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>let s = &quot;Hello, world!&quot;;
-<span class="boring">}</span></code></pre></pre>
-<p>The type of <code>s</code> here is <code>&amp;str</code>: it’s a slice pointing to that specific point of
-the binary. This is also why string literals are immutable; <code>&amp;str</code> is an
-immutable reference.</p>
-<h4 id="string-slices-as-parameters"><a class="header" href="#string-slices-as-parameters">String Slices as Parameters</a></h4>
-<p>Knowing that you can take slices of literals and <code>String</code> values leads us to
-one more improvement on <code>first_word</code>, and that’s its signature:</p>
-<pre><code class="language-rust ignore">fn first_word(s: &amp;String) -&gt; &amp;str {</code></pre>
-<p>A more experienced Rustacean would write the signature shown in Listing 4-9
-instead because it allows us to use the same function on both <code>&amp;String</code> values
-and <code>&amp;str</code> values.</p>
-<pre><code class="language-rust ignore">fn first_word(s: &amp;str) -&gt; &amp;str {
-<span class="boring">    let bytes = s.as_bytes();
-</span><span class="boring">
-</span><span class="boring">    for (i, &amp;item) in bytes.iter().enumerate() {
-</span><span class="boring">        if item == b' ' {
-</span><span class="boring">            return &amp;s[0..i];
-</span><span class="boring">        }
-</span><span class="boring">    }
-</span><span class="boring">
-</span><span class="boring">    &amp;s[..]
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">fn main() {
-</span><span class="boring">    let my_string = String::from(&quot;hello world&quot;);
-</span><span class="boring">
-</span><span class="boring">    // `first_word` works on slices of `String`s, whether partial or whole
-</span><span class="boring">    let word = first_word(&amp;my_string[0..6]);
-</span><span class="boring">    let word = first_word(&amp;my_string[..]);
-</span><span class="boring">    // `first_word` also works on references to `String`s, which are equivalent
-</span><span class="boring">    // to whole slices of `String`s
-</span><span class="boring">    let word = first_word(&amp;my_string);
-</span><span class="boring">
-</span><span class="boring">    let my_string_literal = &quot;hello world&quot;;
-</span><span class="boring">
-</span><span class="boring">    // `first_word` works on slices of string literals, whether partial or whole
-</span><span class="boring">    let word = first_word(&amp;my_string_literal[0..6]);
-</span><span class="boring">    let word = first_word(&amp;my_string_literal[..]);
-</span><span class="boring">
-</span><span class="boring">    // Because string literals *are* string slices already,
-</span><span class="boring">    // this works too, without the slice syntax!
-</span><span class="boring">    let word = first_word(my_string_literal);
-</span><span class="boring">}</span></code></pre>
-<p><span class="caption">Listing 4-9: Improving the <code>first_word</code> function by using
-a string slice for the type of the <code>s</code> parameter</span></p>
-<p>If we have a string slice, we can pass that directly. If we have a <code>String</code>, we
-can pass a slice of the <code>String</code> or a reference to the <code>String</code>. This
-flexibility takes advantage of <em>deref coercions</em>, a feature we will cover in
-<a href="ch15-02-deref.html#implicit-deref-coercions-with-functions-and-methods">“Implicit Deref Coercions with Functions and
-Methods”</a><!--ignore--> section of Chapter 15.</p>
-<p>Defining a function to take a string slice instead of a reference to a <code>String</code>
-makes our API more general and useful without losing any functionality:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn first_word(s: &amp;str) -&gt; &amp;str {
-</span><span class="boring">    let bytes = s.as_bytes();
-</span><span class="boring">
-</span><span class="boring">    for (i, &amp;item) in bytes.iter().enumerate() {
-</span><span class="boring">        if item == b' ' {
-</span><span class="boring">            return &amp;s[0..i];
-</span><span class="boring">        }
-</span><span class="boring">    }
-</span><span class="boring">
-</span><span class="boring">    &amp;s[..]
-</span><span class="boring">}
-</span><span class="boring">
-</span>fn main() {
-    let my_string = String::from(&quot;hello world&quot;);
 
-    // `first_word` works on slices of `String`s, whether partial or whole
-    let word = first_word(&amp;my_string[0..6]);
-    let word = first_word(&amp;my_string[..]);
-    // `first_word` also works on references to `String`s, which are equivalent
-    // to whole slices of `String`s
-    let word = first_word(&amp;my_string);
 
-    let my_string_literal = &quot;hello world&quot;;
+                        <p>Remember that these subroutines are static members of the <span class="code">Mosaic</span>
+                            class, so when they are called from outside <span class="code">Mosaic</span>, the name of the class
+                            must be included as part of the name of the routine.  For example,
+                            we'll have to use the name <span class="code">Mosaic.open</span> rather than simply
+                            <span class="code">open</span>.</p>
 
-    // `first_word` works on slices of string literals, whether partial or whole
-    let word = first_word(&amp;my_string_literal[0..6]);
-    let word = first_word(&amp;my_string_literal[..]);
 
-    // Because string literals *are* string slices already,
-    // this works too, without the slice syntax!
-    let word = first_word(my_string_literal);
-}</code></pre></pre>
-<h3 id="other-slices"><a class="header" href="#other-slices">Other Slices</a></h3>
-<p>String slices, as you might imagine, are specific to strings. But there’s a
-more general slice type too. Consider this array:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>let a = [1, 2, 3, 4, 5];
-<span class="boring">}</span></code></pre></pre>
-<p>Just as we might want to refer to part of a string, we might want to refer to
-part of an array. We’d do so like this:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>let a = [1, 2, 3, 4, 5];
+                        <p>You'll notice that the comments on the subroutine don't specify what
+                            happens when the preconditions are <b>not</b> met.  Although a subroutine
+                            is not really obligated by its contract to do anything particular in that
+                            case, it would be good to know what happens.  For example, if the
+                            precondition, "row and col are in the valid range of row and column numbers,"
+                            on the <span class="code">setColor()</span> or <span class="code">getRed()</span> routine is violated,
+                            an <span class="classname">IllegalArgumentException</span> will be thrown.
+                            Knowing that fact would allow you to write programs that catch and handle
+                            the exception, and it would be good to document it with a <span class="code">@throws</span>
+                            doc tag in the Javadoc comment.
+                            Other questions remain about the behavior of the subroutines.
+                            For example, what happens if you call <span class="code">Mosaic.open()</span> and there
+                            is already a mosaic window open on the screen?  (In fact, the second call will
+                            simply be ignored.)  It's difficult to fully document
+                            the behavior of a piece of software&mdash;sometimes, you just have to
+                            experiment or look at the full source code.</p>
 
-let slice = &amp;a[1..3];
 
-assert_eq!(slice, &amp;[2, 3]);
-<span class="boring">}</span></code></pre></pre>
-<p>This slice has the type <code>&amp;[i32]</code>. It works the same way as string slices do, by
-storing a reference to the first element and a length. You’ll use this kind of
-slice for all sorts of other collections. We’ll discuss these collections in
-detail when we talk about vectors in Chapter 8.</p>
-<h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
-<p>The concepts of ownership, borrowing, and slices ensure memory safety in Rust
-programs at compile time. The Rust language gives you control over your memory
-usage in the same way as other systems programming languages, but having the
-owner of data automatically clean up that data when the owner goes out of scope
-means you don’t have to write and debug extra code to get this control.</p>
-<p>Ownership affects how lots of other parts of Rust work, so we’ll talk about
-these concepts further throughout the rest of the book. Let’s move on to
-Chapter 5 and look at grouping pieces of data together in a <code>struct</code>.</p>
+                        
+
+
+                        <p>My idea for a program is to use the <span class="code">Mosaic</span> class as the basis for a neat
+                            animation. I want to fill the window with randomly colored squares, and then
+                            randomly change the colors in a loop that continues as long as the window is
+                            open. "Randomly change the colors" could mean a lot of different things, but
+                            after thinking for a while, I decide it would be interesting to have a
+                            "disturbance" that wanders randomly around the window, changing the color of
+                            each square that it encounters. Here's a picture showing what the contents of the window
+                            might look like at one point in time:</p>
+
+
+                        <p align="center">
+                            <img src="./images/mosaic.png" width="404" height="324" alt="a 20-by-16 grid of randomly colored squares"></p>
+
+
+                        <p>With basic routines for manipulating the window as a foundation, I can turn
+                            to the specific problem at hand. A basic outline for my program is</p>
+
+
+                        <pre><code class="console">Open a Mosaic window
+Fill window with random colors
+Move around, changing squares at random</code></pre>
+
+
+                        <p>Filling the window with random colors seems like a nice coherent task that I
+                            can work on separately, so let's decide to write a separate subroutine to do
+                            it. The third step can be expanded a bit more, into the steps: Start in the
+                            middle of the window, then keep moving to new squares and changing the color
+                            of those squares. This should continue as long as the mosaic window is still
+                            open. Thus we can refine the algorithm to:</p>
+
+
+                        <pre><code class="console">Open a Mosaic window
+Fill window with random colors
+Set the current position to the middle square in the window
+As long as the mosaic window is open:
+   Randomly change color of the square at the current position
+   Move current position up, down, left, or right, at random</code></pre>
+
+
+                        <p>I need to represent the current position in some way. That can be done with
+                            two <span class="ptype">int</span> variables named <span class="code">currentRow</span> and
+                            <span class="code">currentColumn</span> that hold the row number and the column number of
+                            the square where the disturbance is currently located.  I'll use 16 rows and 20 columns of squares in my
+                            mosaic, so setting the current position to be in the center means setting
+                            <span class="code">currentRow</span> to 8 and <span class="code">currentColumn</span> to 10. I already have a
+                            subroutine, <span class="code">Mosaic.open()</span>, to open the window. To keep the main
+                            routine simple, I decide that I will write two more subroutines of my own to
+                            carry out the two tasks in the while loop. The algorithm can then be written in
+                            Java as:</p>
+
+
+                        <pre><code class="java">Mosaic.open(16,20,25,25)
+fillWithRandomColors();
+currentRow = 8;       // Middle row, halfway down the window.
+currentColumn = 10;   // Middle column.
+while ( true ) { // Program ends when user closes the window.
+    changeToRandomColor(currentRow, currentColumn);
+    randomMove();
+}</code></pre>
+
+
+                        <p>With the proper wrapper, this is essentially the <span class="code">main()</span> routine of
+                            my program. It turns out I decided to make one small modification after running the
+                            completed program: To prevent the
+                            animation from running too fast, I added the line "<span class="code">Mosaic.delay(10);</span>"
+                            to the <span class="code">while</span> loop.</p>
+
+
+                        <p>The <span class="code">main()</span> routine is taken care of, but to complete the program, I
+                            still have to write the subroutines <span class="code">fillWithRandomColors()</span>,
+                            <span class="code">changeToRandomColor(int,int)</span>, and <span class="code">randomMove()</span>. Writing each
+                            of these subroutines is a separate, small task. The
+                            <span class="code">fillWithRandomColors()</span> routine is defined by the postcondition that
+                            "each of the rectangles in the mosaic has been changed to a random color."
+                            Pseudocode for an algorithm to accomplish this task can be given as:</p>
+
+
+                        <pre><code class="java">For each row:
+   For each column:
+      set the square in that row and column to a random color</code></pre>
+
+
+                        <p>"For each row" and "for each column" can be implemented as for loops. We've
+                            already planned to write a subroutine <span class="code">changeToRandomColor</span> that can be
+                            used to set the color. (The possibility of reusing subroutines in several
+                            places is one of the big payoffs of using them!) So,
+                            <span class="code">fillWithRandomColors()</span> can be written in proper Java as:</p>
+
+
+                        <pre><code class="java">static void fillWithRandomColors() {
+   int row, column;
+   for ( row = 0; row &lt; 16; row++ )
+      for ( column = 0; column &lt; 20; column++ )
+         changeToRandomColor(row,column);
+}</code></pre>
+
+
+                        <p>Turning to the <span class="code">changeToRandomColor</span> subroutine, we already have a
+                            method in the <span class="code">Mosaic</span> class, <span class="code">Mosaic.setColor()</span>,
+                            that can be used to change the
+                            color of a square. If we want a random color, we just have to choose random
+                            values for <span class="code">r</span>, <span class="code">g</span>, and <span class="code">b</span>. According to the
+                            precondition of the <span class="code">Mosaic.setColor()</span> subroutine, these random values
+                            must be integers in the range from 0 to 255. A formula for randomly selecting
+                            such an integer is "<span class="code">(int)(256*Math.random())</span>". So the random color
+                            subroutine becomes:</p>
+
+
+                        <pre><code class="java">static void changeToRandomColor(int rowNum, int colNum) {
+     int red = (int)(256*Math.random());
+     int green = (int)(256*Math.random());
+     int blue = (int)(256*Math.random());
+     Mosaic.setColor(rowNum,colNum,red,green,blue);
+}</code></pre>
+
+
+                        <p>Finally, consider the <span class="code">randomMove</span> subroutine, which is supposed to
+                            randomly move the disturbance up, down, left, or right. To make a random choice
+                            among four directions, we can choose a random integer in the range 0 to 3. If
+                            the integer is 0, move in one direction; if it is 1, move in another direction;
+                            and so on. The position of the disturbance is given by the variables
+                            <span class="code">currentRow</span> and <span class="code">currentColumn</span>. To "move up" means to subtract
+                            1 from <span class="code">currentRow</span>. This leaves open the question of what to do if
+                            <span class="code">currentRow</span> becomes -1, which would put the disturbance above the
+                            window (which would violate a precondition of several of the <span class="classname">Mosaic</span>
+                            subroutines).
+                            Rather than let this happen, I decide to move the disturbance to the
+                            opposite edge of the grid by setting <span class="code">currentRow</span> to 15. (Remember that
+                            the 16 rows are numbered from 0 to 15.)  An alternative to jumping to the opposite
+                            edge would be to simply do nothing in this case.  Moving the disturbance down, left, or
+                            right is handled similarly. If we use a <span class="code">switch</span> statement to decide
+                            which direction to move, the code for <span class="code">randomMove</span> becomes:</p>
+
+
+                        <pre><code class="java">int directionNum;
+directionNum = (int)(4*Math.random());
+switch (directionNum) {
+   case 0 -&gt; {  // move up
+      currentRow--;
+      if (currentRow &lt; 0)   // CurrentRow is outside the mosaic;
+         currentRow = 15;   // move it to the opposite edge.
+   }
+   case 1 -&gt; {  // move right
+      currentColumn++;
+      if (currentColumn &gt;= 20)
+         currentColumn = 0;
+   }
+   case 2 -&gt; {  // move down
+      currentRow++;
+      if (currentRow &gt;= 16)
+         currentRow = 0;
+   }
+   case 3 -&gt; {  // move left
+      currentColumn--;
+      if (currentColumn &lt; 0)
+         currentColumn = 19;
+   }
+}</code></pre>
+
+                        <h3 id="The Program"><a class="header" href="#The Program">The Program</a></h3>
+
+
+                        <p>Putting this all together, we get the following complete program.  Note that I've added Javadoc-style
+                            comments for the class itself and for each of the subroutines. The
+                            variables <span class="code">currentRow</span> and <span class="code">currentColumn</span> are defined as static
+                            members of the class, rather than local variables, because each of them is used
+                            in several different subroutines.  You can find a copy of the source code in
+                            <span class="sourceref"><a href="./source/chapter4/RandomMosaicWalk.java">RandomMosaicWalk.java</a></span>.  Remember that this program actually
+                            depends on two other files, <span class="sourceref"><a href="./source/chapter4/Mosaic.java">Mosaic.java</a></span> and <span class="sourceref"><a href="./source/chapter4/MosaicCanvas.java">MosaicCanvas.java</a></span>.</p>
+
+
+                        <pre><code class="java">/**
+ * This program opens a window full of randomly colored squares.  A "disturbance"
+ * moves randomly around in the window, randomly changing the color of each
+ * square that it visits.  The program runs until the user closes the window.
+ */
+public class RandomMosaicWalk {
+
+    static int currentRow;    // Row currently containing the disturbance.
+    static int currentColumn; // Column currently containing disturbance.
+
+    /**
+     * The main program creates the window, fills it with random colors,
+     * and then moves the disturbance in a random walk around the window
+     * as long as the window is open.
+     */
+    public static void main(String[] args) {
+        Mosaic.open(16,20,25,25);
+        fillWithRandomColors();
+        currentRow = 8;   // start at center of window
+        currentColumn = 10;
+        while ( true ) {
+            changeToRandomColor(currentRow, currentColumn);
+            randomMove();
+            Mosaic.delay(10);  // Remove this line to speed things up!
+        }
+    }  // end main
+
+    /**
+     * Fills the window with randomly colored squares.
+     * Precondition:   The mosaic window is open.
+     * Postcondition:  Each square has been set to a random color.
+     */
+    static void fillWithRandomColors() {
+        int row, column;
+        for ( row=0; row &lt; 16; row++ ) {
+            for ( column=0; column &lt; 20; column++ ) {
+                changeToRandomColor(row, column);
+            }
+        }
+    }  // end fillWithRandomColors
+
+    /**
+     * Changes one square to a new randomly selected color.
+     * Precondition:   The specified rowNum and colNum are in the valid range
+     *                 of row and column numbers.
+     * Postcondition:  The square in the specified row and column has
+     *                 been set to a random color.
+     * @param rowNum the row number of the square, counting rows down
+     *      from 0 at the top
+     * @param colNum the column number of the square, counting columns over
+     *      from 0 at the left
+     */
+    static void changeToRandomColor(int rowNum, int colNum) {
+        int red = (int)(256*Math.random());    // Choose random levels in range
+        int green = (int)(256*Math.random());  //     0 to 255 for red, green,
+        int blue = (int)(256*Math.random());   //     and blue color components.
+        Mosaic.setColor(rowNum,colNum,red,green,blue);
+    }  // end changeToRandomColor
+
+    /**
+     * Move the disturbance.
+     * Precondition:   The global variables currentRow and currentColumn
+     *                 are within the legal range of row and column numbers.
+     * Postcondition:  currentRow or currentColumn is changed to one of the
+     *                 neighboring positions in the grid -- up, down, left, or
+     *                 right from the current position.  If this moves the
+     *                 position outside of the grid, then it is moved to the
+     *                 opposite edge of the grid.
+     */
+    static void randomMove() {
+        int directionNum; // Randomly set to 0, 1, 2, or 3 to choose direction.
+        directionNum = (int)(4*Math.random());
+        switch (directionNum) {
+            case 0 -&gt; {  // move up
+               currentRow--;
+               if (currentRow &lt; 0)   // CurrentRow is outside the mosaic;
+                  currentRow = 15;   // move it to the opposite edge.
+            }
+            case 1 -&gt; {  // move right
+               currentColumn++;
+               if (currentColumn &gt;= 20)
+                  currentColumn = 0;
+            }
+            case 2 -&gt; {  // move down
+               currentRow++;
+               if (currentRow &gt;= 16)
+                  currentRow = 0;
+            }
+            case 3 -&gt; {  // move left
+               currentColumn--;
+               if (currentColumn &lt; 0)
+                  currentColumn = 19;
+            }
+        }
+    }  // end randomMove
+
+} // end class RandomMosaicWalk</code></pre>
 
                     </main>
 

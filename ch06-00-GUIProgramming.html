@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Enums and Pattern Matching - Introduction to Programming Using Java</title>
+        <title>Introduction to GUI Programming - Introduction to Programming Using Java</title>
 
 
         <!-- Custom HTML head -->
@@ -31,6 +31,8 @@
         <!-- Custom theme stylesheets -->
         <link rel="stylesheet" href="ferris.css">
         <link rel="stylesheet" href="theme/2018-edition.css">
+
+<link rel="stylesheet" href="code-class.css">
 
     </head>
     <body>
@@ -101,7 +103,7 @@
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
                             <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="Java">Java</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
@@ -146,16 +148,52 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="enums-and-pattern-matching"><a class="header" href="#enums-and-pattern-matching">Enums and Pattern Matching</a></h1>
-<p>In this chapter, we’ll look at <em>enumerations</em>, also referred to as <em>enums</em>.
-Enums allow you to define a type by enumerating its possible <em>variants</em>. First
-we’ll define and use an enum to show how an enum can encode meaning along with
-data. Next, we’ll explore a particularly useful enum, called <code>Option</code>, which
-expresses that a value can be either something or nothing. Then we’ll look at
-how pattern matching in the <code>match</code> expression makes it easy to run different
-code for different values of an enum. Finally, we’ll cover how the <code>if let</code>
-construct is another convenient and concise idiom available to handle enums in
-your code.</p>
+                        <h1 id="Introduction to GUI Programming"><a class="header" href="#Introduction to GUI Programming">Introduction to GUI Programming</a></h1>
+                        <p>
+                            Computer users today expect to interact
+                            with their computers using a graphical user interface (GUI), and
+                            Java can be used to write sophisticated GUI programs.</p>
+
+
+                        <p>GUI programs
+                            differ from traditional "straight-through" programs that you have
+                            encountered in the first few chapters of this book.  One big difference is
+                            that GUI programs are <span class="newword">event-driven</span>. That is, user actions such as
+                            clicking on a button or pressing a key on the keyboard generate events, and the
+                            program must respond to these events as they occur.</p>
+
+
+                        <p>Event-driven programming builds on all the skills you have learned in the
+                            first five chapters of this text. You need to be able to write the methods
+                            that respond to events. Inside those methods, you are doing the kind of
+                            programming-in-the-small that was covered in <a href="ch02-00-NameAndThings.html">Chapter&nbsp;2</a>
+                            and <a href="ch03-00-Control.html">Chapter&nbsp;3</a>.
+                            And of course, objects are everywhere in GUI programming.
+                            Events are objects. Colors and fonts are objects.  GUI components such as buttons and
+                            menus are objects.  Events are handled by instance methods contained in objects.
+                            In Java, GUI programming is object-oriented programming.  The purpose of this chapter is, as
+                            much as anything, to give you some experience with a large-scale object-oriented API.</p>
+
+
+                        <p>This chapter is just an introduction to JavaFX, but it covers the
+                            essential features of GUI programming in enough detail to write some
+                            interesting programs.  The discussion of JavaFX will continue in <a href="ch13-00-GUIProgrammingContinued.html">Chapter&nbsp;13</a>
+                            with more details and with more advanced techniques, but complete coverage
+                            of JavaFX would require an entire book of its own.</p>
+
+                        <blockquote>
+                        <p>Note that JavaFX is not distributed as part of the Java
+                            Development Kit.  For information about how to obtain JavaFX and how to
+                            compile and run programs that use it, see <a href="ch02-06-ProgrammingEnvironments.html">Section&nbsp;2.6</a>.</p>
+                        </blockquote>
+
+                        <p>This edition of this textbook covers GUI programming using the JavaFX GUI toolkit.
+                            An alternative edition covers the Swing GUI toolkit instead of JavaFX.
+                            Swing is included as a standard part of Java, so does not require any extra
+                            downloads or configuration.  The Swing edition can be found
+                            at <a href="https://math.hws.edu/javanotes9-swing">https://math.hws.edu/javanotes9-swing</a>.
+                            The only really significant differences between the two editions are in this
+                            chapter and in <a href="ch13-00-GUIProgrammingContinued.html">Chapter&nbsp;13</a>.</p>
 
                     </main>
 

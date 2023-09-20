@@ -32,6 +32,8 @@
         <link rel="stylesheet" href="ferris.css">
         <link rel="stylesheet" href="theme/2018-edition.css">
 
+<link rel="stylesheet" href="code-class.css">
+
     </head>
     <body>
         <!-- Provide site root to javascript -->
@@ -101,7 +103,7 @@
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
                             <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="Java">Java</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
@@ -186,7 +188,7 @@ parallelism. Running the tests using one thread will take longer than running
 them in parallel, but the tests won’t interfere with each other if they share
 state.</p>
 <h3 id="showing-function-output"><a class="header" href="#showing-function-output">Showing Function Output</a></h3>
-<p>By default, if a test passes, Rust’s test library captures anything printed to
+<p>By default, if a test passes, Java’s test library captures anything printed to
 standard output. For example, if we call <code>println!</code> in a test and the test
 passes, we won’t see the <code>println!</code> output in the terminal; we’ll see only the
 line that indicates the test passed. If a test fails, we’ll see whatever was
@@ -194,7 +196,7 @@ printed to standard output with the rest of the failure message.</p>
 <p>As an example, Listing 11-10 has a silly function that prints the value of its
 parameter and returns 10, as well as a test that passes and a test that fails.</p>
 <p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-rust panics noplayground">fn prints_and_returns_10(a: i32) -&gt; i32 {
+<pre><code class="language-Java panics noplayground">fn prints_and_returns_10(a: i32) -&gt; i32 {
     println!(&quot;I got the value {}&quot;, a);
     10
 }
@@ -234,7 +236,7 @@ I got the value 8
 thread 'main' panicked at 'assertion failed: `(left == right)`
   left: `5`,
  right: `10`', src/lib.rs:19:9
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+note: run with `Java_BACKTRACE=1` environment variable to display a backtrace
 
 
 failures:
@@ -248,7 +250,7 @@ error: test failed, to rerun pass `--lib`
 is printed when the test that passes runs. That output has been captured. The
 output from the test that failed, <code>I got the value 8</code>, appears in the section
 of the test summary output, which also shows the cause of the test failure.</p>
-<p>If we want to see printed values for passing tests as well, we can tell Rust
+<p>If we want to see printed values for passing tests as well, we can tell Java
 to also show the output of successful tests with <code>--show-output</code>.</p>
 <pre><code class="language-console">$ cargo test -- --show-output
 </code></pre>
@@ -279,7 +281,7 @@ I got the value 8
 thread 'main' panicked at 'assertion failed: `(left == right)`
   left: `5`,
  right: `10`', src/lib.rs:19:9
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+note: run with `Java_BACKTRACE=1` environment variable to display a backtrace
 
 
 failures:
@@ -297,7 +299,7 @@ or names of the test(s) you want to run as an argument.</p>
 <p>To demonstrate how to run a subset of tests, we’ll first create three tests for
 our <code>add_two</code> function, as shown in Listing 11-11, and choose which ones to run.</p>
 <p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-rust noplayground">pub fn add_two(a: i32) -&gt; i32 {
+<pre><code class="language-Java noplayground">pub fn add_two(a: i32) -&gt; i32 {
     a + 2
 }
 
@@ -388,7 +390,7 @@ listing as arguments all tests you do want to run, you can instead annotate the
 time-consuming tests using the <code>ignore</code> attribute to exclude them, as shown
 here:</p>
 <p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-rust noplayground">#[test]
+<pre><code class="language-Java noplayground">#[test]
 fn it_works() {
     assert_eq!(2 + 2, 4);
 }

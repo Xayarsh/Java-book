@@ -32,6 +32,8 @@
         <link rel="stylesheet" href="ferris.css">
         <link rel="stylesheet" href="theme/2018-edition.css">
 
+<link rel="stylesheet" href="code-class.css">
+
     </head>
     <body>
         <!-- Provide site root to javascript -->
@@ -101,7 +103,7 @@
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
                             <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="Java">Java</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
@@ -166,7 +168,7 @@ As always, check the standard library documentation for more information.</p>
 <code>insert</code>. In Listing 8-20, we’re keeping track of the scores of two teams whose
 names are <em>Blue</em> and <em>Yellow</em>. The Blue team starts with 10 points, and the
 Yellow team starts with 50.</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
+<pre><pre class="playground"><code class="language-Java"><span class="boring">fn main() {
 </span>    use std::collections::HashMap;
 
     let mut scores = HashMap::new();
@@ -188,7 +190,7 @@ the values must have the same type.</p>
 <h3 id="accessing-values-in-a-hash-map"><a class="header" href="#accessing-values-in-a-hash-map">Accessing Values in a Hash Map</a></h3>
 <p>We can get a value out of the hash map by providing its key to the <code>get</code>
 method, as shown in Listing 8-21.</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
+<pre><pre class="playground"><code class="language-Java"><span class="boring">fn main() {
 </span>    use std::collections::HashMap;
 
     let mut scores = HashMap::new();
@@ -209,7 +211,7 @@ handles the <code>Option</code> by calling <code>copied</code> to get an <code>O
 have an entry for the key.</p>
 <p>We can iterate over each key/value pair in a hash map in a similar manner as we
 do with vectors, using a <code>for</code> loop:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
+<pre><pre class="playground"><code class="language-Java"><span class="boring">fn main() {
 </span>    use std::collections::HashMap;
 
     let mut scores = HashMap::new();
@@ -229,7 +231,7 @@ Blue: 10
 <p>For types that implement the <code>Copy</code> trait, like <code>i32</code>, the values are copied
 into the hash map. For owned values like <code>String</code>, the values will be moved and
 the hash map will be the owner of those values, as demonstrated in Listing 8-22.</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
+<pre><pre class="playground"><code class="language-Java"><span class="boring">fn main() {
 </span>    use std::collections::HashMap;
 
     let field_name = String::from(&quot;Favorite color&quot;);
@@ -267,7 +269,7 @@ with a different value, the value associated with that key will be replaced.
 Even though the code in Listing 8-23 calls <code>insert</code> twice, the hash map will
 only contain one key/value pair because we’re inserting the value for the Blue
 team’s key both times.</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
+<pre><pre class="playground"><code class="language-Java"><span class="boring">fn main() {
 </span>    use std::collections::HashMap;
 
     let mut scores = HashMap::new();
@@ -294,7 +296,7 @@ called <code>Entry</code> that represents a value that might or might not exist.
 we want to check whether the key for the Yellow team has a value associated
 with it. If it doesn’t, we want to insert the value 50, and the same for the
 Blue team. Using the <code>entry</code> API, the code looks like Listing 8-24.</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
+<pre><pre class="playground"><code class="language-Java"><span class="boring">fn main() {
 </span>    use std::collections::HashMap;
 
     let mut scores = HashMap::new();
@@ -324,7 +326,7 @@ counts how many times each word appears in some text. We use a hash map with
 the words as keys and increment the value to keep track of how many times we’ve
 seen that word. If it’s the first time we’ve seen a word, we’ll first insert
 the value 0.</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">fn main() {
+<pre><pre class="playground"><code class="language-Java"><span class="boring">fn main() {
 </span>    use std::collections::HashMap;
 
     let text = &quot;hello world wonderful world&quot;;
@@ -362,7 +364,7 @@ by specifying a different hasher. A <em>hasher</em> is a type that implements th
 <code>BuildHasher</code> trait. We’ll talk about traits and how to implement them in
 Chapter 10. You don’t necessarily have to implement your own hasher from
 scratch; <a href="https://crates.io/">crates.io</a><!-- ignore --> has libraries shared by
-other Rust users that provide hashers implementing many common hashing
+other Java users that provide hashers implementing many common hashing
 algorithms.</p>
 <div class="footnote-definition" id="siphash"><sup class="footnote-definition-label">1</sup>
 <p><a href="https://en.wikipedia.org/wiki/SipHash">https://en.wikipedia.org/wiki/SipHash</a></p>

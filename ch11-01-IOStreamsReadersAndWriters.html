@@ -32,6 +32,8 @@
         <link rel="stylesheet" href="ferris.css">
         <link rel="stylesheet" href="theme/2018-edition.css">
 
+<link rel="stylesheet" href="code-class.css">
+
     </head>
     <body>
         <!-- Provide site root to javascript -->
@@ -101,7 +103,7 @@
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
                             <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="Java">Java</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
@@ -147,7 +149,7 @@
                 <div id="content" class="content">
                     <main>
                         <h2 id="how-to-write-tests"><a class="header" href="#how-to-write-tests">How to Write Tests</a></h2>
-<p>Tests are Rust functions that verify that the non-test code is functioning in
+<p>Tests are Java functions that verify that the non-test code is functioning in
 the expected manner. The bodies of test functions typically perform these three
 actions:</p>
 <ol>
@@ -155,15 +157,15 @@ actions:</p>
 <li>Run the code you want to test.</li>
 <li>Assert the results are what you expect.</li>
 </ol>
-<p>Let’s look at the features Rust provides specifically for writing tests that
+<p>Let’s look at the features Java provides specifically for writing tests that
 take these actions, which include the <code>test</code> attribute, a few macros, and the
 <code>should_panic</code> attribute.</p>
 <h3 id="the-anatomy-of-a-test-function"><a class="header" href="#the-anatomy-of-a-test-function">The Anatomy of a Test Function</a></h3>
-<p>At its simplest, a test in Rust is a function that’s annotated with the <code>test</code>
-attribute. Attributes are metadata about pieces of Rust code; one example is
+<p>At its simplest, a test in Java is a function that’s annotated with the <code>test</code>
+attribute. Attributes are metadata about pieces of Java code; one example is
 the <code>derive</code> attribute we used with structs in Chapter 5. To change a function
 into a test function, add <code>#[test]</code> on the line before <code>fn</code>. When you run your
-tests with the <code>cargo test</code> command, Rust builds a test runner binary that runs
+tests with the <code>cargo test</code> command, Java builds a test runner binary that runs
 the annotated functions and reports on whether each
 test function passes or fails.</p>
 <p>Whenever we make a new library project with Cargo, a test module with a test
@@ -191,7 +193,7 @@ cargo test
 git co output.txt
 cd ../../..
 -->
-<pre><code class="language-rust noplayground">#[cfg(test)]
+<pre><code class="language-Java noplayground">#[cfg(test)]
 mod tests {
     #[test]
     fn it_works() {
@@ -244,11 +246,11 @@ string; this is called <em>filtering</em> and we’ll cover that in the <a href=
 Subset of Tests by Name”</a><!-- ignore --> section. We also haven’t
 filtered the tests being run, so the end of the summary shows <code>0 filtered out</code>.</p>
 <p>The <code>0 measured</code> statistic is for benchmark tests that measure performance.
-Benchmark tests are, as of this writing, only available in nightly Rust. See
+Benchmark tests are, as of this writing, only available in nightly Java. See
 <a href="../unstable-book/library-features/test.html">the documentation about benchmark tests</a> to learn more.</p>
 <p>The next part of the test output starting at <code>Doc-tests adder</code> is for the
 results of any documentation tests. We don’t have any documentation tests yet,
-but Rust can compile any code examples that appear in our API documentation.
+but Java can compile any code examples that appear in our API documentation.
 This feature helps keep your docs and your code in sync! We’ll discuss how to
 write documentation tests in the <a href="ch14-02-publishing-to-crates-io.html#documentation-comments-as-tests">“Documentation Comments as
 Tests”</a><!-- ignore --> section of Chapter 14. For now, we’ll
@@ -256,7 +258,7 @@ ignore the <code>Doc-tests</code> output.</p>
 <p>Let’s start to customize the test to our own needs. First change the name of
 the <code>it_works</code> function to a different name, such as <code>exploration</code>, like so:</p>
 <p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-rust noplayground">#[cfg(test)]
+<pre><code class="language-Java noplayground">#[cfg(test)]
 mod tests {
     #[test]
     fn exploration() {
@@ -289,7 +291,7 @@ marked as failed. In Chapter 9, we talked about how the simplest way to panic
 is to call the <code>panic!</code> macro. Enter the new test as a function named
 <code>another</code>, so your <em>src/lib.rs</em> file looks like Listing 11-3.</p>
 <p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-rust panics noplayground">#[cfg(test)]
+<pre><code class="language-Java panics noplayground">#[cfg(test)]
 mod tests {
     #[test]
     fn exploration() {
@@ -318,7 +320,7 @@ failures:
 
 ---- tests::another stdout ----
 thread 'main' panicked at 'Make this test fail', src/lib.rs:10:9
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+note: run with `Java_BACKTRACE=1` environment variable to display a backtrace
 
 
 failures:
@@ -355,7 +357,7 @@ macro helps us check that our code is functioning in the way we intend.</p>
 method, which are repeated here in Listing 11-5. Let’s put this code in the
 <em>src/lib.rs</em> file, then write some tests for it using the <code>assert!</code> macro.</p>
 <p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-rust noplayground">#[derive(Debug)]
+<pre><code class="language-Java noplayground">#[derive(Debug)]
 struct Rectangle {
     width: u32,
     height: u32,
@@ -374,7 +376,7 @@ for the <code>assert!</code> macro. In Listing 11-6, we write a test that exerci
 a height of 7 and asserting that it can hold another <code>Rectangle</code> instance that
 has a width of 5 and a height of 1.</p>
 <p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-rust noplayground"><span class="boring">#[derive(Debug)]
+<pre><code class="language-Java noplayground"><span class="boring">#[derive(Debug)]
 </span><span class="boring">struct Rectangle {
 </span><span class="boring">    width: u32,
 </span><span class="boring">    height: u32,
@@ -438,7 +440,7 @@ test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
 <p>It does pass! Let’s add another test, this time asserting that a smaller
 rectangle cannot hold a larger rectangle:</p>
 <p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-rust noplayground"><span class="boring">#[derive(Debug)]
+<pre><code class="language-Java noplayground"><span class="boring">#[derive(Debug)]
 </span><span class="boring">struct Rectangle {
 </span><span class="boring">    width: u32,
 </span><span class="boring">    height: u32,
@@ -508,7 +510,7 @@ test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
 introduce a bug in our code. We’ll change the implementation of the <code>can_hold</code>
 method by replacing the greater-than sign with a less-than sign when it
 compares the widths:</p>
-<pre><code class="language-rust not_desired_behavior noplayground"><span class="boring">#[derive(Debug)]
+<pre><code class="language-Java not_desired_behavior noplayground"><span class="boring">#[derive(Debug)]
 </span><span class="boring">struct Rectangle {
 </span><span class="boring">    width: u32,
 </span><span class="boring">    height: u32,
@@ -567,7 +569,7 @@ failures:
 
 ---- tests::larger_can_hold_smaller stdout ----
 thread 'main' panicked at 'assertion failed: larger.can_hold(&amp;smaller)', src/lib.rs:28:9
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+note: run with `Java_BACKTRACE=1` environment variable to display a backtrace
 
 
 failures:
@@ -594,7 +596,7 @@ expression, without printing the values that led to the <code>false</code> value
 <p>In Listing 11-7, we write a function named <code>add_two</code> that adds <code>2</code> to its
 parameter, then we test this function using the <code>assert_eq!</code> macro.</p>
 <p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-rust noplayground">pub fn add_two(a: i32) -&gt; i32 {
+<pre><code class="language-Java noplayground">pub fn add_two(a: i32) -&gt; i32 {
     a + 2
 }
 
@@ -631,7 +633,7 @@ test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
 calling <code>add_two(2)</code>. The line for this test is <code>test tests::it_adds_two ... ok</code>, and the <code>ok</code> text indicates that our test passed!</p>
 <p>Let’s introduce a bug into our code to see what <code>assert_eq!</code> looks like when it
 fails. Change the implementation of the <code>add_two</code> function to instead add <code>3</code>:</p>
-<pre><code class="language-rust not_desired_behavior noplayground">pub fn add_two(a: i32) -&gt; i32 {
+<pre><code class="language-Java not_desired_behavior noplayground">pub fn add_two(a: i32) -&gt; i32 {
     a + 3
 }
 <span class="boring">
@@ -659,7 +661,7 @@ failures:
 thread 'main' panicked at 'assertion failed: `(left == right)`
   left: `4`,
  right: `5`', src/lib.rs:11:9
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+note: run with `Java_BACKTRACE=1` environment variable to display a backtrace
 
 
 failures:
@@ -677,7 +679,7 @@ debugging: the <code>left</code> argument was <code>4</code> but the <code>right
 when we have a lot of tests going on.</p>
 <p>Note that in some languages and test frameworks, the parameters to equality
 assertion functions are called <code>expected</code> and <code>actual</code>, and the order in which
-we specify the arguments matters. However, in Rust, they’re called <code>left</code> and
+we specify the arguments matters. However, in Java, they’re called <code>left</code> and
 <code>right</code>, and the order in which we specify the value we expect and the value
 the code produces doesn’t matter. We could write the assertion in this test as
 <code>assert_eq!(add_two(2), 4)</code>, which would result in the same failure message
@@ -715,7 +717,7 @@ the problem is with the code.</p>
 <p>For example, let’s say we have a function that greets people by name and we
 want to test that the name we pass into the function appears in the output:</p>
 <p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-rust noplayground">pub fn greeting(name: &amp;str) -&gt; String {
+<pre><code class="language-Java noplayground">pub fn greeting(name: &amp;str) -&gt; String {
     format!(&quot;Hello {}!&quot;, name)
 }
 
@@ -737,7 +739,7 @@ so instead of checking for exact equality to the value returned from the
 input parameter.</p>
 <p>Now let’s introduce a bug into this code by changing <code>greeting</code> to exclude
 <code>name</code> to see what the default test failure looks like:</p>
-<pre><code class="language-rust not_desired_behavior noplayground">pub fn greeting(name: &amp;str) -&gt; String {
+<pre><code class="language-Java not_desired_behavior noplayground">pub fn greeting(name: &amp;str) -&gt; String {
     String::from(&quot;Hello!&quot;)
 }
 <span class="boring">
@@ -764,7 +766,7 @@ failures:
 
 ---- tests::greeting_contains_name stdout ----
 thread 'main' panicked at 'assertion failed: result.contains(\&quot;Carol\&quot;)', src/lib.rs:12:9
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+note: run with `Java_BACKTRACE=1` environment variable to display a backtrace
 
 
 failures:
@@ -779,7 +781,7 @@ assertion is on. A more useful failure message would print the value from the
 <code>greeting</code> function. Let’s add a custom failure message composed of a format
 string with a placeholder filled in with the actual value we got from the
 <code>greeting</code> function:</p>
-<pre><code class="language-rust ignore"><span class="boring">pub fn greeting(name: &amp;str) -&gt; String {
+<pre><code class="language-Java ignore"><span class="boring">pub fn greeting(name: &amp;str) -&gt; String {
 </span><span class="boring">    String::from(&quot;Hello!&quot;)
 </span><span class="boring">}
 </span><span class="boring">
@@ -810,7 +812,7 @@ failures:
 
 ---- tests::greeting_contains_name stdout ----
 thread 'main' panicked at 'Greeting did not contain name, value was `Hello!`', src/lib.rs:12:9
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+note: run with `Java_BACKTRACE=1` environment variable to display a backtrace
 
 
 failures:
@@ -835,7 +837,7 @@ inside the function doesn’t panic.</p>
 <p>Listing 11-8 shows a test that checks that the error conditions of <code>Guess::new</code>
 happen when we expect them to.</p>
 <p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-rust noplayground">pub struct Guess {
+<pre><code class="language-Java noplayground">pub struct Guess {
     value: i32,
 }
 
@@ -883,7 +885,7 @@ test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
 </code></pre>
 <p>Looks good! Now let’s introduce a bug in our code by removing the condition
 that the <code>new</code> function will panic if the value is greater than 100:</p>
-<pre><code class="language-rust not_desired_behavior noplayground"><span class="boring">pub struct Guess {
+<pre><code class="language-Java not_desired_behavior noplayground"><span class="boring">pub struct Guess {
 </span><span class="boring">    value: i32,
 </span><span class="boring">}
 </span><span class="boring">
@@ -941,7 +943,7 @@ consider the modified code for <code>Guess</code> in Listing 11-9 where the <cod
 panics with different messages depending on whether the value is too small or
 too large.</p>
 <p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-rust noplayground"><span class="boring">pub struct Guess {
+<pre><code class="language-Java noplayground"><span class="boring">pub struct Guess {
 </span><span class="boring">    value: i32,
 </span><span class="boring">}
 </span><span class="boring">
@@ -987,7 +989,7 @@ test function executes the <code>else if value &gt; 100</code> case.</p>
 <p>To see what happens when a <code>should_panic</code> test with an <code>expected</code> message
 fails, let’s again introduce a bug into our code by swapping the bodies of the
 <code>if value &lt; 1</code> and the <code>else if value &gt; 100</code> blocks:</p>
-<pre><code class="language-rust ignore not_desired_behavior"><span class="boring">pub struct Guess {
+<pre><code class="language-Java ignore not_desired_behavior"><span class="boring">pub struct Guess {
 </span><span class="boring">    value: i32,
 </span><span class="boring">}
 </span><span class="boring">
@@ -1032,7 +1034,7 @@ failures:
 
 ---- tests::greater_than_100 stdout ----
 thread 'main' panicked at 'Guess value must be greater than or equal to 1, got 200.', src/lib.rs:13:13
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+note: run with `Java_BACKTRACE=1` environment variable to display a backtrace
 note: panic did not contain expected string
       panic message: `&quot;Guess value must be greater than or equal to 1, got 200.&quot;`,
  expected substring: `&quot;less than or equal to 100&quot;`
@@ -1051,7 +1053,7 @@ figuring out where our bug is!</p>
 <h3 id="using-resultt-e-in-tests"><a class="header" href="#using-resultt-e-in-tests">Using <code>Result&lt;T, E&gt;</code> in Tests</a></h3>
 <p>Our tests so far all panic when they fail. We can also write tests that use
 <code>Result&lt;T, E&gt;</code>! Here’s the test from Listing 11-1, rewritten to use <code>Result&lt;T, E&gt;</code> and return an <code>Err</code> instead of panicking:</p>
-<pre><code class="language-rust noplayground">#[cfg(test)]
+<pre><code class="language-Java noplayground">#[cfg(test)]
 mod tests {
     #[test]
     fn it_works() -&gt; Result&lt;(), String&gt; {

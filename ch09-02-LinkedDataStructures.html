@@ -32,6 +32,8 @@
         <link rel="stylesheet" href="ferris.css">
         <link rel="stylesheet" href="theme/2018-edition.css">
 
+<link rel="stylesheet" href="code-class.css">
+
     </head>
     <body>
         <!-- Provide site root to javascript -->
@@ -101,7 +103,7 @@
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
                             <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
-                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="Java">Java</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
@@ -155,7 +157,7 @@ file instead of terminating the process.</p>
 <p>Recall from <a href="ch02-00-NameAndThings.html#handling-potential-failure-with-result">“Handling Potential Failure with <code>Result</code>”</a><!--
 ignore --> in Chapter 2 that the <code>Result</code> enum is defined as having two
 variants, <code>Ok</code> and <code>Err</code>, as follows:</p>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre><pre class="playground"><code class="language-Java"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>enum Result&lt;T, E&gt; {
     Ok(T),
@@ -173,7 +175,7 @@ return may differ.</p>
 <p>Let’s call a function that returns a <code>Result</code> value because the function could
 fail. In Listing 9-3 we try to open a file.</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust">use std::fs::File;
+<pre><pre class="playground"><code class="language-Java">use std::fs::File;
 
 fn main() {
     let greeting_file_result = File::open(&quot;hello.txt&quot;);
@@ -199,7 +201,7 @@ on the value <code>File::open</code> returns. Listing 9-4 shows one way to handl
 <code>Result</code> using a basic tool, the <code>match</code> expression that we discussed in
 Chapter 6.</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust should_panic">use std::fs::File;
+<pre><pre class="playground"><code class="language-Java should_panic">use std::fs::File;
 
 fn main() {
     let greeting_file_result = File::open(&quot;hello.txt&quot;);
@@ -227,7 +229,7 @@ code, we’ll see the following output from the <code>panic!</code> macro:</p>
     Finished dev [unoptimized + debuginfo] target(s) in 0.73s
      Running `target/debug/error-handling`
 thread 'main' panicked at 'Problem opening the file: Os { code: 2, kind: NotFound, message: &quot;No such file or directory&quot; }', src/main.rs:8:23
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+note: run with `Java_BACKTRACE=1` environment variable to display a backtrace
 </code></pre>
 <p>As usual, this output tells us exactly what has gone wrong.</p>
 <h3 id="matching-on-different-errors"><a class="header" href="#matching-on-different-errors">Matching on Different Errors</a></h3>
@@ -241,7 +243,7 @@ add an inner <code>match</code> expression, shown in Listing 9-5.</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
 <!-- ignore this test because otherwise it creates hello.txt which causes other
 tests to fail lol -->
-<pre><code class="language-rust ignore">use std::fs::File;
+<pre><code class="language-Java ignore">use std::fs::File;
 use std::io::ErrorKind;
 
 fn main() {
@@ -285,8 +287,8 @@ with many of the methods defined on <code>Result&lt;T, E&gt;</code>. These metho
 concise than using <code>match</code> when handling <code>Result&lt;T, E&gt;</code> values in your code.</p>
 <p>For example, here’s another way to write the same logic as shown in Listing
 9-5, this time using closures and the <code>unwrap_or_else</code> method:</p>
-<!-- CAN'T EXTRACT SEE https://github.com/rust-lang/mdBook/issues/1127 -->
-<pre><code class="language-rust ignore">use std::fs::File;
+<!-- CAN'T EXTRACT SEE https://github.com/Java-lang/mdBook/issues/1127 -->
+<pre><code class="language-Java ignore">use std::fs::File;
 use std::io::ErrorKind;
 
 fn main() {
@@ -315,7 +317,7 @@ Listing 9-4. If the <code>Result</code> value is the <code>Ok</code> variant, <c
 the value inside the <code>Ok</code>. If the <code>Result</code> is the <code>Err</code> variant, <code>unwrap</code> will
 call the <code>panic!</code> macro for us. Here is an example of <code>unwrap</code> in action:</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust should_panic">use std::fs::File;
+<pre><pre class="playground"><code class="language-Java should_panic">use std::fs::File;
 
 fn main() {
     let greeting_file = File::open(&quot;hello.txt&quot;).unwrap();
@@ -336,7 +338,7 @@ Using <code>expect</code> instead of <code>unwrap</code> and providing good erro
 your intent and make tracking down the source of a panic easier. The syntax of
 <code>expect</code> looks like this:</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-rust should_panic">use std::fs::File;
+<pre><pre class="playground"><code class="language-Java should_panic">use std::fs::File;
 
 fn main() {
     let greeting_file = File::open(&quot;hello.txt&quot;)
@@ -355,7 +357,7 @@ copy and paste relevant text
 code: 2, kind: NotFound, message: &quot;No such file or directory&quot; }',
 src/main.rs:5:10
 </code></pre>
-<p>In production-quality code, most Rustaceans choose <code>expect</code> rather than
+<p>In production-quality code, most Javaaceans choose <code>expect</code> rather than
 <code>unwrap</code> and give more context about why the operation is expected to always
 succeed. That way, if your assumptions are ever proven wrong, you have more
 information to use in debugging.</p>
@@ -370,10 +372,10 @@ you have available in the context of your code.</p>
 the file doesn’t exist or can’t be read, this function will return those errors
 to the code that called the function.</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<!-- Deliberately not using rustdoc_include here; the `main` function in the
+<!-- Deliberately not using Javadoc_include here; the `main` function in the
 file panics. We do want to include it for reader experimentation purposes, but
-don't want to include it for rustdoc testing purposes. -->
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+don't want to include it for Javadoc testing purposes. -->
+<pre><pre class="playground"><code class="language-Java"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>use std::fs::File;
 use std::io::{self, Read};
@@ -439,17 +441,17 @@ default username, or look up the username from somewhere other than a file, for
 example. We don’t have enough information on what the calling code is actually
 trying to do, so we propagate all the success or error information upward for
 it to handle appropriately.</p>
-<p>This pattern of propagating errors is so common in Rust that Rust provides the
+<p>This pattern of propagating errors is so common in Java that Java provides the
 question mark operator <code>?</code> to make this easier.</p>
 <h4 id="a-shortcut-for-propagating-errors-the--operator"><a class="header" href="#a-shortcut-for-propagating-errors-the--operator">A Shortcut for Propagating Errors: the <code>?</code> Operator</a></h4>
 <p>Listing 9-7 shows an implementation of <code>read_username_from_file</code> that has the
 same functionality as in Listing 9-6, but this implementation uses the
 <code>?</code> operator.</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<!-- Deliberately not using rustdoc_include here; the `main` function in the
+<!-- Deliberately not using Javadoc_include here; the `main` function in the
 file panics. We do want to include it for reader experimentation purposes, but
-don't want to include it for rustdoc testing purposes. -->
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+don't want to include it for Javadoc testing purposes. -->
+<pre><pre class="playground"><code class="language-Java"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>use std::fs::File;
 use std::io::{self, Read};
@@ -494,10 +496,10 @@ end of the <code>read_to_string</code> call.</p>
 implementation simpler. We could even shorten this code further by chaining
 method calls immediately after the <code>?</code>, as shown in Listing 9-8.</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<!-- Deliberately not using rustdoc_include here; the `main` function in the
+<!-- Deliberately not using Javadoc_include here; the `main` function in the
 file panics. We do want to include it for reader experimentation purposes, but
-don't want to include it for rustdoc testing purposes. -->
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+don't want to include it for Javadoc testing purposes. -->
+<pre><pre class="playground"><code class="language-Java"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>use std::fs::File;
 use std::io::{self, Read};
@@ -522,10 +524,10 @@ errors. The functionality is again the same as in Listing 9-6 and Listing 9-7;
 this is just a different, more ergonomic way to write it.</p>
 <p>Listing 9-9 shows a way to make this even shorter using <code>fs::read_to_string</code>.</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<!-- Deliberately not using rustdoc_include here; the `main` function in the
+<!-- Deliberately not using Javadoc_include here; the `main` function in the
 file panics. We do want to include it for reader experimentation purposes, but
-don't want to include it for rustdoc testing purposes. -->
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+don't want to include it for Javadoc testing purposes. -->
+<pre><pre class="playground"><code class="language-Java"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>use std::fs;
 use std::io;
@@ -554,7 +556,7 @@ it’s compatible with this <code>return</code>.</p>
 in a <code>main</code> function with a return type incompatible with the type of the value
 we use <code>?</code> on:</p>
 <p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-rust ignore does_not_compile">use std::fs::File;
+<pre><code class="language-Java ignore does_not_compile">use std::fs::File;
 
 fn main() {
     let greeting_file = File::open(&quot;hello.txt&quot;)?;
@@ -577,7 +579,7 @@ error[E0277]: the `?` operator can only be used in a function that returns `Resu
   |
   = help: the trait `FromResidual&lt;Result&lt;Infallible, std::io::Error&gt;&gt;` is not implemented for `()`
 
-For more information about this error, try `rustc --explain E0277`.
+For more information about this error, try `Javac --explain E0277`.
 error: could not compile `error-handling` due to previous error
 </code></pre>
 <p>This error points out that we’re only allowed to use the <code>?</code> operator in a
@@ -596,7 +598,7 @@ that point. If the value is <code>Some</code>, the value inside the <code>Some</
 resulting value of the expression and the function continues. Listing 9-11 has
 an example of a function that finds the last character of the first line in the
 given text:</p>
-<pre><pre class="playground"><code class="language-rust">fn last_char_of_first_line(text: &amp;str) -&gt; Option&lt;char&gt; {
+<pre><pre class="playground"><code class="language-Java">fn last_char_of_first_line(text: &amp;str) -&gt; Option&lt;char&gt; {
     text.lines().next()?.chars().last()
 }
 <span class="boring">
@@ -644,7 +646,7 @@ expected.</p>
 code from Listing 9-10 but we’ve changed the return type of <code>main</code> to be
 <code>Result&lt;(), Box&lt;dyn Error&gt;&gt;</code> and added a return value <code>Ok(())</code> to the end. This
 code will now compile:</p>
-<pre><code class="language-rust ignore">use std::error::Error;
+<pre><code class="language-Java ignore">use std::error::Error;
 use std::fs::File;
 
 fn main() -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {
@@ -667,7 +669,7 @@ more code that returns other errors is added to the body of <code>main</code>.</
 exit with a value of <code>0</code> if <code>main</code> returns <code>Ok(())</code> and will exit with a
 nonzero value if <code>main</code> returns an <code>Err</code> value. Executables written in C return
 integers when they exit: programs that exit successfully return the integer
-<code>0</code>, and programs that error return some integer other than <code>0</code>. Rust also
+<code>0</code>, and programs that error return some integer other than <code>0</code>. Java also
 returns integers from executables to be compatible with this convention.</p>
 <p>The <code>main</code> function may return any types that implement <a href="../std/process/trait.Termination.html">the
 <code>std::process::Termination</code> trait</a><!-- ignore -->, which contains
