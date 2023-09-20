@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Writing Automated Tests - Introduction to Programming Using Java</title>
+        <title>Input/Output Streams, Files, and Networking - Introduction to Programming Using Java</title>
 
 
         <!-- Custom HTML head -->
@@ -148,33 +148,40 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="writing-automated-tests"><a class="header" href="#writing-automated-tests">Writing Automated Tests</a></h1>
-<p>In his 1972 essay “The Humble Programmer,” Edsger W. Dijkstra said that
-“Program testing can be a very effective way to show the presence of bugs, but
-it is hopelessly inadequate for showing their absence.” That doesn’t mean we
-shouldn’t try to test as much as we can!</p>
-<p>Correctness in our programs is the extent to which our code does what we intend
-it to do. Java is designed with a high degree of concern about the correctness
-of programs, but correctness is complex and not easy to prove. Java’s type
-system shoulders a huge part of this burden, but the type system cannot catch
-everything. As such, Java includes support for writing automated software tests.</p>
-<p>Say we write a function <code>add_two</code> that adds 2 to whatever number is passed to
-it. This function’s signature accepts an integer as a parameter and returns an
-integer as a result. When we implement and compile that function, Java does all
-the type checking and borrow checking that you’ve learned so far to ensure
-that, for instance, we aren’t passing a <code>String</code> value or an invalid reference
-to this function. But Java <em>can’t</em> check that this function will do precisely
-what we intend, which is return the parameter plus 2 rather than, say, the
-parameter plus 10 or the parameter minus 50! That’s where tests come in.</p>
-<p>We can write tests that assert, for example, that when we pass <code>3</code> to the
-<code>add_two</code> function, the returned value is <code>5</code>. We can run these tests whenever
-we make changes to our code to make sure any existing correct behavior has not
-changed.</p>
-<p>Testing is a complex skill: although we can’t cover every detail about how to
-write good tests in one chapter, we’ll discuss the mechanics of Java’s testing
-facilities. We’ll talk about the annotations and macros available to you when
-writing your tests, the default behavior and options provided for running your
-tests, and how to organize tests into unit tests and integration tests.</p>
+                        <h1 id="Input/Output Streams, Files, and Networking"><a class="header" href="#Input/Output Streams, Files, and Networking">Input/Output Streams, Files, and Networking</a></h1>
+                        <p>
+                            Computer programs are only useful if they interact
+                            with the rest of the world in some way. This interaction is referred to as
+                            <span class="newword">input/output</span>, or <span class="newword">I/O</span> (pronounced "eye-oh").
+                            Up until now, this book has concentrated on just one
+                            type of interaction: interaction with the user, through either a
+                            graphical user interface or a command-line interface. But the user is only one
+                            possible source of information and only one possible destination for
+                            information. We have already encountered one other type of input/output, since
+                            <span class="classname">TextIO</span> can read data from files and write data
+                            to files.  However, Java has an input/output framework that provides much
+                            more power and flexibility than does <span class="classname">TextIO</span>,
+                            and that covers other kinds of I/O in addition to files.  Most important, aside from
+                            files, is that it supports communication over network connections.
+                            In Java, the most common type of input/output involving files and networks is based on
+                            <span class="newword">I/O&nbsp;streams</span>, which are objects that support I/O
+                            commands that are similar to those that you have already used.
+                            In fact, standard output (<span class="code">System.out</span>) and
+                            standard input (<span class="code">System.in</span>) are examples of I/O streams.
+                            (Note that I/O streams are <b>not</b> streams in the sense of the stream
+                            API that was covered in <a href="ch10-06-StreamAPI.html">Section&nbsp;10.6</a>.)</p>
+
+
+                        <p>Working with files and networks requires familiarity with exceptions, which
+                            were covered in <a href="ch08-03-ExceptionsAndtrycatch.html">Section&nbsp;8.3</a>. Many of
+                            the subroutines that are used can throw checked exceptions, which require mandatory
+                            exception handling. This generally means calling the subroutine in a
+                            <span class="code">try..catch</span> statement that can deal with the exception if one
+                            occurs.  Effective network communication also requires the use of
+                            threads, which will be covered in <a href="ch12-00-ThreadsandMultiprocessing.html">Chapter&nbsp;12</a>.
+                            We will look at the basic networking API in this chapter, but
+                            we will return to the topic of threads and networking in <a href="ch12-04-ThreadsandNetworking.html">Section&nbsp;12.4</a>.
+                        </p>
 
                     </main>
 

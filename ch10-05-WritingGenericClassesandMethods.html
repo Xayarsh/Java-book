@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Validating References with Lifetimes - Introduction to Programming Using Java</title>
+        <title>Writing Generic Classes and Methods - Introduction to Programming Using Java</title>
 
 
         <!-- Custom HTML head -->
@@ -148,711 +148,796 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h2 id="validating-references-with-lifetimes"><a class="header" href="#validating-references-with-lifetimes">Validating References with Lifetimes</a></h2>
-<p>Lifetimes are another kind of generic that we’ve already been using. Rather
-than ensuring that a type has the behavior we want, lifetimes ensure that
-references are valid as long as we need them to be.</p>
-<p>One detail we didn’t discuss in the <a href="ch04-02-StaticSubroutines.html#references-and-borrowing">“References and
-Borrowing”</a><!-- ignore --> section in Chapter 4 is
-that every reference in Java has a <em>lifetime</em>, which is the scope for which
-that reference is valid. Most of the time, lifetimes are implicit and inferred,
-just like most of the time, types are inferred. We only must annotate types
-when multiple types are possible. In a similar way, we must annotate lifetimes
-when the lifetimes of references could be related in a few different ways. Java
-requires us to annotate the relationships using generic lifetime parameters to
-ensure the actual references used at runtime will definitely be valid.</p>
-<p>Annotating lifetimes is not even a concept most other programming languages
-have, so this is going to feel unfamiliar. Although we won’t cover lifetimes in
-their entirety in this chapter, we’ll discuss common ways you might encounter
-lifetime syntax so you can get comfortable with the concept.</p>
-<h3 id="preventing-dangling-references-with-lifetimes"><a class="header" href="#preventing-dangling-references-with-lifetimes">Preventing Dangling References with Lifetimes</a></h3>
-<p>The main aim of lifetimes is to prevent <em>dangling references</em>, which cause a
-program to reference data other than the data it’s intended to reference.
-Consider the program in Listing 10-16, which has an outer scope and an inner
-scope.</p>
-<pre><code class="language-Java ignore does_not_compile">fn main() {
-    let r;
+                        <h2 id="Writing Generic Classes and Methods"><a class="header" href="#Writing Generic Classes and Methods">Writing Generic Classes and Methods</a></h2>
+                        <p>
+                            So far in this chapter, you have learned
+                            about using the generic classes and methods that are part of the
+                            Java Collection Framework.  Now, it's time to learn how to write
+                            new generic classes and methods from scratch.  Generic programming produces
+                            highly general and reusable code&mdash;it's very useful for people
+                            who write reusable software libraries to know how to do generic
+                            programming, since it enables them to write code that can be used in
+                            many different situations.  Not every programmer needs to write reusable
+                            software libraries, but every programmer should know at least a little
+                            about how to do it.  In fact, just to read the Javadoc documentation for
+                            Java's standard generic classes, you need to know some of the syntax that is
+                            introduced in this section.</p>
 
-    {
-        let x = 5;
-        r = &amp;x;
-    }
 
-    println!(&quot;r: {}&quot;, r);
+                        <p>I will not cover every detail of generic programming in Java in this
+                            section, but the material presented here should be sufficient to cover the
+                            most common cases.</p>
+
+
+                        <h3 id="Simple Generic Classes"><a class="header" href="#Simple Generic Classes">Simple Generic Classes</a></h3>
+
+                        <p>Let's start with an example that illustrates the motivation for generic
+                            programming.  In <a href="ch10-02-ListsandSets.html">Subsection&nbsp;10.2.1</a>, I remarked that it would
+                            be easy to use a <span class="classname">LinkedList</span> to implement a queue.
+                            (Queues were introduced in <a href="ch09-03-StacksQueuesADTs.html">Subsection&nbsp;9.3.2</a>.)
+                            To ensure that the only operations that are performed on the list are
+                            the queue operations <span class="code">enqueue</span>, <span class="code">dequeue</span>, and
+                            <span class="code">isEmpty</span>, we can create a new class that contains the
+                            linked list as a private instance variable.  To implement
+                            queues of strings, for example, we can define the class:</p>
+
+
+                        <pre><code class="java">class QueueOfStrings {
+   private LinkedList&lt;String&gt; items = new LinkedList&lt;&gt;();
+   public void enqueue(String item) {
+      items.addLast(item);
+   }
+   public String dequeue() {
+      return items.removeFirst();
+   }
+   public boolean isEmpty() {
+      return (items.size() == 0);
+   }
 }</code></pre>
-<p><span class="caption">Listing 10-16: An attempt to use a reference whose value
-has gone out of scope</span></p>
-<blockquote>
-<p>Note: The examples in Listings 10-16, 10-17, and 10-23 declare variables
-without giving them an initial value, so the variable name exists in the
-outer scope. At first glance, this might appear to be in conflict with Java’s
-having no null values. However, if we try to use a variable before giving it
-a value, we’ll get a compile-time error, which shows that Java indeed does
-not allow null values.</p>
-</blockquote>
-<p>The outer scope declares a variable named <code>r</code> with no initial value, and the
-inner scope declares a variable named <code>x</code> with the initial value of 5. Inside
-the inner scope, we attempt to set the value of <code>r</code> as a reference to <code>x</code>. Then
-the inner scope ends, and we attempt to print the value in <code>r</code>. This code won’t
-compile because the value <code>r</code> is referring to has gone out of scope before we
-try to use it. Here is the error message:</p>
-<pre><code class="language-console">$ cargo run
-   Compiling chapter10 v0.1.0 (file:///projects/chapter10)
-error[E0597]: `x` does not live long enough
- --&gt; src/main.rs:6:13
-  |
-6 |         r = &amp;x;
-  |             ^^ borrowed value does not live long enough
-7 |     }
-  |     - `x` dropped here while still borrowed
-8 |
-9 |     println!(&quot;r: {}&quot;, r);
-  |                       - borrow later used here
 
-For more information about this error, try `Javac --explain E0597`.
-error: could not compile `chapter10` due to previous error
-</code></pre>
-<p>The variable <code>x</code> doesn’t “live long enough.” The reason is that <code>x</code> will be out
-of scope when the inner scope ends on line 7. But <code>r</code> is still valid for the
-outer scope; because its scope is larger, we say that it “lives longer.” If
-Java allowed this code to work, <code>r</code> would be referencing memory that was
-deallocated when <code>x</code> went out of scope, and anything we tried to do with <code>r</code>
-wouldn’t work correctly. So how does Java determine that this code is invalid?
-It uses a borrow checker.</p>
-<h3 id="the-borrow-checker"><a class="header" href="#the-borrow-checker">The Borrow Checker</a></h3>
-<p>The Java compiler has a <em>borrow checker</em> that compares scopes to determine
-whether all borrows are valid. Listing 10-17 shows the same code as Listing
-10-16 but with annotations showing the lifetimes of the variables.</p>
-<pre><code class="language-Java ignore does_not_compile">fn main() {
-    let r;                // ---------+-- 'a
-                          //          |
-    {                     //          |
-        let x = 5;        // -+-- 'b  |
-        r = &amp;x;           //  |       |
-    }                     // -+       |
-                          //          |
-    println!(&quot;r: {}&quot;, r); //          |
-}                         // ---------+</code></pre>
-<p><span class="caption">Listing 10-17: Annotations of the lifetimes of <code>r</code> and
-<code>x</code>, named <code>'a</code> and <code>'b</code>, respectively</span></p>
-<p>Here, we’ve annotated the lifetime of <code>r</code> with <code>'a</code> and the lifetime of <code>x</code>
-with <code>'b</code>. As you can see, the inner <code>'b</code> block is much smaller than the outer
-<code>'a</code> lifetime block. At compile time, Java compares the size of the two
-lifetimes and sees that <code>r</code> has a lifetime of <code>'a</code> but that it refers to memory
-with a lifetime of <code>'b</code>. The program is rejected because <code>'b</code> is shorter than
-<code>'a</code>: the subject of the reference doesn’t live as long as the reference.</p>
-<p>Listing 10-18 fixes the code so it doesn’t have a dangling reference and
-compiles without any errors.</p>
-<pre><pre class="playground"><code class="language-Java">fn main() {
-    let x = 5;            // ----------+-- 'b
-                          //           |
-    let r = &amp;x;           // --+-- 'a  |
-                          //   |       |
-    println!(&quot;r: {}&quot;, r); //   |       |
-                          // --+       |
-}                         // ----------+</code></pre></pre>
-<p><span class="caption">Listing 10-18: A valid reference because the data has a
-longer lifetime than the reference</span></p>
-<p>Here, <code>x</code> has the lifetime <code>'b</code>, which in this case is larger than <code>'a</code>. This
-means <code>r</code> can reference <code>x</code> because Java knows that the reference in <code>r</code> will
-always be valid while <code>x</code> is valid.</p>
-<p>Now that you know where the lifetimes of references are and how Java analyzes
-lifetimes to ensure references will always be valid, let’s explore generic
-lifetimes of parameters and return values in the context of functions.</p>
-<h3 id="generic-lifetimes-in-functions"><a class="header" href="#generic-lifetimes-in-functions">Generic Lifetimes in Functions</a></h3>
-<p>We’ll write a function that returns the longer of two string slices. This
-function will take two string slices and return a single string slice. After
-we’ve implemented the <code>longest</code> function, the code in Listing 10-19 should
-print <code>The longest string is abcd</code>.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-Java ignore">fn main() {
-    let string1 = String::from(&quot;abcd&quot;);
-    let string2 = &quot;xyz&quot;;
 
-    let result = longest(string1.as_str(), string2);
-    println!(&quot;The longest string is {}&quot;, result);
+                        <p>This is a fine and useful class.  But, if this is how we write queue classes, and
+                            if we want queues of <span class="classname">Integers</span>
+                            or <span class="classname">Doubles</span> or <span class="classname">Colors</span> or any other type,
+                            then we will have to write a different class for each type.  The code for all of these
+                            classes will be almost identical, which seems like a lot of redundant programming.
+                            To avoid the redundancy, we can write a <b>generic</b> <span class="classname">Queue</span>
+                            class that can be used to define queues of any type of object.</p>
+
+
+                        <p>The syntax for writing the generic class is straightforward: We replace the specific
+                            type <span class="classname">String</span> with a type parameter such as&nbsp;<span class="classname">T</span>,
+                            and we add the type parameter to the name of the class:</p>
+
+
+                        <pre><code class="java">class Queue&lt;T&gt; {
+   private LinkedList&lt;T&gt; items = new LinkedList&lt;&gt;();
+   public void enqueue(T item) {
+      items.addLast(item);
+   }
+   public T dequeue() {
+      return items.removeFirst();
+   }
+   public boolean isEmpty() {
+      return (items.size() == 0);
+   }
 }</code></pre>
-<p><span class="caption">Listing 10-19: A <code>main</code> function that calls the <code>longest</code>
-function to find the longer of two string slices</span></p>
-<p>Note that we want the function to take string slices, which are references,
-rather than strings, because we don’t want the <code>longest</code> function to take
-ownership of its parameters. Refer to the <a href="ch04-03-Parameters.html#string-slices-as-parameters">“String Slices as
-Parameters”</a><!-- ignore --> section in Chapter 4
-for more discussion about why the parameters we use in Listing 10-19 are the
-ones we want.</p>
-<p>If we try to implement the <code>longest</code> function as shown in Listing 10-20, it
-won’t compile.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-Java ignore does_not_compile"><span class="boring">fn main() {
-</span><span class="boring">    let string1 = String::from(&quot;abcd&quot;);
-</span><span class="boring">    let string2 = &quot;xyz&quot;;
-</span><span class="boring">
-</span><span class="boring">    let result = longest(string1.as_str(), string2);
-</span><span class="boring">    println!(&quot;The longest string is {}&quot;, result);
-</span><span class="boring">}
-</span><span class="boring">
-</span>fn longest(x: &amp;str, y: &amp;str) -&gt; &amp;str {
-    if x.len() &gt; y.len() {
-        x
-    } else {
-        y
-    }
+
+
+                        <p>Note that within the class, the type parameter <span class="classname">T</span> is used
+                            just like any regular type name.  It's used to declare the return type for
+                            <span class="code">dequeue</span>, as the type of the formal parameter <span class="code">item</span> in
+                            <span class="code">enqueue</span>, and even as the actual type parameter in <span class="classname">LinkedList&lt;T&gt;</span>.
+                            Given this class definition, we can use parameterized types such
+                            as <span class="classname">Queue&lt;String&gt;</span> and <span class="classname">Queue&lt;Integer&gt;</span>
+                            and <span class="classname">Queue&lt;Color&gt;</span>.  That is, the <span class="classname">Queue</span> class
+                            is used in exactly the same way as built-in generic classes like <span class="classname">LinkedList</span>
+                            and <span class="classname">HashSet</span>.</p>
+
+
+                        <p>Note that you don't have to use "T" as the name of the type parameter in the
+                            definition of the generic class.  Type parameters are like formal parameters in subroutines.
+                            You can make up any name you like in the <b>definition</b> of the class.  The
+                            name in the definition will be replaced by an actual type name when the class
+                            is used to declare variables or create objects.  If you prefer to use a more
+                            meaningful name for the type parameter, you might define the <span class="classname">Queue</span>
+                            class as:</p>
+
+
+                        <pre><code class="java">class Queue&lt;<span class="newcode">ItemType</span>&gt; {
+   private LinkedList&lt;<span class="newcode">ItemType</span>&gt; items = new LinkedList&lt;&gt;();
+   public void enqueue(<span class="newcode">ItemType</span> item) {
+      items.addLast(item);
+   }
+   public <span class="newcode">ItemType</span> dequeue() {
+      return items.removeFirst();
+   }
+   public boolean isEmpty() {
+      return (items.size() == 0);
+   }
 }</code></pre>
-<p><span class="caption">Listing 10-20: An implementation of the <code>longest</code>
-function that returns the longer of two string slices but does not yet
-compile</span></p>
-<p>Instead, we get the following error that talks about lifetimes:</p>
-<pre><code class="language-console">$ cargo run
-   Compiling chapter10 v0.1.0 (file:///projects/chapter10)
-error[E0106]: missing lifetime specifier
- --&gt; src/main.rs:9:33
-  |
-9 | fn longest(x: &amp;str, y: &amp;str) -&gt; &amp;str {
-  |               ----     ----     ^ expected named lifetime parameter
-  |
-  = help: this function's return type contains a borrowed value, but the signature does not say whether it is borrowed from `x` or `y`
-help: consider introducing a named lifetime parameter
-  |
-9 | fn longest&lt;'a&gt;(x: &amp;'a str, y: &amp;'a str) -&gt; &amp;'a str {
-  |           ++++     ++          ++          ++
 
-For more information about this error, try `Javac --explain E0106`.
-error: could not compile `chapter10` due to previous error
-</code></pre>
-<p>The help text reveals that the return type needs a generic lifetime parameter
-on it because Java can’t tell whether the reference being returned refers to
-<code>x</code> or <code>y</code>. Actually, we don’t know either, because the <code>if</code> block in the body
-of this function returns a reference to <code>x</code> and the <code>else</code> block returns a
-reference to <code>y</code>!</p>
-<p>When we’re defining this function, we don’t know the concrete values that will
-be passed into this function, so we don’t know whether the <code>if</code> case or the
-<code>else</code> case will execute. We also don’t know the concrete lifetimes of the
-references that will be passed in, so we can’t look at the scopes as we did in
-Listings 10-17 and 10-18 to determine whether the reference we return will
-always be valid. The borrow checker can’t determine this either, because it
-doesn’t know how the lifetimes of <code>x</code> and <code>y</code> relate to the lifetime of the
-return value. To fix this error, we’ll add generic lifetime parameters that
-define the relationship between the references so the borrow checker can
-perform its analysis.</p>
-<h3 id="lifetime-annotation-syntax"><a class="header" href="#lifetime-annotation-syntax">Lifetime Annotation Syntax</a></h3>
-<p>Lifetime annotations don’t change how long any of the references live. Rather,
-they describe the relationships of the lifetimes of multiple references to each
-other without affecting the lifetimes. Just as functions can accept any type
-when the signature specifies a generic type parameter, functions can accept
-references with any lifetime by specifying a generic lifetime parameter.</p>
-<p>Lifetime annotations have a slightly unusual syntax: the names of lifetime
-parameters must start with an apostrophe (<code>'</code>) and are usually all lowercase
-and very short, like generic types. Most people use the name <code>'a</code> for the first
-lifetime annotation. We place lifetime parameter annotations after the <code>&amp;</code> of a
-reference, using a space to separate the annotation from the reference’s type.</p>
-<p>Here are some examples: a reference to an <code>i32</code> without a lifetime parameter, a
-reference to an <code>i32</code> that has a lifetime parameter named <code>'a</code>, and a mutable
-reference to an <code>i32</code> that also has the lifetime <code>'a</code>.</p>
-<pre><code class="language-Java ignore">&amp;i32        // a reference
-&amp;'a i32     // a reference with an explicit lifetime
-&amp;'a mut i32 // a mutable reference with an explicit lifetime</code></pre>
-<p>One lifetime annotation by itself doesn’t have much meaning, because the
-annotations are meant to tell Java how generic lifetime parameters of multiple
-references relate to each other. Let’s examine how the lifetime annotations
-relate to each other in the context of the <code>longest</code> function.</p>
-<h3 id="lifetime-annotations-in-function-signatures"><a class="header" href="#lifetime-annotations-in-function-signatures">Lifetime Annotations in Function Signatures</a></h3>
-<p>To use lifetime annotations in function signatures, we need to declare the
-generic <em>lifetime</em> parameters inside angle brackets between the function name
-and the parameter list, just as we did with generic <em>type</em> parameters.</p>
-<p>We want the signature to express the following constraint: the returned
-reference will be valid as long as both the parameters are valid. This is the
-relationship between lifetimes of the parameters and the return value. We’ll
-name the lifetime <code>'a</code> and then add it to each reference, as shown in Listing
-10-21.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-Java"><span class="boring">fn main() {
-</span><span class="boring">    let string1 = String::from(&quot;abcd&quot;);
-</span><span class="boring">    let string2 = &quot;xyz&quot;;
-</span><span class="boring">
-</span><span class="boring">    let result = longest(string1.as_str(), string2);
-</span><span class="boring">    println!(&quot;The longest string is {}&quot;, result);
-</span><span class="boring">}
-</span><span class="boring">
-</span>fn longest&lt;'a&gt;(x: &amp;'a str, y: &amp;'a str) -&gt; &amp;'a str {
-    if x.len() &gt; y.len() {
-        x
-    } else {
-        y
-    }
-}</code></pre></pre>
-<p><span class="caption">Listing 10-21: The <code>longest</code> function definition
-specifying that all the references in the signature must have the same lifetime
-<code>'a</code></span></p>
-<p>This code should compile and produce the result we want when we use it with the
-<code>main</code> function in Listing 10-19.</p>
-<p>The function signature now tells Java that for some lifetime <code>'a</code>, the function
-takes two parameters, both of which are string slices that live at least as
-long as lifetime <code>'a</code>. The function signature also tells Java that the string
-slice returned from the function will live at least as long as lifetime <code>'a</code>.
-In practice, it means that the lifetime of the reference returned by the
-<code>longest</code> function is the same as the smaller of the lifetimes of the values
-referred to by the function arguments. These relationships are what we want
-Java to use when analyzing this code.</p>
-<p>Remember, when we specify the lifetime parameters in this function signature,
-we’re not changing the lifetimes of any values passed in or returned. Rather,
-we’re specifying that the borrow checker should reject any values that don’t
-adhere to these constraints. Note that the <code>longest</code> function doesn’t need to
-know exactly how long <code>x</code> and <code>y</code> will live, only that some scope can be
-substituted for <code>'a</code> that will satisfy this signature.</p>
-<p>When annotating lifetimes in functions, the annotations go in the function
-signature, not in the function body. The lifetime annotations become part of
-the contract of the function, much like the types in the signature. Having
-function signatures contain the lifetime contract means the analysis the Java
-compiler does can be simpler. If there’s a problem with the way a function is
-annotated or the way it is called, the compiler errors can point to the part of
-our code and the constraints more precisely. If, instead, the Java compiler
-made more inferences about what we intended the relationships of the lifetimes
-to be, the compiler might only be able to point to a use of our code many steps
-away from the cause of the problem.</p>
-<p>When we pass concrete references to <code>longest</code>, the concrete lifetime that is
-substituted for <code>'a</code> is the part of the scope of <code>x</code> that overlaps with the
-scope of <code>y</code>. In other words, the generic lifetime <code>'a</code> will get the concrete
-lifetime that is equal to the smaller of the lifetimes of <code>x</code> and <code>y</code>. Because
-we’ve annotated the returned reference with the same lifetime parameter <code>'a</code>,
-the returned reference will also be valid for the length of the smaller of the
-lifetimes of <code>x</code> and <code>y</code>.</p>
-<p>Let’s look at how the lifetime annotations restrict the <code>longest</code> function by
-passing in references that have different concrete lifetimes. Listing 10-22 is
-a straightforward example.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-Java">fn main() {
-    let string1 = String::from(&quot;long string is long&quot;);
 
-    {
-        let string2 = String::from(&quot;xyz&quot;);
-        let result = longest(string1.as_str(), string2.as_str());
-        println!(&quot;The longest string is {}&quot;, result);
-    }
-}
-<span class="boring">
-</span><span class="boring">fn longest&lt;'a&gt;(x: &amp;'a str, y: &amp;'a str) -&gt; &amp;'a str {
-</span><span class="boring">    if x.len() &gt; y.len() {
-</span><span class="boring">        x
-</span><span class="boring">    } else {
-</span><span class="boring">        y
-</span><span class="boring">    }
-</span><span class="boring">}</span></code></pre></pre>
-<p><span class="caption">Listing 10-22: Using the <code>longest</code> function with
-references to <code>String</code> values that have different concrete lifetimes</span></p>
-<p>In this example, <code>string1</code> is valid until the end of the outer scope, <code>string2</code>
-is valid until the end of the inner scope, and <code>result</code> references something
-that is valid until the end of the inner scope. Run this code, and you’ll see
-that the borrow checker approves; it will compile and print <code>The longest string is long string is long</code>.</p>
-<p>Next, let’s try an example that shows that the lifetime of the reference in
-<code>result</code> must be the smaller lifetime of the two arguments. We’ll move the
-declaration of the <code>result</code> variable outside the inner scope but leave the
-assignment of the value to the <code>result</code> variable inside the scope with
-<code>string2</code>. Then we’ll move the <code>println!</code> that uses <code>result</code> to outside the
-inner scope, after the inner scope has ended. The code in Listing 10-23 will
-not compile.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-Java ignore does_not_compile">fn main() {
-    let string1 = String::from(&quot;long string is long&quot;);
-    let result;
-    {
-        let string2 = String::from(&quot;xyz&quot;);
-        result = longest(string1.as_str(), string2.as_str());
-    }
-    println!(&quot;The longest string is {}&quot;, result);
-}
-<span class="boring">
-</span><span class="boring">fn longest&lt;'a&gt;(x: &amp;'a str, y: &amp;'a str) -&gt; &amp;'a str {
-</span><span class="boring">    if x.len() &gt; y.len() {
-</span><span class="boring">        x
-</span><span class="boring">    } else {
-</span><span class="boring">        y
-</span><span class="boring">    }
-</span><span class="boring">}</span></code></pre>
-<p><span class="caption">Listing 10-23: Attempting to use <code>result</code> after <code>string2</code>
-has gone out of scope</span></p>
-<p>When we try to compile this code, we get this error:</p>
-<pre><code class="language-console">$ cargo run
-   Compiling chapter10 v0.1.0 (file:///projects/chapter10)
-error[E0597]: `string2` does not live long enough
- --&gt; src/main.rs:6:44
-  |
-6 |         result = longest(string1.as_str(), string2.as_str());
-  |                                            ^^^^^^^^^^^^^^^^ borrowed value does not live long enough
-7 |     }
-  |     - `string2` dropped here while still borrowed
-8 |     println!(&quot;The longest string is {}&quot;, result);
-  |                                          ------ borrow later used here
+                        <p>Changing the name from "<span class="code">T</span>" to "<span class="code">ItemType</span>" has absolutely no effect on the meaning
+                            of the class definition or on the way that <span class="classname">Queue</span> is used.</p>
 
-For more information about this error, try `Javac --explain E0597`.
-error: could not compile `chapter10` due to previous error
-</code></pre>
-<p>The error shows that for <code>result</code> to be valid for the <code>println!</code> statement,
-<code>string2</code> would need to be valid until the end of the outer scope. Java knows
-this because we annotated the lifetimes of the function parameters and return
-values using the same lifetime parameter <code>'a</code>.</p>
-<p>As humans, we can look at this code and see that <code>string1</code> is longer than
-<code>string2</code> and therefore <code>result</code> will contain a reference to <code>string1</code>.
-Because <code>string1</code> has not gone out of scope yet, a reference to <code>string1</code> will
-still be valid for the <code>println!</code> statement. However, the compiler can’t see
-that the reference is valid in this case. We’ve told Java that the lifetime of
-the reference returned by the <code>longest</code> function is the same as the smaller of
-the lifetimes of the references passed in. Therefore, the borrow checker
-disallows the code in Listing 10-23 as possibly having an invalid reference.</p>
-<p>Try designing more experiments that vary the values and lifetimes of the
-references passed in to the <code>longest</code> function and how the returned reference
-is used. Make hypotheses about whether or not your experiments will pass the
-borrow checker before you compile; then check to see if you’re right!</p>
-<h3 id="thinking-in-terms-of-lifetimes"><a class="header" href="#thinking-in-terms-of-lifetimes">Thinking in Terms of Lifetimes</a></h3>
-<p>The way in which you need to specify lifetime parameters depends on what your
-function is doing. For example, if we changed the implementation of the
-<code>longest</code> function to always return the first parameter rather than the longest
-string slice, we wouldn’t need to specify a lifetime on the <code>y</code> parameter. The
-following code will compile:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-Java"><span class="boring">fn main() {
-</span><span class="boring">    let string1 = String::from(&quot;abcd&quot;);
-</span><span class="boring">    let string2 = &quot;efghijklmnopqrstuvwxyz&quot;;
-</span><span class="boring">
-</span><span class="boring">    let result = longest(string1.as_str(), string2);
-</span><span class="boring">    println!(&quot;The longest string is {}&quot;, result);
-</span><span class="boring">}
-</span><span class="boring">
-</span>fn longest&lt;'a&gt;(x: &amp;'a str, y: &amp;str) -&gt; &amp;'a str {
-    x
-}</code></pre></pre>
-<p>We’ve specified a lifetime parameter <code>'a</code> for the parameter <code>x</code> and the return
-type, but not for the parameter <code>y</code>, because the lifetime of <code>y</code> does not have
-any relationship with the lifetime of <code>x</code> or the return value.</p>
-<p>When returning a reference from a function, the lifetime parameter for the
-return type needs to match the lifetime parameter for one of the parameters. If
-the reference returned does <em>not</em> refer to one of the parameters, it must refer
-to a value created within this function. However, this would be a dangling
-reference because the value will go out of scope at the end of the function.
-Consider this attempted implementation of the <code>longest</code> function that won’t
-compile:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-Java ignore does_not_compile"><span class="boring">fn main() {
-</span><span class="boring">    let string1 = String::from(&quot;abcd&quot;);
-</span><span class="boring">    let string2 = &quot;xyz&quot;;
-</span><span class="boring">
-</span><span class="boring">    let result = longest(string1.as_str(), string2);
-</span><span class="boring">    println!(&quot;The longest string is {}&quot;, result);
-</span><span class="boring">}
-</span><span class="boring">
-</span>fn longest&lt;'a&gt;(x: &amp;str, y: &amp;str) -&gt; &amp;'a str {
-    let result = String::from(&quot;really long string&quot;);
-    result.as_str()
+
+                        <p>Generic interfaces can be defined in a similar way.
+                            It's also easy to define generic classes and interfaces that have two or more type parameters,
+                            as is done with the standard interface <span class="classname">Map&lt;K,V&gt;</span>.
+                            A typical example is the definition of a "Pair" that contains two objects,
+                            possibly of different types.  A simple version of such a class can be defined as:</p>
+
+
+                        <pre><code class="java">public class Pair&lt;T,S&gt; {
+   public T first;
+   public S second;
+   public Pair( T a, S b ) {  // Constructor.
+      first = a;
+      second = b;
+   }
 }</code></pre>
-<p>Here, even though we’ve specified a lifetime parameter <code>'a</code> for the return
-type, this implementation will fail to compile because the return value
-lifetime is not related to the lifetime of the parameters at all. Here is the
-error message we get:</p>
-<pre><code class="language-console">$ cargo run
-   Compiling chapter10 v0.1.0 (file:///projects/chapter10)
-error[E0515]: cannot return reference to local variable `result`
-  --&gt; src/main.rs:11:5
-   |
-11 |     result.as_str()
-   |     ^^^^^^^^^^^^^^^ returns a reference to data owned by the current function
 
-For more information about this error, try `Javac --explain E0515`.
-error: could not compile `chapter10` due to previous error
-</code></pre>
-<p>The problem is that <code>result</code> goes out of scope and gets cleaned up at the end
-of the <code>longest</code> function. We’re also trying to return a reference to <code>result</code>
-from the function. There is no way we can specify lifetime parameters that
-would change the dangling reference, and Java won’t let us create a dangling
-reference. In this case, the best fix would be to return an owned data type
-rather than a reference so the calling function is then responsible for
-cleaning up the value.</p>
-<p>Ultimately, lifetime syntax is about connecting the lifetimes of various
-parameters and return values of functions. Once they’re connected, Java has
-enough information to allow memory-safe operations and disallow operations that
-would create dangling pointers or otherwise violate memory safety.</p>
-<h3 id="lifetime-annotations-in-struct-definitions"><a class="header" href="#lifetime-annotations-in-struct-definitions">Lifetime Annotations in Struct Definitions</a></h3>
-<p>So far, the structs we’ve defined all hold owned types. We can define structs to
-hold references, but in that case we would need to add a lifetime annotation on
-every reference in the struct’s definition. Listing 10-24 has a struct named
-<code>ImportantExcerpt</code> that holds a string slice.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-Java">struct ImportantExcerpt&lt;'a&gt; {
-    part: &amp;'a str,
-}
 
-fn main() {
-    let novel = String::from(&quot;Call me Ishmael. Some years ago...&quot;);
-    let first_sentence = novel.split('.').next().expect(&quot;Could not find a '.'&quot;);
-    let i = ImportantExcerpt {
-        part: first_sentence,
-    };
-}</code></pre></pre>
-<p><span class="caption">Listing 10-24: A struct that holds a reference, requiring
-a lifetime annotation</span></p>
-<p>This struct has the single field <code>part</code> that holds a string slice, which is a
-reference. As with generic data types, we declare the name of the generic
-lifetime parameter inside angle brackets after the name of the struct so we can
-use the lifetime parameter in the body of the struct definition. This
-annotation means an instance of <code>ImportantExcerpt</code> can’t outlive the reference
-it holds in its <code>part</code> field.</p>
-<p>The <code>main</code> function here creates an instance of the <code>ImportantExcerpt</code> struct
-that holds a reference to the first sentence of the <code>String</code> owned by the
-variable <code>novel</code>. The data in <code>novel</code> exists before the <code>ImportantExcerpt</code>
-instance is created. In addition, <code>novel</code> doesn’t go out of scope until after
-the <code>ImportantExcerpt</code> goes out of scope, so the reference in the
-<code>ImportantExcerpt</code> instance is valid.</p>
-<h3 id="lifetime-elision"><a class="header" href="#lifetime-elision">Lifetime Elision</a></h3>
-<p>You’ve learned that every reference has a lifetime and that you need to specify
-lifetime parameters for functions or structs that use references. However, in
-Chapter 4 we had a function in Listing 4-9, shown again in Listing 10-25, that
-compiled without lifetime annotations.</p>
-<p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><pre class="playground"><code class="language-Java">fn first_word(s: &amp;str) -&gt; &amp;str {
-    let bytes = s.as_bytes();
+                        <p>This class can be used to declare variables and create objects such as:</p>
 
-    for (i, &amp;item) in bytes.iter().enumerate() {
-        if item == b' ' {
-            return &amp;s[0..i];
-        }
-    }
 
-    &amp;s[..]
-}
-<span class="boring">
-</span><span class="boring">fn main() {
-</span><span class="boring">    let my_string = String::from(&quot;hello world&quot;);
-</span><span class="boring">
-</span><span class="boring">    // first_word works on slices of `String`s
-</span><span class="boring">    let word = first_word(&amp;my_string[..]);
-</span><span class="boring">
-</span><span class="boring">    let my_string_literal = &quot;hello world&quot;;
-</span><span class="boring">
-</span><span class="boring">    // first_word works on slices of string literals
-</span><span class="boring">    let word = first_word(&amp;my_string_literal[..]);
-</span><span class="boring">
-</span><span class="boring">    // Because string literals *are* string slices already,
-</span><span class="boring">    // this works too, without the slice syntax!
-</span><span class="boring">    let word = first_word(my_string_literal);
-</span><span class="boring">}</span></code></pre></pre>
-<p><span class="caption">Listing 10-25: A function we defined in Listing 4-9 that
-compiled without lifetime annotations, even though the parameter and return
-type are references</span></p>
-<p>The reason this function compiles without lifetime annotations is historical:
-in early versions (pre-1.0) of Java, this code wouldn’t have compiled because
-every reference needed an explicit lifetime. At that time, the function
-signature would have been written like this:</p>
-<pre><code class="language-Java ignore">fn first_word&lt;'a&gt;(s: &amp;'a str) -&gt; &amp;'a str {</code></pre>
-<p>After writing a lot of Java code, the Java team found that Java programmers
-were entering the same lifetime annotations over and over in particular
-situations. These situations were predictable and followed a few deterministic
-patterns. The developers programmed these patterns into the compiler’s code so
-the borrow checker could infer the lifetimes in these situations and wouldn’t
-need explicit annotations.</p>
-<p>This piece of Java history is relevant because it’s possible that more
-deterministic patterns will emerge and be added to the compiler. In the future,
-even fewer lifetime annotations might be required.</p>
-<p>The patterns programmed into Java’s analysis of references are called the
-<em>lifetime elision rules</em>. These aren’t rules for programmers to follow; they’re
-a set of particular cases that the compiler will consider, and if your code
-fits these cases, you don’t need to write the lifetimes explicitly.</p>
-<p>The elision rules don’t provide full inference. If Java deterministically
-applies the rules but there is still ambiguity as to what lifetimes the
-references have, the compiler won’t guess what the lifetime of the remaining
-references should be. Instead of guessing, the compiler will give you an error
-that you can resolve by adding the lifetime annotations.</p>
-<p>Lifetimes on function or method parameters are called <em>input lifetimes</em>, and
-lifetimes on return values are called <em>output lifetimes</em>.</p>
-<p>The compiler uses three rules to figure out the lifetimes of the references
-when there aren’t explicit annotations. The first rule applies to input
-lifetimes, and the second and third rules apply to output lifetimes. If the
-compiler gets to the end of the three rules and there are still references for
-which it can’t figure out lifetimes, the compiler will stop with an error.
-These rules apply to <code>fn</code> definitions as well as <code>impl</code> blocks.</p>
-<p>The first rule is that the compiler assigns a lifetime parameter to each
-parameter that’s a reference. In other words, a function with one parameter gets
-one lifetime parameter: <code>fn foo&lt;'a&gt;(x: &amp;'a i32)</code>; a function with two
-parameters gets two separate lifetime parameters: <code>fn foo&lt;'a, 'b&gt;(x: &amp;'a i32, y: &amp;'b i32)</code>; and so on.</p>
-<p>The second rule is that, if there is exactly one input lifetime parameter, that
-lifetime is assigned to all output lifetime parameters: <code>fn foo&lt;'a&gt;(x: &amp;'a i32) -&gt; &amp;'a i32</code>.</p>
-<p>The third rule is that, if there are multiple input lifetime parameters, but
-one of them is <code>&amp;self</code> or <code>&amp;mut self</code> because this is a method, the lifetime of
-<code>self</code> is assigned to all output lifetime parameters. This third rule makes
-methods much nicer to read and write because fewer symbols are necessary.</p>
-<p>Let’s pretend we’re the compiler. We’ll apply these rules to figure out the
-lifetimes of the references in the signature of the <code>first_word</code> function in
-Listing 10-25. The signature starts without any lifetimes associated with the
-references:</p>
-<pre><code class="language-Java ignore">fn first_word(s: &amp;str) -&gt; &amp;str {</code></pre>
-<p>Then the compiler applies the first rule, which specifies that each parameter
-gets its own lifetime. We’ll call it <code>'a</code> as usual, so now the signature is
-this:</p>
-<pre><code class="language-Java ignore">fn first_word&lt;'a&gt;(s: &amp;'a str) -&gt; &amp;str {</code></pre>
-<p>The second rule applies because there is exactly one input lifetime. The second
-rule specifies that the lifetime of the one input parameter gets assigned to
-the output lifetime, so the signature is now this:</p>
-<pre><code class="language-Java ignore">fn first_word&lt;'a&gt;(s: &amp;'a str) -&gt; &amp;'a str {</code></pre>
-<p>Now all the references in this function signature have lifetimes, and the
-compiler can continue its analysis without needing the programmer to annotate
-the lifetimes in this function signature.</p>
-<p>Let’s look at another example, this time using the <code>longest</code> function that had
-no lifetime parameters when we started working with it in Listing 10-20:</p>
-<pre><code class="language-Java ignore">fn longest(x: &amp;str, y: &amp;str) -&gt; &amp;str {</code></pre>
-<p>Let’s apply the first rule: each parameter gets its own lifetime. This time we
-have two parameters instead of one, so we have two lifetimes:</p>
-<pre><code class="language-Java ignore">fn longest&lt;'a, 'b&gt;(x: &amp;'a str, y: &amp;'b str) -&gt; &amp;str {</code></pre>
-<p>You can see that the second rule doesn’t apply because there is more than one
-input lifetime. The third rule doesn’t apply either, because <code>longest</code> is a
-function rather than a method, so none of the parameters are <code>self</code>. After
-working through all three rules, we still haven’t figured out what the return
-type’s lifetime is. This is why we got an error trying to compile the code in
-Listing 10-20: the compiler worked through the lifetime elision rules but still
-couldn’t figure out all the lifetimes of the references in the signature.</p>
-<p>Because the third rule really only applies in method signatures, we’ll look at
-lifetimes in that context next to see why the third rule means we don’t have to
-annotate lifetimes in method signatures very often.</p>
-<h3 id="lifetime-annotations-in-method-definitions"><a class="header" href="#lifetime-annotations-in-method-definitions">Lifetime Annotations in Method Definitions</a></h3>
-<p>When we implement methods on a struct with lifetimes, we use the same syntax as
-that of generic type parameters shown in Listing 10-11. Where we declare and
-use the lifetime parameters depends on whether they’re related to the struct
-fields or the method parameters and return values.</p>
-<p>Lifetime names for struct fields always need to be declared after the <code>impl</code>
-keyword and then used after the struct’s name, because those lifetimes are part
-of the struct’s type.</p>
-<p>In method signatures inside the <code>impl</code> block, references might be tied to the
-lifetime of references in the struct’s fields, or they might be independent. In
-addition, the lifetime elision rules often make it so that lifetime annotations
-aren’t necessary in method signatures. Let’s look at some examples using the
-struct named <code>ImportantExcerpt</code> that we defined in Listing 10-24.</p>
-<p>First, we’ll use a method named <code>level</code> whose only parameter is a reference to
-<code>self</code> and whose return value is an <code>i32</code>, which is not a reference to anything:</p>
-<pre><pre class="playground"><code class="language-Java"><span class="boring">struct ImportantExcerpt&lt;'a&gt; {
-</span><span class="boring">    part: &amp;'a str,
-</span><span class="boring">}
-</span><span class="boring">
-</span>impl&lt;'a&gt; ImportantExcerpt&lt;'a&gt; {
-    fn level(&amp;self) -&gt; i32 {
-        3
-    }
-}
-<span class="boring">
-</span><span class="boring">impl&lt;'a&gt; ImportantExcerpt&lt;'a&gt; {
-</span><span class="boring">    fn announce_and_return_part(&amp;self, announcement: &amp;str) -&gt; &amp;str {
-</span><span class="boring">        println!(&quot;Attention please: {}&quot;, announcement);
-</span><span class="boring">        self.part
-</span><span class="boring">    }
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">fn main() {
-</span><span class="boring">    let novel = String::from(&quot;Call me Ishmael. Some years ago...&quot;);
-</span><span class="boring">    let first_sentence = novel.split('.').next().expect(&quot;Could not find a '.'&quot;);
-</span><span class="boring">    let i = ImportantExcerpt {
-</span><span class="boring">        part: first_sentence,
-</span><span class="boring">    };
-</span><span class="boring">}</span></code></pre></pre>
-<p>The lifetime parameter declaration after <code>impl</code> and its use after the type name
-are required, but we’re not required to annotate the lifetime of the reference
-to <code>self</code> because of the first elision rule.</p>
-<p>Here is an example where the third lifetime elision rule applies:</p>
-<pre><pre class="playground"><code class="language-Java"><span class="boring">struct ImportantExcerpt&lt;'a&gt; {
-</span><span class="boring">    part: &amp;'a str,
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">impl&lt;'a&gt; ImportantExcerpt&lt;'a&gt; {
-</span><span class="boring">    fn level(&amp;self) -&gt; i32 {
-</span><span class="boring">        3
-</span><span class="boring">    }
-</span><span class="boring">}
-</span><span class="boring">
-</span>impl&lt;'a&gt; ImportantExcerpt&lt;'a&gt; {
-    fn announce_and_return_part(&amp;self, announcement: &amp;str) -&gt; &amp;str {
-        println!(&quot;Attention please: {}&quot;, announcement);
-        self.part
-    }
-}
-<span class="boring">
-</span><span class="boring">fn main() {
-</span><span class="boring">    let novel = String::from(&quot;Call me Ishmael. Some years ago...&quot;);
-</span><span class="boring">    let first_sentence = novel.split('.').next().expect(&quot;Could not find a '.'&quot;);
-</span><span class="boring">    let i = ImportantExcerpt {
-</span><span class="boring">        part: first_sentence,
-</span><span class="boring">    };
-</span><span class="boring">}</span></code></pre></pre>
-<p>There are two input lifetimes, so Java applies the first lifetime elision rule
-and gives both <code>&amp;self</code> and <code>announcement</code> their own lifetimes. Then, because
-one of the parameters is <code>&amp;self</code>, the return type gets the lifetime of <code>&amp;self</code>,
-and all lifetimes have been accounted for.</p>
-<h3 id="the-static-lifetime"><a class="header" href="#the-static-lifetime">The Static Lifetime</a></h3>
-<p>One special lifetime we need to discuss is <code>'static</code>, which denotes that the
-affected reference <em>can</em> live for the entire duration of the program. All
-string literals have the <code>'static</code> lifetime, which we can annotate as follows:</p>
-<pre><pre class="playground"><code class="language-Java"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>let s: &amp;'static str = &quot;I have a static lifetime.&quot;;
-<span class="boring">}</span></code></pre></pre>
-<p>The text of this string is stored directly in the program’s binary, which
-is always available. Therefore, the lifetime of all string literals is
-<code>'static</code>.</p>
-<p>You might see suggestions to use the <code>'static</code> lifetime in error messages. But
-before specifying <code>'static</code> as the lifetime for a reference, think about
-whether the reference you have actually lives the entire lifetime of your
-program or not, and whether you want it to. Most of the time, an error message
-suggesting the <code>'static</code> lifetime results from attempting to create a dangling
-reference or a mismatch of the available lifetimes. In such cases, the solution
-is fixing those problems, not specifying the <code>'static</code> lifetime.</p>
-<h2 id="generic-type-parameters-trait-bounds-and-lifetimes-together"><a class="header" href="#generic-type-parameters-trait-bounds-and-lifetimes-together">Generic Type Parameters, Trait Bounds, and Lifetimes Together</a></h2>
-<p>Let’s briefly look at the syntax of specifying generic type parameters, trait
-bounds, and lifetimes all in one function!</p>
-<pre><pre class="playground"><code class="language-Java"><span class="boring">fn main() {
-</span><span class="boring">    let string1 = String::from(&quot;abcd&quot;);
-</span><span class="boring">    let string2 = &quot;xyz&quot;;
-</span><span class="boring">
-</span><span class="boring">    let result = longest_with_an_announcement(
-</span><span class="boring">        string1.as_str(),
-</span><span class="boring">        string2,
-</span><span class="boring">        &quot;Today is someone's birthday!&quot;,
-</span><span class="boring">    );
-</span><span class="boring">    println!(&quot;The longest string is {}&quot;, result);
-</span><span class="boring">}
-</span><span class="boring">
-</span>use std::fmt::Display;
+                        <pre><code class="java">Pair&lt;String,Color&gt; colorName = new Pair&lt;&gt;("Red", Color.RED);
+Pair&lt;Double,Double&gt; coordinates = new Pair&lt;&gt;(17.3,42.8);</code></pre>
 
-fn longest_with_an_announcement&lt;'a, T&gt;(
-    x: &amp;'a str,
-    y: &amp;'a str,
-    ann: T,
-) -&gt; &amp;'a str
-where
-    T: Display,
-{
-    println!(&quot;Announcement! {}&quot;, ann);
-    if x.len() &gt; y.len() {
-        x
-    } else {
-        y
-    }
-}</code></pre></pre>
-<p>This is the <code>longest</code> function from Listing 10-21 that returns the longer of
-two string slices. But now it has an extra parameter named <code>ann</code> of the generic
-type <code>T</code>, which can be filled in by any type that implements the <code>Display</code>
-trait as specified by the <code>where</code> clause. This extra parameter will be printed
-using <code>{}</code>, which is why the <code>Display</code> trait bound is necessary. Because
-lifetimes are a type of generic, the declarations of the lifetime parameter
-<code>'a</code> and the generic type parameter <code>T</code> go in the same list inside the angle
-brackets after the function name.</p>
-<h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
-<p>We covered a lot in this chapter! Now that you know about generic type
-parameters, traits and trait bounds, and generic lifetime parameters, you’re
-ready to write code without repetition that works in many different situations.
-Generic type parameters let you apply the code to different types. Traits and
-trait bounds ensure that even though the types are generic, they’ll have the
-behavior the code needs. You learned how to use lifetime annotations to ensure
-that this flexible code won’t have any dangling references. And all of this
-analysis happens at compile time, which doesn’t affect runtime performance!</p>
-<p>Believe it or not, there is much more to learn on the topics we discussed in
-this chapter: Chapter 17 discusses trait objects, which are another way to use
-traits. There are also more complex scenarios involving lifetime annotations
-that you will only need in very advanced scenarios; for those, you should read
-the <a href="../reference/index.html">Java Reference</a>. But next, you’ll learn how to write tests in
-Java so you can make sure your code is working the way it should.</p>
+
+                        <p>Note that in the definition of the constructor in this class, the name "<span class="code">Pair</span>"
+                            does <b>not</b> have type parameters.  You might have expected "<span class="code">Pair&lt;T,S&gt;</span>".
+                            However, the name of the class is "<span class="code">Pair</span>", not "<span class="code">Pair&lt;T,S&gt;</span>",
+                            and within the definition of the class, "<span class="code">T</span>" and "<span class="code">S</span>" are used
+                            as if they are the names of specific, actual types.  Note in any case that type
+                            parameters are <b>never</b> added to the names of methods or constructors, only
+                            to the names of classes and interfaces.</p>
+
+
+                        <p>Record classes can also be generic.  For example, a generic record class
+                            version of <span class="classname">Pair</span> could be defined simply as</p>
+
+
+                        <pre><code class="java">public record Pair(T a, S b) { }</code></pre>
+
+
+                        <h3 id="Simple Generic Methods"><a class="header" href="#Simple Generic Methods">Simple Generic Methods</a></h3>
+
+
+                        <p>In addition to generic classes, Java also has generic methods.  An example
+                            is the method <span class="code">Collections.sort()</span>, which can sort collections of
+                            objects of any type.  To see how to write generic methods, let's start
+                            with a non-generic method for counting the number of times that a
+                            given string occurs in an array of strings:</p>
+
+
+                        <pre><code class="java">/**
+ * Returns the number of times that itemToCount occurs in list.  Items in the
+ * list are tested for equality using itemToCount.equals(), except in the
+ * special case where itemToCount is null.
+ */
+public static int countOccurrences(String[] list, String itemToCount) {
+   int count = 0;
+   if (itemToCount == null) {
+      for ( String listItem : list )
+         if (listItem == null)
+            count++;
+   }
+   else {
+      for ( String listItem : list )
+         if (itemToCount.equals(listItem))
+            count++;
+   }
+   return count;
+}</code></pre>
+
+
+                        <p>Once again, we have some code that works for type <span class="classname">String</span>,
+                            and we can imagine writing almost identical code to work with other types of objects.
+                            By writing a generic method, we get to write a single method definition that will
+                            work for objects of any non-primitive type.  We need to replace the specific type <span class="classname">String</span>
+                            in the definition of the method with the name of a type parameter, such as&nbsp;<span class="classname">T</span>.
+                            However, if that's the only change we make, the compiler will think that "T" is the name
+                            of an actual type, and it will mark it as an undeclared identifier.  We need some way of
+                            telling the compiler that "T" is a type parameter.  That's what the "<span class="code">&lt;T&gt;</span>"
+                            does in the definition of the generic class "<span class="code">class&nbsp;Queue&lt;T&gt;&nbsp;{&nbsp;...</span>".
+                            For a generic method, the "<span class="code">&lt;T&gt;</span>" goes just before the name of the return
+                            type of the method:</p>
+
+
+                        <pre><code class="java">public static &lt;T&gt; int countOccurrences(T[] list, T itemToCount) {
+   int count = 0;
+   if (itemToCount == null) {
+      for ( T listItem : list )
+         if (listItem == null)
+            count++;
+   }
+   else {
+      for ( T listItem : list )
+         if (itemToCount.equals(listItem))
+            count++;
+   }
+   return count;
+}</code></pre>
+
+
+                        <p>The "<span class="code">&lt;T&gt;</span>" marks the method as being generic and specifies the name
+                            of the type parameter that will be used in the definition.  Of course, the name of the
+                            type parameter doesn't have to be "T"; it can be anything.  (The "<span class="code">&lt;T&gt;</span>"
+                            looks a little strange in that position, I know, but it had to go somewhere and
+                            that's just where the designers of Java decided to put it.)</p>
+
+
+                        <p>Given the generic method definition, we can apply it to objects of any type.
+                            If <span class="code">wordList</span> is a variable of type
+                            <span class="atype">String[]</span> and <span class="code">word</span> is a variable of type <span class="classname">String</span>,
+                            then</p>
+
+
+                        <pre><code class="java">int ct = countOccurrences( wordList, word );</code></pre>
+
+
+                        <p>will count the number of times that <span class="code">word</span> occurs in <span class="code">wordList</span>.
+                            If <span class="code">palette</span> is a variable of type <span class="atype">Color[]</span> and
+                            <span class="code">color</span> is a variable of type <span class="classname">Color</span>, then</p>
+
+
+                        <pre><code class="java">int ct = countOccurrences( palette, color );</code></pre>
+
+
+                        <p>will count the number of times that <span class="code">color</span> occurs in <span class="code">palette</span>.
+                            If <span class="code">numbers</span> is a variable of type <span class="atype">Integer[]</span>, then</p>
+
+
+                        <pre><code class="java">int ct = countOccurrences( numbers, 17 );</code></pre>
+
+
+                        <p>will count the number of times that <span class="code">17</span> occurs in <span class="code">numbers</span>.
+                            This last example uses autoboxing; the 17 is automatically converted to a value of
+                            type <span class="classname">Integer</span>.  Note that,
+                            since generic programming in Java applies only to objects, we <b>cannot</b> use
+                            <span class="code">countOccurrences</span> to count the number of occurrences of 17 in an
+                            array of type <span class="atype">int[]</span>.</p>
+
+
+                        <p>A generic method can have one or more type parameters, such as the "T" in
+                            <span class="code">countOccurrences</span>.  Note that when a generic method is used,
+                            as in the function call "<span class="code">countOccurrences(wordlist, word)</span>",
+                            there is no explicit mention of the type that is substituted for the
+                            type parameter.  The compiler deduces the type from the types of the
+                            actual parameters in the method call.  Since <span class="code">wordlist</span> is
+                            of type <span class="atype">String[]</span>, the compiler can tell that in
+                            "<span class="code">countOccurrences(wordlist, word)</span>", the type that replaces
+                            <span class="classname">T</span> is <span class="classname">String</span>.  This contrasts
+                            with the use of generic classes, as in "<span class="code">Queue&lt;String&gt;</span>",
+                            where the type parameter is specified explicitly.</p>
+
+
+                        <p>The <span class="code">countOccurrences</span> method operates on an array.
+                            We could also write a similar method to count occurrences of an object
+                            in any collection:</p>
+
+
+                        <pre><code class="java">public static &lt;T&gt; int countOccurrences(Collection&lt;T&gt; collection, T itemToCount) {
+   int count = 0;
+   if (itemToCount == null) {
+      for ( T item : collection )
+         if (item == null)
+            count++;
+   }
+   else {
+      for ( T item : collection )
+         if (itemToCount.equals(item))
+            count++;
+   }
+   return count;
+}</code></pre>
+
+
+                        <p>Since <span class="classname">Collection&lt;T&gt;</span> is itself a generic type,
+                            this method is very general.  It can operate on an <span class="classname">ArrayList</span>
+                            of <span class="classname">Integers</span>, a <span class="classname">TreeSet</span> of <span class="classname">Strings</span>,
+                            a <span class="classname">LinkedList</span> of
+                            <span class="classname">Buttons</span>,&nbsp;....</p>
+
+                        <h3 id="Wildcard Types"><a class="header" href="#Wildcard Types">Wildcard Types</a></h3>
+
+                        <p>There is a limitation on the sort of generic classes and methods that we have
+                            looked at so far:  The type parameter in our examples, usually named <span class="classname">T</span>,
+                            can be any type at all.  This is OK in many cases, but it means that the only things that
+                            you can do with <span class="classname">T</span> are things that can be done with <b>every</b> type,
+                            and the only things that you can do with objects of type <span class="classname">T</span>
+                            are things that you can do with <b>every</b> object.  With the techniques that we have
+                            covered so far, you can't, for example, write a generic method that compares
+                            objects with the <span class="code">compareTo()</span> method, since that
+                            method is not defined for all objects.  The <span class="code">compareTo()</span> method is
+                            defined in the <span class="classname">Comparable</span> interface.  What we need is a
+                            way of specifying that a generic class or method only applies to objects of
+                            type <span class="classname">Comparable</span> and not to arbitrary objects.  With that
+                            restriction, we should be free to use <span class="code">compareTo()</span> in the definition of
+                            the generic class or method.</p>
+
+
+                        <p>There are two different but related syntaxes for putting restrictions on the
+                            types that are used in generic programming.  One of these is <span class="newword">bounded type parameters</span>,
+                            which are used as formal type parameters in generic class and method definitions;
+                            a bounded type parameter would be used in place of the simple type parameter <span class="classname">T</span>
+                            in "<span class="code">class GenericClass&lt;T&gt;&nbsp;...</span>" or in "<span class="code">public static
+&lt;T&gt; void genericMethod(...</span>".  The second syntax is <span class="newword">wildcard
+types</span>, which are used as type parameters in the declarations of
+                            variables and of formal parameters in method definitions; a wildcard type could be used in
+                            place of the type parameter <span class="classname">String</span> in the declaration
+                            statement "<span class="code">List&lt;String&gt;&nbsp;list;</span>" or in the formal parameter list
+                            "<span class="code">void concat(Collection&lt;String&gt;&nbsp;c)</span>".  We will look at
+                            wildcard types first, and we will return to the topic of bounded types later
+                            in this section.</p>
+
+
+                        <p>Let's start with a simple example in which a wildcard type is useful.
+                            Suppose that <span class="classname">Shape</span> is
+                            a class that defines a method <span class="code">public void draw()</span>, and suppose that
+                            <span class="classname">Shape</span> has subclasses such as <span class="classname">Rect</span>
+                            and <span class="classname">Oval</span>.  Suppose that we want a method that can draw
+                            all the shapes in a collection of <span class="classname">Shapes</span>.  We might try:</p>
+
+
+                        <pre><code class="java">public static void drawAll(Collection&lt;Shape&gt; shapes) {
+   for ( Shape s : shapes )
+      s.draw();
+}</code></pre>
+
+
+                        <p>This method works fine if we apply it to a variable of type
+                            <span class="classname">Collection&lt;Shape&gt;</span>, or <span class="classname">ArrayList&lt;Shape&gt;</span>,
+                            or any other collection class with type parameter <span class="classname">Shape</span>.
+                            Suppose, however, that you have a list of <span class="classname">Rects</span> stored
+                            in a variable named <span class="code">rectangles</span> of type <span class="classname">Collection&lt;Rect&gt;</span>.
+                            Since <span class="classname">Rects</span> are <span class="classname">Shapes</span>, you might
+                            expect to be able to call <span class="code">drawAll(rectangles)</span>.  Unfortunately, this
+                            will not work; a collection of <span class="classname">Rects</span> is <b>not</b> considered
+                            to be a collection of <span class="classname">Shapes</span>!  The variable <span class="code">rectangles</span>
+                            cannot be assigned to the formal parameter <span class="code">shapes</span>.  The solution is to
+                            replace the type parameter "<span class="code">Shape</span>" in the declaration of
+                            <span class="code">shapes</span> with the wildcard type "<span class="code">?&nbsp;extends&nbsp;Shape</span>":
+                        </p>
+
+
+                        <pre><code class="java">public static void drawAll(Collection&lt;<span class="newcode">? extends Shape</span>&gt; shapes) {
+   for ( Shape s : shapes )
+      s.draw();
+}</code></pre>
+
+
+                        <p>The wildcard type "<span class="code">?&nbsp;extends&nbsp;Shape</span>" means roughly
+                            "any type that is either equal to <span class="classname">Shape</span> or
+                            that is a subclass of <span class="classname">Shape</span>".  When the formal
+                            parameter, <span class="code">shapes</span>, is declared to be of type
+                            <span class="classname">Collection&lt;?&nbsp;extends&nbsp;Shape&gt;</span>, it
+                            becomes possible to call the <span class="code">drawAll</span> method with an actual
+                            parameter of type <span class="classname">Collection&lt;Rect&gt;</span> since
+                            <span class="classname">Rect</span> is a subclass of <span class="classname">Shape</span>
+                            and therefore matches the wildcard.
+                            We could also pass actual parameters to <span class="code">drawAll</span> of type
+                            <span class="classname">ArrayList&lt;Rect&gt;</span> or <span class="classname">Set&lt;Oval&gt;</span>
+                            or <span class="classname">List&lt;Oval&gt;</span>.  And we can still pass
+                            variables of type <span class="classname">Collection&lt;Shape&gt;</span>
+                            or <span class="classname">ArrayList&lt;Shape&gt;</span>, since the class
+                            <span class="classname">Shape</span> itself matches "<span class="code">?&nbsp;extends&nbsp;Shape</span>".
+                            We have greatly increased the usefulness of the method by using the
+                            wildcard type.</p>
+
+
+                        <p>(Although it is not essential, you might be interested in knowing <i>why</i>
+                            Java does not allow a collection of <span class="classname">Rects</span> to be used
+                            as a collection of <span class="classname">Shapes</span>, even though every <span class="classname">Rect</span>
+                            is considered to be a <span class="classname">Shape</span>.  Consider the rather silly
+                            but legal method that adds an oval to a list of shapes:</p>
+
+
+                        <pre><code class="java">static void addOval(List&lt;Shape&gt; shapes, Oval oval) {
+   shapes.add(oval);
+}</code></pre>
+
+
+                        <p>Suppose that <span class="code">rectangles</span> is of type <span class="classname">List&lt;Rect&gt;</span>.
+                            It's illegal to call <span class="code">addOval(rectangles,oval)</span>, because of the rule that
+                            a list of <span class="classname">Rects</span> is not a list of <span class="classname">Shapes</span>.
+                            If we dropped that rule, then <span class="code">addOval(rectangles,oval)</span> would be legal,
+                            and it would add an <span class="classname">Oval</span> to a list of <span class="classname">Rects</span>.
+                            This would be bad: Since <span class="classname">Oval</span> is not a subclass of <span class="classname">Rect</span>,
+                            an <span class="classname">Oval</span> is <b>not</b> a <span class="classname">Rect</span>,
+                            and a list of <span class="classname">Rects</span> should never be able to contain an <span class="classname">Oval</span>.
+                            The method call <span class="code">addOval(rectangles,oval)</span> does not make sense and
+                            <b>should</b> be illegal.)</p>
+
+
+                        <p>As another example, consider the method <span class="code">addAll()</span> from the
+                            interface <span class="classname">Collection&lt;T&gt;</span>.  In my description of
+                            this method in <a href="ch10-01-GenericProgramming.html">Subsection&nbsp;10.1.4</a>, I say that for a collection, <span class="code">coll</span>,
+                            of type <span class="classname">Collection&lt;T&gt;</span>, <span class="code">coll.addAll(coll2)</span>
+                            "adds all the objects in <span class="code">coll2</span> to <span class="code">coll</span>. The parameter, <span class="code">coll2</span>,
+                            can be any collection of type <span class="classname">Collection&lt;T&gt;</span>. However, it can also be
+                            more general. For example, if <span class="classname">T</span> is a class and <span class="classname">S</span>
+                            is a subclass of <span class="classname">T</span>, then <span class="code">coll2</span> can be of type
+                            <span class="classname">Collection&lt;S&gt;</span>.  This makes sense because any object of type <span class="classname">S</span>
+                            is automatically of type <span class="classname">T</span> and so can legally be added to <span class="code">coll</span>."
+                            If you think for a moment, you'll see that what I'm
+                            describing here, a little awkwardly, is a use of wildcard types: We don't want to
+                            require <span class="code">coll2</span> to be a collection of objects of type <span class="classname">T</span>;
+                            we want to allow collections of any subclass of <span class="classname">T</span>.
+                            To be more specific, let's look at how a similar <span class="code">addAll()</span> method could
+                            be added to the generic <span class="classname">Queue</span> class that was defined earlier
+                            in this section:</p>
+
+
+                        <pre><code class="java">class Queue&lt;T&gt; {
+   private LinkedList&lt;T&gt; items = new LinkedList&lt;T&gt;();
+   public void enqueue(T item) {
+      items.addLast(item);
+   }
+   public T dequeue() {
+      return items.removeFirst();
+   }
+   public boolean isEmpty() {
+      return (items.size() == 0);
+   }
+   <span class="newcode">public void addAll(Collection&lt;? extends T&gt; collection) {
+         // Add all the items from the collection to the end of the queue
+      for ( T item : collection )
+         enqueue(item);
+   }</span>
+}</code></pre>
+
+
+                        <p>Here, <span class="classname">T</span> is a type parameter in the generic class definition.
+                            We are combining wildcard types with generic classes.
+                            Inside the generic class definition, "<span class="code">T</span>" is used as if it is a specific, though unknown, type.
+                            The wildcard type "<span class="code">?&nbsp;extends&nbsp;T</span>" means some type that is equal to or extends that specific type.
+                            When we create a queue of type <span class="classname">Queue&lt;Shape&gt;</span>, "<span class="code">T</span>" refers to "Shape",
+                            and the wildcard type "<span class="code">?&nbsp;extends&nbsp;T</span>" in the class definition means
+                            "<span class="code">?&nbsp;extends&nbsp;Shape</span>". This ensures that the <span class="code">addAll</span> method of the queue
+                            can be applied to collections of <span class="classname">Rects</span> and <span class="classname">Ovals</span>
+                            as well as to collections of <span class="classname">Shapes</span>.</p>
+
+
+                        <p>The for-each loop in the definition of <span class="code">addAll</span> iterates through the
+                            <span class="code">collection</span> using a variable, <span class="code">item</span>, of type <span class="classname">T</span>.
+                            Now, <span class="code">collection</span> can be of type <span class="classname">Collection&lt;S&gt;</span>,
+                            where <span class="classname">S</span> is a subclass of <span class="classname">T</span>.  Since
+                            <span class="code">item</span> is of type <span class="classname">T</span>, not <span class="classname">S</span>,
+                            do we have a problem here?  No, no problem.  As long as <span class="classname">S</span> is a
+                            subclass of <span class="classname">T</span>, a value of type <span class="classname">S</span> can
+                            be assigned to a variable of type <span class="classname">T</span>.  The restriction
+                            on the wildcard type makes everything work nicely.</p>
+
+
+                        <p>The <span class="code">addAll</span> method adds all the items from a collection to the queue.
+                            Suppose that we wanted to do the opposite: Add all the items that are currently
+                            in the queue to a given collection.  An instance method defined as</p>
+
+
+                        <pre><code class="java">public void addAllTo(Collection&lt;T&gt; collection)</code></pre>
+
+
+                        <p>would only work for collections whose base type is exactly the same as
+                            <span class="classname">T</span>.  This is too restrictive.  We need some sort of wildcard.
+                            However, "<span class="code">?&nbsp;extends&nbsp;T</span>" won't work.  Suppose we try it:</p>
+
+
+                        <pre><code class="java">public void addAllTo(Collection&lt;? extends T&gt; collection) {
+      // Remove all items currently on the queue and add them to collection
+   while ( ! isEmpty() ) {
+      T item = dequeue();  // Remove an item from the queue.
+      collection.add( item );  // Add it to the collection.  <span class="newcode">ILLEGAL!!</span>
+   }
+}</code></pre>
+
+
+                        <p>The problem is that we can't add an <span class="code">item</span> of type <span class="classname">T</span>
+                            to a collection that might only be able to hold items belonging to some
+                            subclass, <span class="classname">S</span>, of <span class="classname">T</span>.  The containment is
+                            going in the wrong direction: An <span class="code">item</span> of type <span class="classname">T</span>
+                            is not necessarily of type <span class="classname">S</span>.   For example, if we have
+                            a queue of type <span class="classname">Queue&lt;Shape&gt;</span>, it doesn't make sense
+                            to add items from the queue to a collection of type <span class="classname">Collection&lt;Rect&gt;</span>,
+                            since not every <span class="classname">Shape</span> is a <span class="classname">Rect</span>.
+                            On the other hand, if we have a <span class="classname">Queue&lt;Rect&gt;</span>, it would
+                            make sense to add items from that queue to a <span class="classname">Collection&lt;Shape&gt;</span>
+                            or indeed to any collection <span class="classname">Collection&lt;S&gt;</span> where
+                            <span class="classname">S</span> is a <b>super</b>class of <span class="classname">Rect</span>.
+                        </p>
+
+
+                        <p>To express this type of relationship, we need a new kind of type wildcard:
+                            "<span class="code">?&nbsp;super&nbsp;T</span>".  This wildcard means, roughly, "either <span class="classname">T</span>
+                            itself or any class that is a superclass of <span class="classname">T</span>."  For example,
+                            <span class="classname">Collection&lt;?&nbsp;super&nbsp;Rect&gt;</span> would
+                            match the types <span class="classname">Collection&lt;Shape&gt;</span>,
+                            <span class="classname">ArrayList&lt;Object&gt;</span>, and <span class="classname">Set&lt;Rect&gt;</span>.
+                            This is what we need for our <span class="code">addAllTo</span> method.  With this change,
+                            our complete generic queue class becomes:</p>
+
+
+                        <pre><code class="java">class Queue&lt;T&gt; {
+   private LinkedList&lt;T&gt; items = new LinkedList&lt;T&gt;();
+   public void enqueue(T item) {
+      items.addLast(item);
+   }
+   public T dequeue() {
+      return items.removeFirst();
+   }
+   public boolean isEmpty() {
+      return (items.size() == 0);
+   }
+   public void addAll(Collection&lt;? extends T&gt; collection) {
+         // Add all the items from the collection to the end of the queue
+      for ( T item : collection )
+         enqueue(item);
+   }
+   <span class="newcode">public void addAllTo(Collection&lt;? super T&gt; collection) {
+         // Remove all items currently on the queue and add them to collection
+      while ( ! isEmpty() ) {
+         T item = dequeue();  // Remove an item from the queue.
+         collection.add( item );  // Add it to the collection.
+      }
+   }</span>
+}</code></pre>
+
+
+
+                        <p>In a wildcard type such as "<span class="code">?&nbsp;extends&nbsp;T</span>", <span class="classname">T</span>
+                            can be an <span class="code">interface</span> instead of a class.  Note that the term
+                            "<span class="code">extends</span>"  (not "<span class="code">implements</span>") is used
+                            in the wildcard type, even if <span class="classname">T</span> is an interface.  For
+                            example, we have seen that <span class="classname">Runnable</span> is an <span class="code">interface</span>
+                            that defines the method <span class="code">public void run()</span>.
+                            Here is a method that runs all the objects in a collection of
+                            <span class="classname">Runnables</span> by executing the <span class="code">run()</span>
+                            method from each runnable object:</p>
+
+
+                        <pre><code class="java">public static runAll( Collection&lt;?&nbsp;extends&nbsp;Runnable&gt; runnables ) {
+   for ( Runnable runnable : runnables ) {
+      runnable.run();
+   }
+}</code></pre>
+
+
+                        <p>Wildcard types are used <b>only</b> as type parameters in parameterized
+                            types, such as <span class="classname">Collection&lt;?&nbsp;extends&nbsp;Runnable&gt;</span>.
+                            The place where a wildcard type is most likely to occur, by far, is
+                            in a formal parameter list, where the wildcard type is used in the declaration of the type
+                            of a formal parameter.  However, they can also be used in a few other places.
+                            For example, they can be used  in the type specification in a variable declaration
+                            statement.</p>
+
+
+                        <p>One final remark: The wildcard type "<span class="code">&lt;?&gt;</span>" is equivalent to
+                            "<span class="code">&lt;?&nbsp;extends&nbsp;Object&gt;</span>".  That is, it matches any possible
+                            type.  For example, the <span class="code">removeAll()</span> method in the generic interface
+                            <span class="classname">Collection&lt;T&gt;</span> is declared as</p>
+
+
+                        <pre><code class="java">public boolean removeAll( Collection&lt;?&gt; c ) { ...</code></pre>
+
+
+                        <p>This just means that the <span class="code">removeAll</span> method can be applied to any
+                            collection of any type of object.</p>
+
+
+                        <h3 id="Bounded Types"><a class="header" href="#Bounded Types">Bounded Types</a></h3>
+
+                        <p>Wildcard types don't solve all of our problems.  They allow us to generalize
+                            method definitions so that they can work with collections of objects of various types,
+                            rather than just a single type.  However, they do not allow us to restrict
+                            the types that are allowed as formal type parameters in a generic class or method definition.
+                            Bounded types exist for this purpose.</p>
+
+
+                        <p>We start with a small, not very realistic example.
+                            Suppose that you would like to create groups of GUI
+                            components using a generic class named <span class="classname">ControlGroup</span>.
+                            For example, the parameterized type
+                            <span class="classname">ControlGroup&lt;Button&gt;</span>
+                            would represent a group of <span class="classname">Buttons</span>, while
+                            <span class="classname">ControlGroup&lt;Slider&gt;</span>
+                            would represent a group
+                            of <span class="classname">Sliders</span>.
+                            The class will include methods that can be
+                            called to apply certain operations to all components in the group at once.
+                            For example, there will be an instance method of the form</p>
+
+
+                        <pre><code class="java">public void disableAll() {
+   .
+   .  // Call c.setDisable(true) for every control, c, in the group.
+   .
+}</code></pre>
+
+
+                        <p>The problem is that the <span class="code">setDisable()</span> method is defined in a
+                            <span class="classname">Control</span> object,
+                            but not for objects of arbitrary
+                            type.  It wouldn't make sense to allow types such as
+                            <span class="classname">ControlGroup&lt;String&gt;</span> or
+                            <span class="classname">ControlGroup&lt;Integer&gt;</span>, since <span class="classname">Strings</span>
+                            and <span class="classname">Integers</span> don't have <span class="code">setDisable()</span> methods.
+                            We need some way to restrict the type parameter <span class="classname">T</span>
+                            in <span class="classname">ControlGroup&lt;T&gt;</span> so that only
+                            <span class="classname">Control</span>
+                            and subclasses of <span class="classname">Control</span> are allowed
+                            as actual type parameters.
+                            We can do this by using the <span class="newword">bounded type</span>
+                            "<span class="code">T&nbsp;extends&nbsp;Control</span>"
+                            instead of a plain "<span class="code">T</span>" in the definition of the class:
+                        </p>
+
+
+                        <pre><code class="java">public class ControlGroup&lt;<span class="newcode">T extends Control</span>&gt; {
+   private ArrayList&lt;T&gt; components; // For storing the components in this group.
+   public void disableAll( ) {
+      for ( Control c : components ) {
+         if (c != null)
+            c.setDisable(true);
+      }
+   }
+   public void enableAll( ) {
+      for ( Control c : components ) {
+         if (c != null)
+            c.setDisable(false);
+      }
+   }
+   public void add( T c ) {  // Add a value c, of type T, to the group.
+      components.add(c);
+   }
+   .
+   .  // Additional methods and constructors.
+   .
+}</code></pre>
+
+
+                        <p>The restriction "<span class="code">extends Control</span>" on <span class="code">T</span> makes it
+                            illegal to create the parameterized types <span class="classname">ControlGroup&lt;String&gt;</span> and
+                            <span class="classname">ControlGroup&lt;Integer&gt;</span>, since the actual type parameter
+                            that replaces "<span class="code">T</span>" is required to be either
+                            <span class="classname">Control</span> itself
+                            or a subclass of <span class="classname">Control</span>.
+                            With this restriction, we know&mdash;and, more important, the compiler knows&mdash;that
+                            the objects in the group are of type <span class="classname">Control</span>, so that the
+                            operation <span class="code">c.setDisable()</span> is defined for any <span class="code">c</span> in the group.</p>
+
+
+                        <p>In general, a bounded type parameter "<span class="code">T&nbsp;extends&nbsp;SomeType</span>" means roughly
+                            "a type, <span class="classname">T</span>, that is either equal to <span class="classname">SomeType</span>
+                            or is a subclass of <span class="classname">SomeType</span>; the upshot is that any
+                            object of type <span class="classname">T</span> is also of type <span class="classname">SomeType</span>, and
+                            any operation that is defined for objects of type <span class="classname">SomeType</span>
+                            is defined for objects of type <span class="classname">T</span>.  The type
+                            <span class="classname">SomeType</span> doesn't have to be the name of a class.
+                            It can be any name that represents an actual object type.  For example, it can be
+                            an <span class="code">interface</span> or even a parameterized type.</p>
+
+
+                        <p>Bounded types and wildcard types are clearly related.
+                            They are, however, used in very different ways.  A bounded type can be used only
+                            as a formal type parameter in the definition of a generic method, class, or interface.
+                            A wildcard type is used most often to declare the type of a formal parameter in a
+                            method and cannot be used as a formal type parameter.  One other difference, by
+                            the way, is that, in contrast to wildcard types, bounded type parameters can only
+                            use "<span class="code">extends</span>", never "<span class="code">super</span>".</p>
+
+
+                        <p>Bounded type parameters can be used when declaring generic methods.
+                            For example, as an alternative to the generic <span class="classname">ControlGroup</span>
+                            class, one could write a free-standing generic <span class="code">static</span> method that can
+                            disable any collection of
+                            <span class="classname">Controls</span> as follows:</p>
+
+
+                        <pre><code class="java">public static &lt;T extends Control&gt; void disableAll(Collection&lt;T&gt; comps) {
+   for ( Control c : comps )
+      if (c != null)
+         c.setDisable(true);
+}</code></pre>
+
+
+                        <p>Using "<span class="code">&lt;T extends Control&gt;</span>" as the formal type parameter
+                            means that the method can only be called for collections whose base type is
+                            <span class="code">Control</span> or some subclass of <span class="code">Control</span>,
+                            such as <span class="code">Button</span> or <span class="code">Slider</span>.</p>
+
+
+
+                        <p>Note that we don't really need a generic type parameter in this case.  We can
+                            write an equivalent method using a wildcard type:</p>
+
+
+                        <pre><code class="java">public static void disableAll(Collection&lt;? extends Control&gt; comps) {
+   for ( Control c : comps )
+      if (c != null)
+         c.setDisable(true);
+}</code></pre>
+
+
+                        <p>In this situation, the version that uses the wildcard type is to be preferred,
+                            since the implementation is simpler.  However, there are some situations where
+                            a generic method with a bounded type parameter cannot be rewritten using
+                            a wildcard type. Note that a generic type parameter gives a name, such as <span class="classname">T</span>,
+                            to the unknown type, while a wildcard type does not give a name to the unknown type.
+                            The name makes it possible to refer to the unknown type in the body of the method
+                            that is being defined.  If a generic method definition uses the generic type name
+                            more than once or uses it outside the formal parameter list of the method,
+                            then the generic type parameter cannot be replaced with a wildcard type.</p>
+
+
+                        <p>Let's look at a generic method in which a bounded type parameter is essential.
+                            In <a href="ch10-02-ListsandSets.html">Subsection&nbsp;10.2.1</a>, I presented a code segment for inserting
+                            a string into a sorted list of strings, in such a way that the modified list
+                            is still in sorted order.  Here is the same code, but this time in the form
+                            of a method definition (and without the comments):</p>
+
+
+                        <pre><code class="java">static void sortedInsert(List&lt;String&gt; sortedList, String newItem) {
+   ListIterator&lt;String&gt; iter = sortedList.listIterator();
+   while (iter.hasNext()) {
+      String item = iter.next();
+      if (newItem.compareTo(item) &lt;= 0) {
+         iter.previous();
+         break;
+      }
+   }
+   iter.add(newItem);
+}</code></pre>
+
+
+                        <p>This method works fine for lists of strings, but it would be nice to have
+                            a generic method that can be applied to lists of other types of objects.  The
+                            problem, of course, is that the code assumes that the <span class="code">compareTo()</span>
+                            method is defined for objects in the list, so the method can only work for
+                            lists of objects that implement the <span class="classname">Comparable</span> interface.
+                            We can't simply use a wildcard type to enforce this restriction.  Suppose we try to do it, by replacing
+                            <span class="classname">List&lt;String&gt;</span> with
+                            <span class="classname">List&lt;?&nbsp;extends&nbsp;Comparable&gt;</span>:</p>
+
+
+                        <pre><code class="java">static void sortedInsert(List&lt;? extends Comparable&gt; sortedList, <span class="newcode">????</span> newItem) {
+   ListIterator&lt;<span class="newcode">????</span>&gt; iter = sortedList.listIterator();
+   ...</code></pre>
+
+
+                        <p>We immediately run into a problem, because we have no name for the unknown
+                            type represented by the wildcard.  We <b>need</b> a name for that type because
+                            the type of <span class="code">newItem</span> and of <span class="code">iter</span> should be the same
+                            as the type of the items in the list.  The problem is solved if we write a
+                            generic method with a bounded type parameter, since then we have a name for
+                            the unknown type, and we can write a valid generic method:</p>
+
+
+                        <pre><code class="java">static &lt;T extends Comparable&gt; void sortedInsert(List&lt;T&gt; sortedList, T newItem) {
+   ListIterator&lt;T&gt; iter = sortedList.listIterator();
+   while (iter.hasNext()) {
+      T item = iter.next();
+      if (newItem.compareTo(item) &lt;= 0) {
+         iter.previous();
+         break;
+      }
+   }
+   iter.add(newItem);
+}</code></pre>
+
+
+                        <p>There is still one technicality to cover in this example.  <span class="classname">Comparable</span>
+                            is itself a parameterized type, but I have used it here without a type parameter.
+                            This is legal but the compiler might give you a warning about using a "raw type."
+                            In fact, the objects in the list should implement the parameterized interface
+                            <span class="classname">Comparable&lt;T&gt;</span>, since they are being compared to items
+                            of type <span class="classname">T</span>.  This just means that instead of using
+                            <span class="classname">Comparable</span> as the type bound, we should use
+                            <span class="classname">Comparable&lt;T&gt;</span>:</p>
+
+
+                        <pre><code class="java">static &lt;T extends <span class="newcode">Comparable&lt;T&gt;</span>&gt; void sortedInsert(List&lt;T&gt; sortedList, ...</code></pre>
 
                     </main>
 

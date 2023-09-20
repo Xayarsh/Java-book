@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Common Collections - Introduction to Programming Using Java</title>
+        <title>Correctness, Robustness, Efficiency - Introduction to Programming Using Java</title>
 
 
         <!-- Custom HTML head -->
@@ -148,27 +148,48 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="common-collections"><a class="header" href="#common-collections">Common Collections</a></h1>
-<p>Java’s standard library includes a number of very useful data structures called
-<em>collections</em>. Most other data types represent one specific value, but
-collections can contain multiple values. Unlike the built-in array and tuple
-types, the data these collections point to is stored on the heap, which means
-the amount of data does not need to be known at compile time and can grow or
-shrink as the program runs. Each kind of collection has different capabilities
-and costs, and choosing an appropriate one for your current situation is a
-skill you’ll develop over time. In this chapter, we’ll discuss three
-collections that are used very often in Java programs:</p>
-<ul>
-<li>A <em>vector</em> allows you to store a variable number of values next to each other.</li>
-<li>A <em>string</em> is a collection of characters. We’ve mentioned the <code>String</code> type
-previously, but in this chapter we’ll talk about it in depth.</li>
-<li>A <em>hash map</em> allows you to associate a value with a particular key. It’s a
-particular implementation of the more general data structure called a <em>map</em>.</li>
-</ul>
-<p>To learn about the other kinds of collections provided by the standard library,
-see <a href="../std/collections/index.html">the documentation</a>.</p>
-<p>We’ll discuss how to create and update vectors, strings, and hash maps, as well
-as what makes each special.</p>
+                        <h1 id="Correctness, Robustness, Efficiency"><a class="header" href="#Correctness, Robustness, Efficiency">Correctness, Robustness, Efficiency</a></h1>
+                        <p>
+                            In previous chapters, we have covered programming
+                            fundamentals. The chapters that follow this one will cover more advanced aspects of
+                            programming.  The ideas that are presented will generally be more complex and
+                            the programs that use them a little more complicated.  This relatively short chapter is
+                            a kind of turning point in which we look at the problem of getting such complex
+                            programs <i>right</i>.</p>
+
+
+                        <p>Computer programs that fail are much too common.
+                            Programs are fragile. A tiny error can cause a program to misbehave or crash.
+                            Most of us are familiar with this from our own experience with computers. And
+                            we've all heard stories about software glitches that cause spacecraft to crash,
+                            web sites to go offline, telephone service to fail, and, in a few cases, people to die.</p>
+
+
+                        <p>Programs don't have to be as bad as they are. It might well be impossible to
+                            guarantee that programs are problem-free, but careful programming and
+                            well-designed programming tools can help keep the problems to a minimum. This
+                            chapter will look at issues of correctness and robustness of programs.
+                            <a href="ch08-02-WritingCorrectPrograms.html">Section&nbsp;8.2</a> discusses how you can think about and
+                            analyze programs to make the programs that you write more likely to
+                            be correct&mdash;possibly even provably correct.</p>
+
+
+                        <p>
+                            <a href="ch08-03-ExceptionsAndtrycatch.html">Section&nbsp;8.3</a> looks more closely at exceptions and the <span class="code">try..catch</span>
+                            statement, and <a href="ch08-04-AssertionsAnnotations.html">Section&nbsp;8.4</a> introduces <span class="newword">assertions</span>, another of the
+                            tools that Java provides as an aid in writing correct programs.</p>
+
+
+                        <p>In <a href="ch08-05-AnalysisofAlgorithms.html">Section&nbsp;8.5</a>, we look at another issue that is important for programs
+                            in the real world: efficiency.  Even a completely correct program is not
+                            very useful if it takes an unreasonable amount of time to run.  The last
+                            section of this chapter introduces techniques for analyzing the run time
+                            efficiency of algorithms.</p>
+
+
+                        <p>Some of the topics in this chapter are the topics of advanced courses in
+                            computer science, and only a brief overview can be given here.  But what you do
+                            learn here will be useful in the rest of the book.</p>
 
                     </main>
 

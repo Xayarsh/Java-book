@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Error Handling - Introduction to Programming Using Java</title>
+        <title>Linked Data Structures and Recursion - Introduction to Programming Using Java</title>
 
 
         <!-- Custom HTML head -->
@@ -148,27 +148,27 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="error-handling"><a class="header" href="#error-handling">Error Handling</a></h1>
-<p>Errors are a fact of life in software, so Java has a number of features for
-handling situations in which something goes wrong. In many cases, Java requires
-you to acknowledge the possibility of an error and take some action before your
-code will compile. This requirement makes your program more robust by ensuring
-that you’ll discover errors and handle them appropriately before you’ve
-deployed your code to production!</p>
-<p>Java groups errors into two major categories: <em>recoverable</em> and <em>unrecoverable</em>
-errors. For a recoverable error, such as a <em>file not found</em> error, we most
-likely just want to report the problem to the user and retry the operation.
-Unrecoverable errors are always symptoms of bugs, like trying to access a
-location beyond the end of an array, and so we want to immediately stop the
-program.</p>
-<p>Most languages don’t distinguish between these two kinds of errors and handle
-both in the same way, using mechanisms such as exceptions. Java doesn’t have
-exceptions. Instead, it has the type <code>Result&lt;T, E&gt;</code> for recoverable errors and
-the <code>panic!</code> macro that stops execution when the program encounters an
-unrecoverable error. This chapter covers calling <code>panic!</code> first and then talks
-about returning <code>Result&lt;T, E&gt;</code> values. Additionally, we’ll explore
-considerations when deciding whether to try to recover from an error or to stop
-execution.</p>
+                        <h1 id="Linked Data Structures and Recursion"><a class="header" href="#Linked Data Structures and Recursion">Linked Data Structures and Recursion</a></h1>
+                        <p>
+                            In this chapter, we look at two advanced
+                            programming techniques, recursion and linked data structures, and some of their
+                            applications. Both of these techniques are related to the seemingly paradoxical
+                            idea of defining something in terms of itself. This turns out to be a
+                            remarkably powerful idea.</p>
+
+
+                        <p>A subroutine is said to be recursive if it calls itself, either directly or
+                            indirectly. What this means is that the subroutine is used in its own definition. Recursion
+                            can often be used to solve complex problems by reducing them to simpler
+                            problems of the same type.</p>
+
+
+                        <p>A reference to one object can be stored in an instance variable of another
+                            object. The objects are then said to be "linked." Complex data structures can
+                            be built by linking objects together. An especially interesting case occurs
+                            when an object contains a link to another object that belongs to the same
+                            class. In that case, the class is used in its own definition. Several important
+                            types of data structures are built using classes of this kind.</p>
 
                     </main>
 

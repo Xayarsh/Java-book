@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Test Organization - Introduction to Programming Using Java</title>
+        <title>Programming with Files - Introduction to Programming Using Java</title>
 
 
         <!-- Custom HTML head -->
@@ -148,294 +148,675 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h2 id="test-organization"><a class="header" href="#test-organization">Test Organization</a></h2>
-<p>As mentioned at the start of the chapter, testing is a complex discipline, and
-different people use different terminology and organization. The Java community
-thinks about tests in terms of two main categories: unit tests and integration
-tests. <em>Unit tests</em> are small and more focused, testing one module in isolation
-at a time, and can test private interfaces. <em>Integration tests</em> are entirely
-external to your library and use your code in the same way any other external
-code would, using only the public interface and potentially exercising multiple
-modules per test.</p>
-<p>Writing both kinds of tests is important to ensure that the pieces of your
-library are doing what you expect them to, separately and together.</p>
-<h3 id="unit-tests"><a class="header" href="#unit-tests">Unit Tests</a></h3>
-<p>The purpose of unit tests is to test each unit of code in isolation from the
-rest of the code to quickly pinpoint where code is and isn’t working as
-expected. You’ll put unit tests in the <em>src</em> directory in each file with the
-code that they’re testing. The convention is to create a module named <code>tests</code>
-in each file to contain the test functions and to annotate the module with
-<code>cfg(test)</code>.</p>
-<h4 id="the-tests-module-and-cfgtest"><a class="header" href="#the-tests-module-and-cfgtest">The Tests Module and <code>#[cfg(test)]</code></a></h4>
-<p>The <code>#[cfg(test)]</code> annotation on the tests module tells Java to compile and run
-the test code only when you run <code>cargo test</code>, not when you run <code>cargo build</code>.
-This saves compile time when you only want to build the library and saves space
-in the resulting compiled artifact because the tests are not included. You’ll
-see that because integration tests go in a different directory, they don’t need
-the <code>#[cfg(test)]</code> annotation. However, because unit tests go in the same files
-as the code, you’ll use <code>#[cfg(test)]</code> to specify that they shouldn’t be
-included in the compiled result.</p>
-<p>Recall that when we generated the new <code>adder</code> project in the first section of
-this chapter, Cargo generated this code for us:</p>
-<p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-Java noplayground">#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        let result = 2 + 2;
-        assert_eq!(result, 4);
-    }
+                        <h2 id="Programming with Files"><a class="header" href="#Programming with Files">Programming with Files</a></h2>
+                        <p>
+                            In this section, we look at several programming
+                            examples that work with files, using the techniques that were
+                            introduced in <a href="ch11-01-IOStreamsReadersAndWriters.html">Section&nbsp;11.1</a> and <a href="ch11-02-Files.html">Section&nbsp;11.2</a>.</p>
+
+
+
+                        <h3 id="Copying a File"><a class="header" href="#Copying a File">Copying a File</a></h3>
+
+                        <p>As a first example, we look at a simple command-line program
+                            that can make a copy of a file.
+                            Copying a file is a pretty common operation, and every operating
+                            system already has a command for doing it. However, it is still instructive
+                            to look at a Java program that does the same thing. Many file operations are
+                            similar to copying a file, except that the data from the input file is
+                            processed in some way before it is written to the output file. All such
+                            operations can be done by programs with the same general form.
+                            <a href="ch04-03-Parameters.html">Subsection&nbsp;4.3.6</a> included a program for copying text files
+                            using <span class="classname">TextIO</span>.  The example in this section will
+                            work for any file.</p>
+
+
+                        <p>Since the program should be able to copy any file, we can't assume that the
+                            data in the file is in human-readable form. So, we have to use the byte streams,
+                            <span class="classname">InputStream</span> and <span class="classname">OutputStream</span>,
+                            to operate on the file.  The program simply copies all the
+                            data from the <span class="classname">InputStream</span> to the <span class="classname">OutputStream</span>, one byte at a
+                            time. If <span class="code">source</span> is the variable that refers to the
+                            <span class="classname">InputStream</span>, then the function <span class="code">source.read()</span> can be used to
+                            read one byte. This function returns the value -1 when all the bytes in the
+                            input file have been read. Similarly, if <span class="code">copy</span> refers to the
+                            <span class="classname">OutputStream</span>, then <span class="code">copy.write(b)</span> writes one byte to the
+                            output file. So, the heart of the program is a simple <span class="code">while</span> loop. As
+                            usual, the I/O operations can throw exceptions, so this must be done in a
+                            <span class="code">try..catch</span> statement:</p>
+
+
+                        <pre><code class="java">while(true) {
+   int data = source.read();
+   if (data &lt; 0)
+      break;
+   copy.write(data);
 }</code></pre>
-<p>This code is the automatically generated test module. The attribute <code>cfg</code>
-stands for <em>configuration</em> and tells Java that the following item should only
-be included given a certain configuration option. In this case, the
-configuration option is <code>test</code>, which is provided by Java for compiling and
-running tests. By using the <code>cfg</code> attribute, Cargo compiles our test code only
-if we actively run the tests with <code>cargo test</code>. This includes any helper
-functions that might be within this module, in addition to the functions
-annotated with <code>#[test]</code>.</p>
-<h4 id="testing-private-functions"><a class="header" href="#testing-private-functions">Testing Private Functions</a></h4>
-<p>There’s debate within the testing community about whether or not private
-functions should be tested directly, and other languages make it difficult or
-impossible to test private functions. Regardless of which testing ideology you
-adhere to, Java’s privacy rules do allow you to test private functions.
-Consider the code in Listing 11-12 with the private function <code>internal_adder</code>.</p>
-<p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-Java noplayground">pub fn add_two(a: i32) -&gt; i32 {
-    internal_adder(a, 2)
+
+
+                        <p>The file-copy command in an operating system such as UNIX uses
+                            command line arguments to specify the names of the files. For example, the user
+                            might say "<span class="code">copy original.dat backup.dat</span>" to copy an existing file,
+                            <span class="code">original.dat</span>, to a file named <span class="code">backup.dat</span>. Command-line
+                            arguments can also be used in Java programs. The command line arguments are
+                            stored in the array of strings, <span class="code">args</span>, which is a parameter to the
+                            <span class="code">main()</span> routine. The program can retrieve the command-line arguments
+                            from this array. (See <a href="ch04-03-Parameters.html">Subsection&nbsp;4.3.6</a>.)
+                            For example, if the program is named <span class="code">CopyFile</span> and if
+                            the user runs the program with the command</p>
+
+
+                        <pre><code class="java">java CopyFile work.dat oldwork.dat</code></pre>
+
+
+                        <p>then in the program, <span class="code">args[0]</span> will be the string
+                            <span class="code">"work.dat"</span> and <span class="code">args[1]</span> will be the string
+                            <span class="code">"oldwork.dat"</span>. The value of <span class="code">args.length</span> tells the program how
+                            many command-line arguments were specified by the user.</p>
+
+
+                        <p>The program <span class="sourceref"><a href="./source/chapter11/CopyFile.java">CopyFile.java</a></span> gets the names of the files from the
+                            command-line arguments. It prints an error message and exits if the file names
+                            are not specified. To add a little interest, there are two ways to use the
+                            program. The command line can simply specify the two file names. In that case,
+                            if the output file already exists, the program will print an error message and
+                            end. This is to make sure that the user won't accidently overwrite an important
+                            file. However, if the command line has three arguments, then the first argument
+                            must be "<span class="code">-f</span>" while the second and third arguments are file names. The
+                            <span class="code">-f</span> is a <span class="newword">command-line option</span>, which is
+                            meant to modify the behavior of the program. The program interprets the
+                            <span class="code">-f</span> to mean that it's OK to overwrite an existing program. (The "f"
+                            stands for "force," since it forces the file to be copied in spite of what
+                            would otherwise have been considered an error.) You can see in the source code
+                            how the command line arguments are interpreted by the program:</p>
+
+
+                        <pre><code class="java">import java.io.*;
+
+/**
+ *  Makes a copy of a file.  The original file and the name of the
+ *  copy must be given as command-line arguments.  In addition, the
+ *  first command-line argument can be "-f"; if present, the program
+ *  will overwrite an existing file; if not, the program will report
+ *  an error and end if the output file already exists.  The number
+ *  of bytes that are copied is reported.
+ */
+public class CopyFile {
+
+   public static void main(String[] args) {
+
+      String sourceName;   // Name of the source file,
+                           //    as specified on the command line.
+      String copyName;     // Name of the copy,
+                           //    as specified on the command line.
+      InputStream source;  // Stream for reading from the source file.
+      OutputStream copy;   // Stream for writing the copy.
+      boolean force;  // This is set to true if the "-f" option
+                      //    is specified on the command line.
+      int byteCount;  // Number of bytes copied from the source file.
+
+      /* Get file names from the command line and check for the
+         presence of the -f option.  If the command line is not one
+         of the two possible legal forms, print an error message and
+         end this program. */
+
+      if (args.length == 3 &amp;&amp; args[0].equalsIgnoreCase("-f")) {
+         sourceName = args[1];
+         copyName = args[2];
+         force = true;
+      }
+      else if (args.length == 2) {
+         sourceName = args[0];
+         copyName = args[1];
+         force = false;
+      }
+      else {
+         System.out.println(
+                 "Usage:  java CopyFile &lt;source-file&gt; &lt;copy-name&gt;");
+         System.out.println(
+                 "    or  java CopyFile -f &lt;source-file&gt; &lt;copy-name&gt;");
+         return;
+      }
+
+      /* Create the input stream.  If an error occurs, end the program. */
+
+      try {
+         source = new FileInputStream(sourceName);
+      }
+      catch (FileNotFoundException e) {
+         System.out.println("Can't find file \"" + sourceName + "\".");
+         return;
+      }
+
+      /* If the output file already exists and the -f option was not
+         specified, print an error message and end the program. */
+
+      File file = new File(copyName);
+      if (file.exists() &amp;&amp; force == false) {
+          System.out.println(
+               "Output file exists.  Use the -f option to replace it.");
+          return;
+      }
+
+      /* Create the output stream.  If an error occurs, end the program. */
+
+      try {
+         copy = new FileOutputStream(copyName);
+      }
+      catch (IOException e) {
+         System.out.println("Can't open output file \"" + copyName + "\".");
+         return;
+      }
+
+      /* Copy one byte at a time from the input stream to the output
+         stream, ending when the read() method returns -1 (which is
+         the signal that the end of the stream has been reached).  If any
+         error occurs, print an error message.  Also print a message if
+         the file has been copied successfully.  */
+
+      byteCount = 0;
+
+      try {
+         while (true) {
+            int data = source.read();
+            if (data &lt; 0)
+               break;
+            copy.write(data);
+            byteCount++;
+         }
+         source.close();
+         copy.close();
+         System.out.println("Successfully copied " + byteCount + " bytes.");
+      }
+      catch (Exception e) {
+         System.out.println("Error occurred while copying.  "
+                                   + byteCount + " bytes copied.");
+         System.out.println("Error: " + e);
+      }
+
+   }  // end main()
+
+
+} // end class CopyFile</code></pre>
+
+
+                        <p>It is actually quite inefficient to copy one byte at a time.  Efficiency could
+                            be improved by using alternative versions of the <span class="code">read()</span> and
+                            <span class="code">write()</span> methods that read and write multiple bytes (see the
+                            API for details).  Alternatively, the input and output streams could
+                            be wrapped in objects of type <span class="classname">BufferedInputStream</span>
+                            and <span class="classname">BufferedOutputStream</span> which automatically read
+                            data from and write data to files in larger blocks.  This would require changing only
+                            the two lines in the program that create the streams.  For example, the
+                            input stream could be created using</p>
+
+
+                        <pre><code class="java">source = new BufferedInputStream(new FileInputStream(sourceName));</code></pre>
+
+
+                        <p>The buffered stream would then be used in exactly the same way as the
+                            unbuffered stream.</p>
+
+
+                        <p>There is also a sample program <span class="sourceref"><a href="./source/chapter11/CopyFileAsResources.java">CopyFileAsResources.java</a></span> that
+                            does the same thing as <span class="code">CopyFile</span> but uses the resource pattern in a
+                            <span class="code">try..catch</span> statement to make sure that the streams are closed in
+                            all cases.  See the discussion at the end of <a href="ch08-03-ExceptionsAndtrycatch.html">Subsection&nbsp;8.3.2</a>)</p>
+
+                        
+                        <h3 id="Persistent Data"><a class="header" href="#Persistent Data">Persistent Data</a></h3>
+                      
+
+                        <p>Once a program ends, any data that was stored in variables and objects in
+                            the program is gone.  In many cases, it would be useful to have some of that
+                            data stick around so that it will be available when the program is run again.
+                            The problem is, how to make the data <span class="newword">persistent</span> between
+                            runs of the program?  The answer, of course, is to store the data in a file
+                            (or, for some applications, in a database&mdash;but the data in a
+                            database is itself stored in files).</p>
+
+
+                        <p>Consider a "phone book" program that allows the user to keep track of
+                            a list of names and associated phone numbers.  The program would make no sense
+                            at all if the user had to create the whole list from scratch each time
+                            the program is run.  It would make more sense to think of the phone book
+                            as a persistent collection of data, and to think of the program as an
+                            interface to that collection of data.  The program would allow the user
+                            to look up names in the phone book and to add new entries.  Any changes
+                            that are made should be preserved after the program ends.</p>
+
+
+                        <p>The sample program <span class="sourceref"><a href="./source/chapter11/PhoneDirectoryFileDemo.java">PhoneDirectoryFileDemo.java</a></span> is
+                            a very simple implementation of this idea.  It is meant only as an
+                            example of file use; the phone book that it implements is a "toy" version
+                            that is <b>not</b> meant to be taken seriously.  This program stores the phone
+                            book data in a file named "<span class="code">.phone_book_demo</span>" in the user's
+                            home directory.  To find the user's home directory, it uses the
+                            <span class="code">System.getProperty()</span> method that was mentioned in
+                            <a href="ch11-02-Files.html">Subsection&nbsp;11.2.2</a>.  When the program starts, it checks whether
+                            the file already exists.  If the file exists, it should contain the user's
+                            phone book, which was saved in a previous run of the program; in that case,
+                            the data from the file is read and entered into a <span class="classname">TreeMap</span>
+                            named <span class="code">phoneBook</span>
+                            that represents the phone book while the program is running.
+                            (See <a href="ch10-03-Maps.html">Subsection&nbsp;10.3.1</a>.)
+                            In order to store the phone book in a file, some decision must be
+                            made about how the data in the phone book will be represented. For
+                            this example, I chose a simple representation in which each line of
+                            the file contains one entry consisting of a name and the associated
+                            phone number.  A percent sign (<span class="code">'%'</span>) separates the name
+                            from the number.  The following code at the beginning of the program
+                            will read the phone book data file, if it exists and has the correct
+                            format:</p>
+
+
+                        <pre><code class="java">File userHomeDirectory = new File( System.getProperty("user.home") );
+File dataFile = new File( userHomeDirectory, ".phone_book_data" );
+        // A file named .phone_book_data in the user's home directory.
+
+if ( ! dataFile.exists() ) {
+   System.out.println("No phone book data file found.  A new one");
+   System.out.println("will be created, if you add any entries.");
+   System.out.println("File name:  " + dataFile.getAbsolutePath());
+}
+else {
+   System.out.println("Reading phone book data...");
+   try( Scanner scanner = new Scanner(dataFile) ) {
+      while (scanner.hasNextLine()) {
+             // Read one line from the file, containing one name/number pair.
+         String phoneEntry = scanner.nextLine();
+         int separatorPosition = phoneEntry.indexOf('%');
+         if (separatorPosition == -1)
+            throw new IOException("File is not a phonebook data file.");
+         name = phoneEntry.substring(0, separatorPosition);
+         number = phoneEntry.substring(separatorPosition+1);
+         phoneBook.put(name,number);
+      }
+   }
+   catch (IOException e) {
+      System.out.println("Error in phone book data file.");
+      System.out.println("File name:  " + dataFile.getAbsolutePath());
+      System.out.println("This program cannot continue.");
+      System.exit(1);
+   }
+}</code></pre>
+
+
+                        <p>The program then lets the user do various things with the phone book,
+                            including making modifications.  Any changes that are made are made
+                            only to the <span class="classname">TreeMap</span> that holds the data.
+                            When the program ends, the phone book data is written to the file
+                            (if any changes have been made while the program was running),
+                            using the following code:</p>
+
+
+                        <pre><code class="java">if (changed) {
+   System.out.println("Saving phone directory changes to file " +
+         dataFile.getAbsolutePath() + " ...");
+   PrintWriter out;
+   try {
+      out = new PrintWriter( new FileWriter(dataFile) );
+   }
+   catch (IOException e) {
+      System.out.println("ERROR: Can't open data file for output.");
+      return;
+   }
+   for ( Map.Entry&lt;String,String&gt; entry : phoneBook.entrySet() )
+      out.println(entry.getKey() + "%" + entry.getValue() );
+   out.flush();
+   out.close();
+   if (out.checkError())
+      System.out.println("ERROR: Some error occurred while writing data file.");
+   else
+      System.out.println("Done.");
+}</code></pre>
+
+
+                        <p>The net effect of this is that all the data, including the changes,
+                            will be there the next time the program is run.  I've shown you all the
+                            file-handling code from the program.  If you would like to see the rest
+                            of the program, see the <span class="sourceref"><a href="./source/chapter11/PhoneDirectoryFileDemo.java">source code</a></span>.</p>
+                        
+
+                        <h3 id="Storing Objects in Files"><a class="header" href="#Storing Objects in Files">Storing Objects in Files</a></h3>
+
+                        <p>Whenever data is stored in files, some definite format must be adopted for
+                            representing the data.  As long as the output routine that writes the data
+                            and the input routine that reads the data use the same format, the files
+                            will be usable.  However, as usual, correctness is not the end of the story.
+                            The representation that is used for data in files should also be robust.
+                            (See <a href="ch08-01-IntroductionCorrectnessandRobustness.html">Section&nbsp;8.1</a>.)  To see what this means, we will look
+                            at several different ways of representing the same data.  This example
+                            builds on the example <span class="sourceref"><a href="./source/chapter7/SimplePaint2.java">SimplePaint2.java</a></span> from
+                            <a href="ch07-03-ArrayLists.html">Subsection&nbsp;7.3.3</a>.  (You might want to run it now to remind yourself
+                            of what it can do.)  In that program, the user can use the
+                            mouse to draw simple sketches.  Now, we will add file input/output capabilities
+                            to that program.  This will allow the user to save a sketch to a file and later read
+                            the sketch back from the file into the program so that the user can continue
+                            to work on the sketch.  The basic requirement is that all relevant data
+                            about the sketch must be saved in the file, so that the sketch can be
+                            exactly restored when the file is read by the program.</p>
+
+
+
+                        <p>The new version of the program can be found in the source code
+                            file <span class="sourceref"><a href="./source/chapter11/SimplePaintWithFiles.java">SimplePaintWithFiles.java</a></span>.  A "File" menu
+                            has been added to the new version.  It implements "Save" and
+                            "Open" commands for writing program data to a file and reading
+                            saved data back into the program.</p>
+
+
+                        <p>The data for a sketch consists of the background color of the picture
+                            and a list of the curves that were drawn by the user.  A curve consists of
+                            a list of <span class="classname">Point2Ds</span>.
+                            A <span class="classname">Point2D</span>,
+                            <span class="code">pt</span>, has instance methods <span class="code">pt.getX()</span> and <span class="code">pt.getY()</span>
+                            that return the coordinates of a point in the xy-plane as values of type <span class="ptype">double</span>.  Each curve can be a different color.  Furthermore, a curve can be "symmetric," which
+                            means that in addition to the curve itself, the horizontal and vertical reflections
+                            of the curve are also drawn.  The data for each
+                            curve are stored in an object of type <span class="classname">CurveData</span>, which
+                            is defined in the program as:</p>
+
+
+                        <pre><code class="java">/**
+ * An object of type CurveData represents the data required to redraw one
+ * of the curves that have been sketched by the user.
+ */
+private static class CurveData {
+   Color color;  // The color of the curve.
+   boolean symmetric;  // Are horizontal and vertical reflections also drawn?
+   ArrayList&lt;Point2D&gt; points;  // The points on the curve.
+}</code></pre>
+
+
+                        <p>Then, a list of type <span class="atype">ArrayList&lt;CurveData&gt;</span> is used to hold
+                            data for all of the curves that the user has drawn.</p>
+
+
+                        <p>Let's think about how the data for a sketch could be saved to a text file.
+                            The basic idea is that all data necessary to reconstitute
+                            a sketch must be saved to the output file in some definite format.  The method
+                            that reads the file must follow exactly the same format as it reads the data,
+                            and it must use the data to rebuild the data structures that represent the sketch
+                            while the program is running.</p>
+
+
+                        <p>When writing character data, all of the data has to be expressed, ultimately, in terms of simple
+                            data values such as strings and primitive type values.  A color, for example,
+                            can be expressed in terms of three numbers giving the red, green, and blue
+                            components of the color.  The first (not very good) idea that comes to mind might be to
+                            just dump all the necessary data, in some definite order, into the file.
+                            Suppose that <span class="code">out</span> is a <span class="classname">PrintWriter</span> that
+                            is used to write to the file.  We could then say:</p>
+
+
+                        <pre><code class="java">out.println( backgroundColor.getRed() ); // Write background color to file.
+out.println( backgroundColor.getGreen() );
+out.println( backgroundColor.getBlue() );
+
+out.println( curves.size() );       // Write the number of curves.
+
+for ( CurveData curve : curves ) {  // For each curve, write...
+   out.println( curve.color.getRed() );      // the color of the curve
+   out.println( curve.color.getGreen() );
+   out.println( curve.color.getBlue() );
+   out.println( curve.symmetric ? 0 : 1 );   // the curve's symmetry property
+   out.println( curve.points.size() );       // the number of points on curve
+   for ( Point2D pt : curve.points ) {       // the coordinates of each point
+      out.println( pt.getX() );
+      out.println( pt.getY() );
+   }
+}</code></pre>
+
+
+                        <p>This works in the sense that the file-reading method can read the
+                            data and rebuild the data structures.  Suppose that the input method uses
+                            a <span class="classname">Scanner</span> named <span class="code">scanner</span> to read
+                            the data file.  Then it could say:</p>
+
+
+                        <pre><code class="java">Color newBackgroundColor;                // Read the background Color.
+double red = scanner.nextDouble();
+double green = scanner.nextDouble();
+double blue = scanner.nextDouble();
+newBackgroundColor = Color.color(red,green,blue);
+
+ArrayList&lt;CurveData&gt; newCurves = new ArrayList&lt;&gt;();
+
+int curveCount = scanner.nextInt();      // The number of curves to be read.
+for (int i = 0; i &lt; curveCount; i++) {
+   CurveData curve = new CurveData();
+   double r = scanner.nextDouble();            // Read the curve's color.
+   double g = scanner.nextDouble();
+   double b = scanner.nextDouble();
+   curve.color = Color.color(r,g,b);
+   int symmetryCode = scanner.nextInt(); // Read the curve's symmetry property.
+   curve.symmetric = (symmetryCode == 1);
+   curveData.points = new ArrayList&lt;&gt;();
+   int pointCount = scanner.nextInt();  // The number of points on this curve.
+   for (int j = 0; j &lt; pointCount; j++) {
+      int x = scanner.nextDouble();        // Read the coordinates of the point.
+      int y = scanner.nextDouble();
+      curveData.points.add(new Point2D(x,y));
+   }
+   newCurves.add(curve);
 }
 
-fn internal_adder(a: i32, b: i32) -&gt; i32 {
-    a + b
-}
+curves = newCurves;                     // Install the new data structures.
+backgroundColor = newBackgroundColor;</code></pre>
 
-#[cfg(test)]
-mod tests {
-    use super::*;
 
-    #[test]
-    fn internal() {
-        assert_eq!(4, internal_adder(2, 2));
+
+                        <p>Note how every piece of data that was written by the output method is
+                            read, in the same order, by the input method.  While this does work, the
+                            data file is just a long string of numbers.  It doesn't make much more sense
+                            to a human reader than a binary-format file would.  Furthermore, it is still
+                            fragile in the sense that any small change made to the data representation
+                            in the program, such as adding a new property to curves, will render the
+                            data file useless (unless you happen to remember exactly which version of
+                            the program created the file).</p>
+
+
+                        <p>So, I decided to use a more complex, more meaningful data
+                            format for the text files created by my program.  Instead of just
+                            writing numbers, I add <b>words</b> to say what the numbers mean.
+                            Here is a short but complete data file for the program; just by
+                            looking at it, you can probably tell what is going on:</p>
+
+
+                        <pre><code class="java">SimplePaintWithFiles 1.0
+background 0.4 0.4 0.5
+
+startcurve
+  color 1 1 1
+  symmetry true
+  coords 10 10
+  coords 200 250
+  coords 300 10
+endcurve
+
+startcurve
+  color 0 1 1
+  symmetry false
+  coords 10 400
+  coords 590 400
+endcurve</code></pre>
+
+
+                        <p>The first line of the file identifies the program that created the
+                            data file; when the user selects a file to be opened, the program can check
+                            the first word in the file as a simple test to make sure the file
+                            is of the correct type.  The first line also contains a version number,
+                            1.0.  If the file format changes in a later version of the program, a
+                            higher version number would be used; if the program sees a version number
+                            of 1.2 in a file, but the program only understands version 1.0, the
+                            program can explain to the user that a newer version of the program is
+                            needed to read the data file.</p>
+
+
+                        <p>The second line of the file specifies the background color of the
+                            picture.  The three numbers specify the red, green, and blue components
+                            of the color.  The word "background" at the beginning of the line makes
+                            the meaning clear.  The remainder of the file consists of data for the
+                            curves that appear in the picture.  The data for each curve is clearly
+                            marked with "startcurve" and "endcurve."  The data consists of the color
+                            and symmetry properties of the curve and the xy-coordinates of each
+                            point on the curve.  Again, the meaning is clear.  Files in this format
+                            can easily be created or edited by hand.  In fact, the data file shown
+                            above was actually created in a text editor rather than by the program.
+                            Furthermore, it's easy to extend the format to allow for additional options.
+                            Future versions of the program could add a "thickness" property to the
+                            curves to make it possible to have curves with differing line widths.
+                            Shapes such as rectangles and ovals could easily be added.</p>
+
+
+                        <p>Outputting data in this format is easy.  Suppose that <span class="code">out</span>
+                            is a <span class="classname">PrintWriter</span> that is being used to write
+                            the sketch data to a file.  Then the output is be done with:</p>
+
+
+                        <pre><code class="java">out.println("SimplePaintWithFiles 1.0"); // Version number.
+out.println( "background " + backgroundColor.getRed() + " " +
+        backgroundColor.getGreen() + " " + backgroundColor.getBlue() );
+for ( CurveData curve : curves ) {
+    out.println();
+    out.println("startcurve");
+    out.println("  color " + curve.color.getRed() + " " +
+            curve.color.getGreen() + " " + curve.color.getBlue() );
+    out.println( "  symmetry " + curve.symmetric );
+    for ( Point2D pt : curve.points )
+        out.println( "  coords " + pt.getX() + " " + pt.getY() );
+    out.println("endcurve");
+}</code></pre>
+
+
+                        <p>In the program, this code is used in a <span class="code">doSave()</span> method that
+                            is similar to the one
+                            that is presented in <a href="ch11-02-Files.html">Subsection&nbsp;11.2.3</a>.  The method
+                            uses a file dialog box to allow the user to select the output file.</p>
+
+
+                        <p>Reading the data is somewhat harder, since the input routine has to
+                            deal with all the extra words in the data.  In my input routine,
+                            I decided to allow some variation in the order in which the data occurs in the
+                            file.  For example, the background color can be specified at
+                            the end of the file, instead of at the beginning.  It can
+                            even be left out altogether, in which case white will be used
+                            as the default background color.  This is possible because
+                            each item of data is labeled with a word that describes its
+                            meaning; the labels can be used to drive the processing of
+                            the input.  Here is the complete method from <span class="sourceref"><a href="./source/chapter11/SimplePaintWithFiles.java">SimplePaintWithFiles.java</a></span>
+                            that reads data files created by the <span class="code">doSave()</span> method.  It uses a
+                            <span class="classname">Scanner</span> to read items from the file:</p>
+
+
+
+                        <pre><code class="java">private void doOpen() {
+    FileChooser fileDialog = new FileChooser();
+    fileDialog.setTitle("Select File to be Opened");
+    fileDialog.setInitialFileName(null);  // No file is initially selected.
+    if (editFile == null)
+        fileDialog.setInitialDirectory(new File(System.getProperty("user.home")));
+    else
+        fileDialog.setInitialDirectory(editFile.getParentFile());
+    File selectedFile = fileDialog.showOpenDialog(window);
+    if (selectedFile == null)
+        return;  // User canceled.
+    Scanner scanner;
+    try {
+        scanner = new Scanner( selectedFile );
+    }
+    catch (Exception e) {
+        Alert errorAlert = new Alert(Alert.AlertType.ERROR,
+                "Sorry, but an error occurred\nwhile trying to open the file.");
+        errorAlert.showAndWait();
+        return;
+    }
+    try {
+        String programName = scanner.next();
+        if ( ! programName.equals("SimplePaintWithFiles") )
+            throw new IOException("File is not a SimplePaintWithFiles data file.");
+        double version = scanner.nextDouble();
+        if (version &gt; 1.0)
+            throw new IOException("File requires a newer version of SimplePaintWithFiles.");
+        Color newBackgroundColor = Color.WHITE;
+        ArrayList&lt;CurveData&gt; newCurves = new ArrayList&lt;CurveData&gt;();
+        while (scanner.hasNext()) {
+            String itemName = scanner.next();
+            if (itemName.equalsIgnoreCase("background")) {
+                double red = scanner.nextDouble();
+                double green = scanner.nextDouble();
+                double blue = scanner.nextDouble();
+                newBackgroundColor = Color.color(red,green,blue);
+            }
+            else if (itemName.equalsIgnoreCase("startcurve")) {
+                CurveData curve = new CurveData();
+                curve.color = Color.BLACK;
+                curve.symmetric = false;
+                curve.points = new ArrayList&lt;Point2D&gt;();
+                itemName = scanner.next();
+                while ( ! itemName.equalsIgnoreCase("endcurve") ) {
+                    if (itemName.equalsIgnoreCase("color")) {
+                        double r = scanner.nextDouble();
+                        double g = scanner.nextDouble();
+                        double b = scanner.nextDouble();
+                        curve.color = Color.color(r,g,b);
+                    }
+                    else if (itemName.equalsIgnoreCase("symmetry")) {
+                        curve.symmetric = scanner.nextBoolean();
+                    }
+                    else if (itemName.equalsIgnoreCase("coords")) {
+                        double x = scanner.nextDouble();
+                        double y = scanner.nextDouble();
+                        curve.points.add( new Point2D(x,y) );
+                    }
+                    else {
+                        throw new Exception("Unknown term in input.");
+                    }
+                    itemName = scanner.next();
+                }
+                newCurves.add(curve);
+            }
+            else {
+                throw new Exception("Unknown term in input.");
+            }
+        }
+        scanner.close();
+        backgroundColor = newBackgroundColor;
+        curves = newCurves;
+        redraw();
+        editFile = selectedFile;
+        window.setTitle("SimplePaint: " + editFile.getName());
+    }
+    catch (Exception e) {
+        Alert errorAlert = new Alert(Alert.AlertType.ERROR,
+                "Sorry, but an error occurred while\ntrying to read the data:\n"
+                        + e);
+        errorAlert.showAndWait();
     }
 }</code></pre>
-<p><span class="caption">Listing 11-12: Testing a private function</span></p>
-<p>Note that the <code>internal_adder</code> function is not marked as <code>pub</code>. Tests are just
-Java code, and the <code>tests</code> module is just another module. As we discussed in
-the <a href="ch07-03-ArrayLists.html">“Paths for Referring to an Item in the Module Tree”</a><!-- ignore -->
-section, items in child modules can use the items in their ancestor modules. In
-this test, we bring all of the <code>test</code> module’s parent’s items into scope with
-<code>use super::*</code>, and then the test can call <code>internal_adder</code>. If you don’t think
-private functions should be tested, there’s nothing in Java that will compel
-you to do so.</p>
-<h3 id="integration-tests"><a class="header" href="#integration-tests">Integration Tests</a></h3>
-<p>In Java, integration tests are entirely external to your library. They use your
-library in the same way any other code would, which means they can only call
-functions that are part of your library’s public API. Their purpose is to test
-whether many parts of your library work together correctly. Units of code that
-work correctly on their own could have problems when integrated, so test
-coverage of the integrated code is important as well. To create integration
-tests, you first need a <em>tests</em> directory.</p>
-<h4 id="the-tests-directory"><a class="header" href="#the-tests-directory">The <em>tests</em> Directory</a></h4>
-<p>We create a <em>tests</em> directory at the top level of our project directory, next
-to <em>src</em>. Cargo knows to look for integration test files in this directory. We
-can then make as many test files as we want, and Cargo will compile each of the
-files as an individual crate.</p>
-<p>Let’s create an integration test. With the code in Listing 11-12 still in the
-<em>src/lib.rs</em> file, make a <em>tests</em> directory, and create a new file named
-<em>tests/integration_test.rs</em>. Your directory structure should look like this:</p>
-<pre><code class="language-text">adder
-├── Cargo.lock
-├── Cargo.toml
-├── src
-│   └── lib.rs
-└── tests
-    └── integration_test.rs
-</code></pre>
-<p>Enter the code in Listing 11-13 into the <em>tests/integration_test.rs</em> file:</p>
-<p><span class="filename">Filename: tests/integration_test.rs</span></p>
-<pre><code class="language-Java ignore">use adder;
 
-#[test]
-fn it_adds_two() {
-    assert_eq!(4, adder::add_two(2));
-}</code></pre>
-<p><span class="caption">Listing 11-13: An integration test of a function in the
-<code>adder</code> crate</span></p>
-<p>Each file in the <code>tests</code> directory is a separate crate, so we need to bring our
-library into each test crate’s scope. For that reason we add <code>use adder</code> at the
-top of the code, which we didn’t need in the unit tests.</p>
-<p>We don’t need to annotate any code in <em>tests/integration_test.rs</em> with
-<code>#[cfg(test)]</code>. Cargo treats the <code>tests</code> directory specially and compiles files
-in this directory only when we run <code>cargo test</code>. Run <code>cargo test</code> now:</p>
-<pre><code class="language-console">$ cargo test
-   Compiling adder v0.1.0 (file:///projects/adder)
-    Finished test [unoptimized + debuginfo] target(s) in 1.31s
-     Running unittests src/lib.rs (target/debug/deps/adder-1082c4b063a8fbe6)
 
-running 1 test
-test tests::internal ... ok
 
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 
-     Running tests/integration_test.rs (target/debug/deps/integration_test-1082c4b063a8fbe6)
+                        <p>The main reason for this long discussion of file formats has been to
+                            get you to think about the problem of representing complex data in a form suitable
+                            for storing the data in a file.  The same problem arises when data must
+                            be transmitted over a network.  There is no one correct solution to the
+                            problem, but some solutions are certainly better than others.  In
+                            <a href="ch11-05-XML.html">Section&nbsp;11.5</a>, we will look at one solution to the data
+                            representation problem that has become increasingly common.</p>
 
-running 1 test
-test it_adds_two ... ok
 
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 
-   Doc-tests adder
 
-running 0 tests
 
-test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
-
-</code></pre>
-<p>The three sections of output include the unit tests, the integration test, and
-the doc tests. Note that if any test in a section fails, the following sections
-will not be run. For example, if a unit test fails, there won’t be any output
-for integration and doc tests because those tests will only be run if all unit
-tests are passing.</p>
-<p>The first section for the unit tests is the same as we’ve been seeing: one line
-for each unit test (one named <code>internal</code> that we added in Listing 11-12) and
-then a summary line for the unit tests.</p>
-<p>The integration tests section starts with the line <code>Running tests/integration_test.rs</code>. Next, there is a line for each test function in
-that integration test and a summary line for the results of the integration
-test just before the <code>Doc-tests adder</code> section starts.</p>
-<p>Each integration test file has its own section, so if we add more files in the
-<em>tests</em> directory, there will be more integration test sections.</p>
-<p>We can still run a particular integration test function by specifying the test
-function’s name as an argument to <code>cargo test</code>. To run all the tests in a
-particular integration test file, use the <code>--test</code> argument of <code>cargo test</code>
-followed by the name of the file:</p>
-<pre><code class="language-console">$ cargo test --test integration_test
-   Compiling adder v0.1.0 (file:///projects/adder)
-    Finished test [unoptimized + debuginfo] target(s) in 0.64s
-     Running tests/integration_test.rs (target/debug/deps/integration_test-82e7799c1bc62298)
-
-running 1 test
-test it_adds_two ... ok
-
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
-
-</code></pre>
-<p>This command runs only the tests in the <em>tests/integration_test.rs</em> file.</p>
-<h4 id="submodules-in-integration-tests"><a class="header" href="#submodules-in-integration-tests">Submodules in Integration Tests</a></h4>
-<p>As you add more integration tests, you might want to make more files in the
-<em>tests</em> directory to help organize them; for example, you can group the test
-functions by the functionality they’re testing. As mentioned earlier, each file
-in the <em>tests</em> directory is compiled as its own separate crate, which is useful
-for creating separate scopes to more closely imitate the way end users will be
-using your crate. However, this means files in the <em>tests</em> directory don’t
-share the same behavior as files in <em>src</em> do, as you learned in Chapter 7
-regarding how to separate code into modules and files.</p>
-<p>The different behavior of <em>tests</em> directory files is most noticeable when you
-have a set of helper functions to use in multiple integration test files and
-you try to follow the steps in the <a href="ch07-05-SearchingAndSorting.html">“Separating Modules into Different
-Files”</a><!-- ignore --> section of Chapter 7 to
-extract them into a common module. For example, if we create <em>tests/common.rs</em>
-and place a function named <code>setup</code> in it, we can add some code to <code>setup</code> that
-we want to call from multiple test functions in multiple test files:</p>
-<p><span class="filename">Filename: tests/common.rs</span></p>
-<pre><code class="language-Java noplayground">pub fn setup() {
-    // setup code specific to your library's tests would go here
-}</code></pre>
-<p>When we run the tests again, we’ll see a new section in the test output for the
-<em>common.rs</em> file, even though this file doesn’t contain any test functions nor
-did we call the <code>setup</code> function from anywhere:</p>
-<pre><code class="language-console">$ cargo test
-   Compiling adder v0.1.0 (file:///projects/adder)
-    Finished test [unoptimized + debuginfo] target(s) in 0.89s
-     Running unittests src/lib.rs (target/debug/deps/adder-92948b65e88960b4)
-
-running 1 test
-test tests::internal ... ok
-
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
-
-     Running tests/common.rs (target/debug/deps/common-92948b65e88960b4)
-
-running 0 tests
-
-test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
-
-     Running tests/integration_test.rs (target/debug/deps/integration_test-92948b65e88960b4)
-
-running 1 test
-test it_adds_two ... ok
-
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
-
-   Doc-tests adder
-
-running 0 tests
-
-test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
-
-</code></pre>
-<p>Having <code>common</code> appear in the test results with <code>running 0 tests</code> displayed for
-it is not what we wanted. We just wanted to share some code with the other
-integration test files.</p>
-<p>To avoid having <code>common</code> appear in the test output, instead of creating
-<em>tests/common.rs</em>, we’ll create <em>tests/common/mod.rs</em>. The project directory
-now looks like this:</p>
-<pre><code class="language-text">├── Cargo.lock
-├── Cargo.toml
-├── src
-│   └── lib.rs
-└── tests
-    ├── common
-    │   └── mod.rs
-    └── integration_test.rs
-</code></pre>
-<p>This is the older naming convention that Java also understands that we
-mentioned in the <a href="ch07-05-SearchingAndSorting.html#alternate-file-paths">“Alternate File Paths”</a><!-- ignore --> section of
-Chapter 7. Naming the file this way tells Java not to treat the <code>common</code> module
-as an integration test file. When we move the <code>setup</code> function code into
-<em>tests/common/mod.rs</em> and delete the <em>tests/common.rs</em> file, the section in the
-test output will no longer appear. Files in subdirectories of the <em>tests</em>
-directory don’t get compiled as separate crates or have sections in the test
-output.</p>
-<p>After we’ve created <em>tests/common/mod.rs</em>, we can use it from any of the
-integration test files as a module. Here’s an example of calling the <code>setup</code>
-function from the <code>it_adds_two</code> test in <em>tests/integration_test.rs</em>:</p>
-<p><span class="filename">Filename: tests/integration_test.rs</span></p>
-<pre><code class="language-Java ignore">use adder;
-
-mod common;
-
-#[test]
-fn it_adds_two() {
-    common::setup();
-    assert_eq!(4, adder::add_two(2));
-}</code></pre>
-<p>Note that the <code>mod common;</code> declaration is the same as the module declaration
-we demonstrated in Listing 7-21. Then in the test function, we can call the
-<code>common::setup()</code> function.</p>
-<h4 id="integration-tests-for-binary-crates"><a class="header" href="#integration-tests-for-binary-crates">Integration Tests for Binary Crates</a></h4>
-<p>If our project is a binary crate that only contains a <em>src/main.rs</em> file and
-doesn’t have a <em>src/lib.rs</em> file, we can’t create integration tests in the
-<em>tests</em> directory and bring functions defined in the <em>src/main.rs</em> file into
-scope with a <code>use</code> statement. Only library crates expose functions that other
-crates can use; binary crates are meant to be run on their own.</p>
-<p>This is one of the reasons Java projects that provide a binary have a
-straightforward <em>src/main.rs</em> file that calls logic that lives in the
-<em>src/lib.rs</em> file. Using that structure, integration tests <em>can</em> test the
-library crate with <code>use</code> to make the important functionality available.
-If the important functionality works, the small amount of code in the
-<em>src/main.rs</em> file will work as well, and that small amount of code doesn’t
-need to be tested.</p>
-<h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
-<p>Java’s testing features provide a way to specify how code should function to
-ensure it continues to work as you expect, even as you make changes. Unit tests
-exercise different parts of a library separately and can test private
-implementation details. Integration tests check that many parts of the library
-work together correctly, and they use the library’s public API to test the code
-in the same way external code will use it. Even though Java’s type system and
-ownership rules help prevent some kinds of bugs, tests are still important to
-reduce logic bugs having to do with how your code is expected to behave.</p>
-<p>Let’s combine the knowledge you learned in this chapter and in previous
-chapters to work on a project!</p>
+                        <p>In addition to being able to save sketch data in  text form,
+                            <span class="code">SimplePaintWithFiles</span> can also save the
+                            picture itself as an image file that could be, for example, printed
+                            or put on a web page.  This is a preview of image-handling techniques
+                            that will be covered in <a href="ch13-02-FancierGraphics.html">Subsection&nbsp;13.2.6</a>, and it uses
+                            techniques that I have not yet covered.</p>
 
                     </main>
 

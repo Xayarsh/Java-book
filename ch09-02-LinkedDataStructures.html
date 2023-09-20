@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Recoverable Errors with Result - Introduction to Programming Using Java</title>
+        <title>Linked Data Structures - Introduction to Programming Using Java</title>
 
 
         <!-- Custom HTML head -->
@@ -148,537 +148,588 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h2 id="recoverable-errors-with-result"><a class="header" href="#recoverable-errors-with-result">Recoverable Errors with <code>Result</code></a></h2>
-<p>Most errors aren’t serious enough to require the program to stop entirely.
-Sometimes, when a function fails, it’s for a reason that you can easily
-interpret and respond to. For example, if you try to open a file and that
-operation fails because the file doesn’t exist, you might want to create the
-file instead of terminating the process.</p>
-<p>Recall from <a href="ch02-00-NameAndThings.html#handling-potential-failure-with-result">“Handling Potential Failure with <code>Result</code>”</a><!--
-ignore --> in Chapter 2 that the <code>Result</code> enum is defined as having two
-variants, <code>Ok</code> and <code>Err</code>, as follows:</p>
-<pre><pre class="playground"><code class="language-Java"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>enum Result&lt;T, E&gt; {
-    Ok(T),
-    Err(E),
+                        <h2 id="Linked Data Structures"><a class="header" href="#Linked Data Structures">Linked Data Structures</a></h2>
+                        <p>
+                            Every useful object contains instance variables.
+                            When the type of an instance variable is given by a class or interface name,
+                            the variable can hold a reference to another object. Such a reference is also
+                            called a pointer, and we say that the variable <span class="newword">points to</span>
+                            the object. (Of course, any variable that can contain a reference to
+                            an object can also contain the special value <span class="code">null</span>, which points to
+                            nowhere.) When one object contains an instance variable that points to another
+                            object, we think of the objects as being "linked" by the pointer. Data
+                            structures of great complexity can be constructed by linking objects
+                            together.</p>
+
+                        
+                       <h3 id="Recursive Linking"><a class="header" href="#Recursive Linking">Recursive Linking</a></h3>
+
+                        <p>Something interesting happens when an object contains an instance variable
+                            that can refer to another object of the same type. In that case, the definition
+                            of the object's class is recursive. Such recursion arises naturally in many
+                            cases. For example, consider a class designed to represent employees at a
+                            company. Suppose that every employee except the boss has a supervisor, who is
+                            another employee of the company. Then the <span class="classname">Employee</span> class would
+                            naturally contain an instance variable of type <span class="classname">Employee</span> that points to
+                            the employee's supervisor:</p>
+
+
+                        <pre><code class="java">
+/**
+ * An object of type Employee holds data about one employee.
+ */
+public class Employee {
+       
+   String name;          // Name of the employee.
+   
+   Employee supervisor;  // The employee's supervisor.
+
+      .
+      .  // (Other instance variables and methods.)
+      .
+      
+} // end class Employee</code></pre>
+
+
+                        <p>If <span class="code">emp</span> is a variable of type <span class="classname">Employee</span>, then
+                            <span class="code">emp.supervisor</span> is another variable of type <span class="classname">Employee</span>. If
+                            <span class="code">emp</span> refers to the boss, then the value of <span class="code">emp.supervisor</span>
+                            should be <span class="code">null</span> to indicate the fact that the boss has no supervisor.
+                            If we wanted to print out the name of the employee's supervisor, for example,
+                            we could use the following Java statement:</p>
+
+
+                        <pre><code class="java">if ( emp.supervisor == null) {
+   System.out.println( emp.name + " is the boss and has no supervisor!" );
 }
-<span class="boring">}</span></code></pre></pre>
-<p>The <code>T</code> and <code>E</code> are generic type parameters: we’ll discuss generics in more
-detail in Chapter 10. What you need to know right now is that <code>T</code> represents
-the type of the value that will be returned in a success case within the <code>Ok</code>
-variant, and <code>E</code> represents the type of the error that will be returned in a
-failure case within the <code>Err</code> variant. Because <code>Result</code> has these generic type
-parameters, we can use the <code>Result</code> type and the functions defined on it in
-many different situations where the successful value and error value we want to
-return may differ.</p>
-<p>Let’s call a function that returns a <code>Result</code> value because the function could
-fail. In Listing 9-3 we try to open a file.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-Java">use std::fs::File;
-
-fn main() {
-    let greeting_file_result = File::open(&quot;hello.txt&quot;);
-}</code></pre></pre>
-<p><span class="caption">Listing 9-3: Opening a file</span></p>
-<p>The return type of <code>File::open</code> is a <code>Result&lt;T, E&gt;</code>. The generic parameter <code>T</code>
-has been filled in by the implementation of <code>File::open</code> with the type of the
-success value, <code>std::fs::File</code>, which is a file handle. The type of <code>E</code> used in
-the error value is <code>std::io::Error</code>. This return type means the call to
-<code>File::open</code> might succeed and return a file handle that we can read from or
-write to. The function call also might fail: for example, the file might not
-exist, or we might not have permission to access the file. The <code>File::open</code>
-function needs to have a way to tell us whether it succeeded or failed and at
-the same time give us either the file handle or error information. This
-information is exactly what the <code>Result</code> enum conveys.</p>
-<p>In the case where <code>File::open</code> succeeds, the value in the variable
-<code>greeting_file_result</code> will be an instance of <code>Ok</code> that contains a file handle.
-In the case where it fails, the value in <code>greeting_file_result</code> will be an
-instance of <code>Err</code> that contains more information about the kind of error that
-happened.</p>
-<p>We need to add to the code in Listing 9-3 to take different actions depending
-on the value <code>File::open</code> returns. Listing 9-4 shows one way to handle the
-<code>Result</code> using a basic tool, the <code>match</code> expression that we discussed in
-Chapter 6.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-Java should_panic">use std::fs::File;
-
-fn main() {
-    let greeting_file_result = File::open(&quot;hello.txt&quot;);
-
-    let greeting_file = match greeting_file_result {
-        Ok(file) =&gt; file,
-        Err(error) =&gt; panic!(&quot;Problem opening the file: {:?}&quot;, error),
-    };
-}</code></pre></pre>
-<p><span class="caption">Listing 9-4: Using a <code>match</code> expression to handle the
-<code>Result</code> variants that might be returned</span></p>
-<p>Note that, like the <code>Option</code> enum, the <code>Result</code> enum and its variants have been
-brought into scope by the prelude, so we don’t need to specify <code>Result::</code>
-before the <code>Ok</code> and <code>Err</code> variants in the <code>match</code> arms.</p>
-<p>When the result is <code>Ok</code>, this code will return the inner <code>file</code> value out of
-the <code>Ok</code> variant, and we then assign that file handle value to the variable
-<code>greeting_file</code>. After the <code>match</code>, we can use the file handle for reading or
-writing.</p>
-<p>The other arm of the <code>match</code> handles the case where we get an <code>Err</code> value from
-<code>File::open</code>. In this example, we’ve chosen to call the <code>panic!</code> macro. If
-there’s no file named <em>hello.txt</em> in our current directory and we run this
-code, we’ll see the following output from the <code>panic!</code> macro:</p>
-<pre><code class="language-console">$ cargo run
-   Compiling error-handling v0.1.0 (file:///projects/error-handling)
-    Finished dev [unoptimized + debuginfo] target(s) in 0.73s
-     Running `target/debug/error-handling`
-thread 'main' panicked at 'Problem opening the file: Os { code: 2, kind: NotFound, message: &quot;No such file or directory&quot; }', src/main.rs:8:23
-note: run with `Java_BACKTRACE=1` environment variable to display a backtrace
-</code></pre>
-<p>As usual, this output tells us exactly what has gone wrong.</p>
-<h3 id="matching-on-different-errors"><a class="header" href="#matching-on-different-errors">Matching on Different Errors</a></h3>
-<p>The code in Listing 9-4 will <code>panic!</code> no matter why <code>File::open</code> failed.
-However, we want to take different actions for different failure reasons: if
-<code>File::open</code> failed because the file doesn’t exist, we want to create the file
-and return the handle to the new file. If <code>File::open</code> failed for any other
-reason—for example, because we didn’t have permission to open the file—we still
-want the code to <code>panic!</code> in the same way as it did in Listing 9-4. For this we
-add an inner <code>match</code> expression, shown in Listing 9-5.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<!-- ignore this test because otherwise it creates hello.txt which causes other
-tests to fail lol -->
-<pre><code class="language-Java ignore">use std::fs::File;
-use std::io::ErrorKind;
-
-fn main() {
-    let greeting_file_result = File::open(&quot;hello.txt&quot;);
-
-    let greeting_file = match greeting_file_result {
-        Ok(file) =&gt; file,
-        Err(error) =&gt; match error.kind() {
-            ErrorKind::NotFound =&gt; match File::create(&quot;hello.txt&quot;) {
-                Ok(fc) =&gt; fc,
-                Err(e) =&gt; panic!(&quot;Problem creating the file: {:?}&quot;, e),
-            },
-            other_error =&gt; {
-                panic!(&quot;Problem opening the file: {:?}&quot;, other_error);
-            }
-        },
-    };
+else {
+   System.out.print( "The supervisor of " + emp.name + " is " );
+   System.out.println( emp.supervisor.name );
 }</code></pre>
-<p><span class="caption">Listing 9-5: Handling different kinds of errors in
-different ways</span></p>
-<p>The type of the value that <code>File::open</code> returns inside the <code>Err</code> variant is
-<code>io::Error</code>, which is a struct provided by the standard library. This struct
-has a method <code>kind</code> that we can call to get an <code>io::ErrorKind</code> value. The enum
-<code>io::ErrorKind</code> is provided by the standard library and has variants
-representing the different kinds of errors that might result from an <code>io</code>
-operation. The variant we want to use is <code>ErrorKind::NotFound</code>, which indicates
-the file we’re trying to open doesn’t exist yet. So we match on
-<code>greeting_file_result</code>, but we also have an inner match on <code>error.kind()</code>.</p>
-<p>The condition we want to check in the inner match is whether the value returned
-by <code>error.kind()</code> is the <code>NotFound</code> variant of the <code>ErrorKind</code> enum. If it is,
-we try to create the file with <code>File::create</code>. However, because <code>File::create</code>
-could also fail, we need a second arm in the inner <code>match</code> expression. When the
-file can’t be created, a different error message is printed. The second arm of
-the outer <code>match</code> stays the same, so the program panics on any error besides
-the missing file error.</p>
-<blockquote>
-<h3 id="alternatives-to-using-match-with-resultt-e"><a class="header" href="#alternatives-to-using-match-with-resultt-e">Alternatives to Using <code>match</code> with <code>Result&lt;T, E&gt;</code></a></h3>
-<p>That’s a lot of <code>match</code>! The <code>match</code> expression is very useful but also very
-much a primitive. In Chapter 13, you’ll learn about closures, which are used
-with many of the methods defined on <code>Result&lt;T, E&gt;</code>. These methods can be more
-concise than using <code>match</code> when handling <code>Result&lt;T, E&gt;</code> values in your code.</p>
-<p>For example, here’s another way to write the same logic as shown in Listing
-9-5, this time using closures and the <code>unwrap_or_else</code> method:</p>
-<!-- CAN'T EXTRACT SEE https://github.com/Java-lang/mdBook/issues/1127 -->
-<pre><code class="language-Java ignore">use std::fs::File;
-use std::io::ErrorKind;
 
-fn main() {
-    let greeting_file = File::open(&quot;hello.txt&quot;).unwrap_or_else(|error| {
-        if error.kind() == ErrorKind::NotFound {
-            File::create(&quot;hello.txt&quot;).unwrap_or_else(|error| {
-                panic!(&quot;Problem creating the file: {:?}&quot;, error);
-            })
-        } else {
-            panic!(&quot;Problem opening the file: {:?}&quot;, error);
-        }
-    });
+
+                        <p>Now, suppose that we want to know how many levels of supervisors there are
+                            between a given employee and the boss. We just have to follow the chain of
+                            command through a series of <span class="code">supervisor</span> links, and count how many steps
+                            it takes to get to the boss:</p>
+
+
+                        <pre><code class="java">if ( emp.supervisor == null ) {
+   System.out.println( emp.name + " is the boss!" );
+}
+else {
+   Employee runner;  // For "running" up the chain of command.
+   runner = emp.supervisor;
+   if ( runner.supervisor == null) {
+      System.out.println( emp.name  + " reports directly to the boss." );
+   }
+   else {
+      int count = 0;
+      while ( runner.supervisor != null ) {
+         count++;  // Count the supervisor on this level.
+         runner = runner.supervisor; // Move up to the next level.
+      }
+      System.out.println( "There are " + count
+                             + " supervisors between " + emp.name
+                             + " and the boss." );
+   }
 }</code></pre>
-<p>Although this code has the same behavior as Listing 9-5, it doesn’t contain
-any <code>match</code> expressions and is cleaner to read. Come back to this example
-after you’ve read Chapter 13, and look up the <code>unwrap_or_else</code> method in the
-standard library documentation. Many more of these methods can clean up huge
-nested <code>match</code> expressions when you’re dealing with errors.</p>
-</blockquote>
-<h3 id="shortcuts-for-panic-on-error-unwrap-and-expect"><a class="header" href="#shortcuts-for-panic-on-error-unwrap-and-expect">Shortcuts for Panic on Error: <code>unwrap</code> and <code>expect</code></a></h3>
-<p>Using <code>match</code> works well enough, but it can be a bit verbose and doesn’t always
-communicate intent well. The <code>Result&lt;T, E&gt;</code> type has many helper methods
-defined on it to do various, more specific tasks. The <code>unwrap</code> method is a
-shortcut method implemented just like the <code>match</code> expression we wrote in
-Listing 9-4. If the <code>Result</code> value is the <code>Ok</code> variant, <code>unwrap</code> will return
-the value inside the <code>Ok</code>. If the <code>Result</code> is the <code>Err</code> variant, <code>unwrap</code> will
-call the <code>panic!</code> macro for us. Here is an example of <code>unwrap</code> in action:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-Java should_panic">use std::fs::File;
 
-fn main() {
-    let greeting_file = File::open(&quot;hello.txt&quot;).unwrap();
-}</code></pre></pre>
-<p>If we run this code without a <em>hello.txt</em> file, we’ll see an error message from
-the <code>panic!</code> call that the <code>unwrap</code> method makes:</p>
-<!-- manual-regeneration
-cd listings/ch09-error-handling/no-listing-04-unwrap
-cargo run
-copy and paste relevant text
--->
-<pre><code class="language-text">thread 'main' panicked at 'called `Result::unwrap()` on an `Err` value: Os {
-code: 2, kind: NotFound, message: &quot;No such file or directory&quot; }',
-src/main.rs:4:49
-</code></pre>
-<p>Similarly, the <code>expect</code> method lets us also choose the <code>panic!</code> error message.
-Using <code>expect</code> instead of <code>unwrap</code> and providing good error messages can convey
-your intent and make tracking down the source of a panic easier. The syntax of
-<code>expect</code> looks like this:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><pre class="playground"><code class="language-Java should_panic">use std::fs::File;
 
-fn main() {
-    let greeting_file = File::open(&quot;hello.txt&quot;)
-        .expect(&quot;hello.txt should be included in this project&quot;);
-}</code></pre></pre>
-<p>We use <code>expect</code> in the same way as <code>unwrap</code>: to return the file handle or call
-the <code>panic!</code> macro. The error message used by <code>expect</code> in its call to <code>panic!</code>
-will be the parameter that we pass to <code>expect</code>, rather than the default
-<code>panic!</code> message that <code>unwrap</code> uses. Here’s what it looks like:</p>
-<!-- manual-regeneration
-cd listings/ch09-error-handling/no-listing-05-expect
-cargo run
-copy and paste relevant text
--->
-<pre><code class="language-text">thread 'main' panicked at 'hello.txt should be included in this project: Os {
-code: 2, kind: NotFound, message: &quot;No such file or directory&quot; }',
-src/main.rs:5:10
-</code></pre>
-<p>In production-quality code, most Javaaceans choose <code>expect</code> rather than
-<code>unwrap</code> and give more context about why the operation is expected to always
-succeed. That way, if your assumptions are ever proven wrong, you have more
-information to use in debugging.</p>
-<h3 id="propagating-errors"><a class="header" href="#propagating-errors">Propagating Errors</a></h3>
-<p>When a function’s implementation calls something that might fail, instead of
-handling the error within the function itself, you can return the error to the
-calling code so that it can decide what to do. This is known as <em>propagating</em>
-the error and gives more control to the calling code, where there might be more
-information or logic that dictates how the error should be handled than what
-you have available in the context of your code.</p>
-<p>For example, Listing 9-6 shows a function that reads a username from a file. If
-the file doesn’t exist or can’t be read, this function will return those errors
-to the code that called the function.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<!-- Deliberately not using Javadoc_include here; the `main` function in the
-file panics. We do want to include it for reader experimentation purposes, but
-don't want to include it for Javadoc testing purposes. -->
-<pre><pre class="playground"><code class="language-Java"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>use std::fs::File;
-use std::io::{self, Read};
+                        <p>As the <span class="code">while</span> loop is executed, <span class="code">runner</span> points in turn to
+                            the original employee (<span class="code">emp</span>), then to <span class="code">emp's</span> supervisor, then to
+                            the supervisor of <span class="code">emp's</span> supervisor, and so on. The <span class="code">count</span>
+                            variable is incremented each time <span class="code">runner</span> "visits" a new employee. The
+                            loop ends when <span class="code">runner.supervisor</span> is <span class="code">null</span>, which indicates
+                            that <span class="code">runner</span> has reached the boss. At that point, <span class="code">count</span> has
+                            counted the number of steps between <span class="code">emp</span> and the boss.</p>
 
-fn read_username_from_file() -&gt; Result&lt;String, io::Error&gt; {
-    let username_file_result = File::open(&quot;hello.txt&quot;);
 
-    let mut username_file = match username_file_result {
-        Ok(file) =&gt; file,
-        Err(e) =&gt; return Err(e),
-    };
+                        <p>In this example, the <span class="code">supervisor</span> variable is quite natural and
+                            useful. In fact, data structures that are built by linking objects together are
+                            so useful that they are a major topic of study in computer science. We'll be
+                            looking at a few typical examples. In this section and the
+                            <a href="ch09-03-StacksQueuesADTs.html">next</a>, we'll be looking at <span class="newword">linked lists</span>.
+                            A linked list consists of a chain of objects of the same type,
+                            linked together by pointers from one object to the next. This is much like the
+                            chain of supervisors between <span class="code">emp</span> and the boss in the above example.
+                            It's also possible to have more complex situations, in which one object can contain
+                            links to several other objects. We'll look at an example of this in <a href="ch09-04-BinaryTrees.html">Section&nbsp;9.4</a>.</p>
 
-    let mut username = String::new();
 
-    match username_file.read_to_string(&amp;mut username) {
-        Ok(_) =&gt; Ok(username),
-        Err(e) =&gt; Err(e),
-    }
-}
-<span class="boring">}</span></code></pre></pre>
-<p><span class="caption">Listing 9-6: A function that returns errors to the
-calling code using <code>match</code></span></p>
-<p>This function can be written in a much shorter way, but we’re going to start by
-doing a lot of it manually in order to explore error handling; at the end,
-we’ll show the shorter way. Let’s look at the return type of the function
-first: <code>Result&lt;String, io::Error&gt;</code>. This means the function is returning a
-value of the type <code>Result&lt;T, E&gt;</code> where the generic parameter <code>T</code> has been
-filled in with the concrete type <code>String</code>, and the generic type <code>E</code> has been
-filled in with the concrete type <code>io::Error</code>.</p>
-<p>If this function succeeds without any problems, the code that calls this
-function will receive an <code>Ok</code> value that holds a <code>String</code>—the username that
-this function read from the file. If this function encounters any problems, the
-calling code will receive an <code>Err</code> value that holds an instance of <code>io::Error</code>
-that contains more information about what the problems were. We chose
-<code>io::Error</code> as the return type of this function because that happens to be the
-type of the error value returned from both of the operations we’re calling in
-this function’s body that might fail: the <code>File::open</code> function and the
-<code>read_to_string</code> method.</p>
-<p>The body of the function starts by calling the <code>File::open</code> function. Then we
-handle the <code>Result</code> value with a <code>match</code> similar to the <code>match</code> in Listing 9-4.
-If <code>File::open</code> succeeds, the file handle in the pattern variable <code>file</code>
-becomes the value in the mutable variable <code>username_file</code> and the function
-continues. In the <code>Err</code> case, instead of calling <code>panic!</code>, we use the <code>return</code>
-keyword to return early out of the function entirely and pass the error value
-from <code>File::open</code>, now in the pattern variable <code>e</code>, back to the calling code as
-this function’s error value.</p>
-<p>So if we have a file handle in <code>username_file</code>, the function then creates a new
-<code>String</code> in variable <code>username</code> and calls the <code>read_to_string</code> method on
-the file handle in <code>username_file</code> to read the contents of the file into
-<code>username</code>. The <code>read_to_string</code> method also returns a <code>Result</code> because it
-might fail, even though <code>File::open</code> succeeded. So we need another <code>match</code> to
-handle that <code>Result</code>: if <code>read_to_string</code> succeeds, then our function has
-succeeded, and we return the username from the file that’s now in <code>username</code>
-wrapped in an <code>Ok</code>. If <code>read_to_string</code> fails, we return the error value in the
-same way that we returned the error value in the <code>match</code> that handled the
-return value of <code>File::open</code>. However, we don’t need to explicitly say
-<code>return</code>, because this is the last expression in the function.</p>
-<p>The code that calls this code will then handle getting either an <code>Ok</code> value
-that contains a username or an <code>Err</code> value that contains an <code>io::Error</code>. It’s
-up to the calling code to decide what to do with those values. If the calling
-code gets an <code>Err</code> value, it could call <code>panic!</code> and crash the program, use a
-default username, or look up the username from somewhere other than a file, for
-example. We don’t have enough information on what the calling code is actually
-trying to do, so we propagate all the success or error information upward for
-it to handle appropriately.</p>
-<p>This pattern of propagating errors is so common in Java that Java provides the
-question mark operator <code>?</code> to make this easier.</p>
-<h4 id="a-shortcut-for-propagating-errors-the--operator"><a class="header" href="#a-shortcut-for-propagating-errors-the--operator">A Shortcut for Propagating Errors: the <code>?</code> Operator</a></h4>
-<p>Listing 9-7 shows an implementation of <code>read_username_from_file</code> that has the
-same functionality as in Listing 9-6, but this implementation uses the
-<code>?</code> operator.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<!-- Deliberately not using Javadoc_include here; the `main` function in the
-file panics. We do want to include it for reader experimentation purposes, but
-don't want to include it for Javadoc testing purposes. -->
-<pre><pre class="playground"><code class="language-Java"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>use std::fs::File;
-use std::io::{self, Read};
+                        <p align="center">
+                            <img src="./images/linked-data-structures.png" width="432" height="340" alt="Some linked data structures"></p>
 
-fn read_username_from_file() -&gt; Result&lt;String, io::Error&gt; {
-    let mut username_file = File::open(&quot;hello.txt&quot;)?;
-    let mut username = String::new();
-    username_file.read_to_string(&amp;mut username)?;
-    Ok(username)
-}
-<span class="boring">}</span></code></pre></pre>
-<p><span class="caption">Listing 9-7: A function that returns errors to the
-calling code using the <code>?</code> operator</span></p>
-<p>The <code>?</code> placed after a <code>Result</code> value is defined to work in almost the same way
-as the <code>match</code> expressions we defined to handle the <code>Result</code> values in Listing
-9-6. If the value of the <code>Result</code> is an <code>Ok</code>, the value inside the <code>Ok</code> will
-get returned from this expression, and the program will continue. If the value
-is an <code>Err</code>, the <code>Err</code> will be returned from the whole function as if we had
-used the <code>return</code> keyword so the error value gets propagated to the calling
-code.</p>
-<p>There is a difference between what the <code>match</code> expression from Listing 9-6 does
-and what the <code>?</code> operator does: error values that have the <code>?</code> operator called
-on them go through the <code>from</code> function, defined in the <code>From</code> trait in the
-standard library, which is used to convert values from one type into another.
-When the <code>?</code> operator calls the <code>from</code> function, the error type received is
-converted into the error type defined in the return type of the current
-function. This is useful when a function returns one error type to represent
-all the ways a function might fail, even if parts might fail for many different
-reasons.</p>
-<p>For example, we could change the <code>read_username_from_file</code> function in Listing
-9-7 to return a custom error type named <code>OurError</code> that we define. If we also
-define <code>impl From&lt;io::Error&gt; for OurError</code> to construct an instance of
-<code>OurError</code> from an <code>io::Error</code>, then the <code>?</code> operator calls in the body of
-<code>read_username_from_file</code> will call <code>from</code> and convert the error types without
-needing to add any more code to the function.</p>
-<p>In the context of Listing 9-7, the <code>?</code> at the end of the <code>File::open</code> call will
-return the value inside an <code>Ok</code> to the variable <code>username_file</code>. If an error
-occurs, the <code>?</code> operator will return early out of the whole function and give
-any <code>Err</code> value to the calling code. The same thing applies to the <code>?</code> at the
-end of the <code>read_to_string</code> call.</p>
-<p>The <code>?</code> operator eliminates a lot of boilerplate and makes this function’s
-implementation simpler. We could even shorten this code further by chaining
-method calls immediately after the <code>?</code>, as shown in Listing 9-8.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<!-- Deliberately not using Javadoc_include here; the `main` function in the
-file panics. We do want to include it for reader experimentation purposes, but
-don't want to include it for Javadoc testing purposes. -->
-<pre><pre class="playground"><code class="language-Java"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>use std::fs::File;
-use std::io::{self, Read};
 
-fn read_username_from_file() -&gt; Result&lt;String, io::Error&gt; {
-    let mut username = String::new();
+                       <h3 id="Linked Lists"><a class="header" href="#Linked Lists">Linked Lists</a></h3>
 
-    File::open(&quot;hello.txt&quot;)?.read_to_string(&amp;mut username)?;
+                        <p>For most of the examples in the rest of this section, linked lists will be constructed out of
+                            objects belonging to the class <span class="classname">Node</span> which is defined as follows:</p>
 
-    Ok(username)
-}
-<span class="boring">}</span></code></pre></pre>
-<p><span class="caption">Listing 9-8: Chaining method calls after the <code>?</code>
-operator</span></p>
-<p>We’ve moved the creation of the new <code>String</code> in <code>username</code> to the beginning of
-the function; that part hasn’t changed. Instead of creating a variable
-<code>username_file</code>, we’ve chained the call to <code>read_to_string</code> directly onto the
-result of <code>File::open(&quot;hello.txt&quot;)?</code>. We still have a <code>?</code> at the end of the
-<code>read_to_string</code> call, and we still return an <code>Ok</code> value containing <code>username</code>
-when both <code>File::open</code> and <code>read_to_string</code> succeed rather than returning
-errors. The functionality is again the same as in Listing 9-6 and Listing 9-7;
-this is just a different, more ergonomic way to write it.</p>
-<p>Listing 9-9 shows a way to make this even shorter using <code>fs::read_to_string</code>.</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<!-- Deliberately not using Javadoc_include here; the `main` function in the
-file panics. We do want to include it for reader experimentation purposes, but
-don't want to include it for Javadoc testing purposes. -->
-<pre><pre class="playground"><code class="language-Java"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>use std::fs;
-use std::io;
 
-fn read_username_from_file() -&gt; Result&lt;String, io::Error&gt; {
-    fs::read_to_string(&quot;hello.txt&quot;)
-}
-<span class="boring">}</span></code></pre></pre>
-<p><span class="caption">Listing 9-9: Using <code>fs::read_to_string</code> instead of
-opening and then reading the file</span></p>
-<p>Reading a file into a string is a fairly common operation, so the standard
-library provides the convenient <code>fs::read_to_string</code> function that opens the
-file, creates a new <code>String</code>, reads the contents of the file, puts the contents
-into that <code>String</code>, and returns it. Of course, using <code>fs::read_to_string</code>
-doesn’t give us the opportunity to explain all the error handling, so we did it
-the longer way first.</p>
-<h4 id="where-the--operator-can-be-used"><a class="header" href="#where-the--operator-can-be-used">Where The <code>?</code> Operator Can Be Used</a></h4>
-<p>The <code>?</code> operator can only be used in functions whose return type is compatible
-with the value the <code>?</code> is used on. This is because the <code>?</code> operator is defined
-to perform an early return of a value out of the function, in the same manner
-as the <code>match</code> expression we defined in Listing 9-6. In Listing 9-6, the
-<code>match</code> was using a <code>Result</code> value, and the early return arm returned an
-<code>Err(e)</code> value. The return type of the function has to be a <code>Result</code> so that
-it’s compatible with this <code>return</code>.</p>
-<p>In Listing 9-10, let’s look at the error we’ll get if we use the <code>?</code> operator
-in a <code>main</code> function with a return type incompatible with the type of the value
-we use <code>?</code> on:</p>
-<p><span class="filename">Filename: src/main.rs</span></p>
-<pre><code class="language-Java ignore does_not_compile">use std::fs::File;
-
-fn main() {
-    let greeting_file = File::open(&quot;hello.txt&quot;)?;
+                        <pre><code class="java">class Node {
+   String item;
+   Node next;
 }</code></pre>
-<p><span class="caption">Listing 9-10: Attempting to use the <code>?</code> in the <code>main</code>
-function that returns <code>()</code> won’t compile</span></p>
-<p>This code opens a file, which might fail. The <code>?</code> operator follows the <code>Result</code>
-value returned by <code>File::open</code>, but this <code>main</code> function has the return type of
-<code>()</code>, not <code>Result</code>. When we compile this code, we get the following error
-message:</p>
-<pre><code class="language-console">$ cargo run
-   Compiling error-handling v0.1.0 (file:///projects/error-handling)
-error[E0277]: the `?` operator can only be used in a function that returns `Result` or `Option` (or another type that implements `FromResidual`)
- --&gt; src/main.rs:4:48
-  |
-3 | fn main() {
-  | --------- this function should return `Result` or `Option` to accept `?`
-4 |     let greeting_file = File::open(&quot;hello.txt&quot;)?;
-  |                                                ^ cannot use the `?` operator in a function that returns `()`
-  |
-  = help: the trait `FromResidual&lt;Result&lt;Infallible, std::io::Error&gt;&gt;` is not implemented for `()`
 
-For more information about this error, try `Javac --explain E0277`.
-error: could not compile `error-handling` due to previous error
-</code></pre>
-<p>This error points out that we’re only allowed to use the <code>?</code> operator in a
-function that returns <code>Result</code>, <code>Option</code>, or another type that implements
-<code>FromResidual</code>.</p>
-<p>To fix the error, you have two choices. One choice is to change the return type
-of your function to be compatible with the value you’re using the <code>?</code> operator
-on as long as you have no restrictions preventing that. The other technique is
-to use a <code>match</code> or one of the <code>Result&lt;T, E&gt;</code> methods to handle the <code>Result&lt;T, E&gt;</code> in whatever way is appropriate.</p>
-<p>The error message also mentioned that <code>?</code> can be used with <code>Option&lt;T&gt;</code> values
-as well. As with using <code>?</code> on <code>Result</code>, you can only use <code>?</code> on <code>Option</code> in a
-function that returns an <code>Option</code>. The behavior of the <code>?</code> operator when called
-on an <code>Option&lt;T&gt;</code> is similar to its behavior when called on a <code>Result&lt;T, E&gt;</code>:
-if the value is <code>None</code>, the <code>None</code> will be returned early from the function at
-that point. If the value is <code>Some</code>, the value inside the <code>Some</code> is the
-resulting value of the expression and the function continues. Listing 9-11 has
-an example of a function that finds the last character of the first line in the
-given text:</p>
-<pre><pre class="playground"><code class="language-Java">fn last_char_of_first_line(text: &amp;str) -&gt; Option&lt;char&gt; {
-    text.lines().next()?.chars().last()
-}
-<span class="boring">
-</span><span class="boring">fn main() {
-</span><span class="boring">    assert_eq!(
-</span><span class="boring">        last_char_of_first_line(&quot;Hello, world\nHow are you today?&quot;),
-</span><span class="boring">        Some('d')
-</span><span class="boring">    );
-</span><span class="boring">
-</span><span class="boring">    assert_eq!(last_char_of_first_line(&quot;&quot;), None);
-</span><span class="boring">    assert_eq!(last_char_of_first_line(&quot;\nhi&quot;), None);
-</span><span class="boring">}</span></code></pre></pre>
-<p><span class="caption">Listing 9-11: Using the <code>?</code> operator on an <code>Option&lt;T&gt;</code>
-value</span></p>
-<p>This function returns <code>Option&lt;char&gt;</code> because it’s possible that there is a
-character there, but it’s also possible that there isn’t. This code takes the
-<code>text</code> string slice argument and calls the <code>lines</code> method on it, which returns
-an iterator over the lines in the string. Because this function wants to
-examine the first line, it calls <code>next</code> on the iterator to get the first value
-from the iterator. If <code>text</code> is the empty string, this call to <code>next</code> will
-return <code>None</code>, in which case we use <code>?</code> to stop and return <code>None</code> from
-<code>last_char_of_first_line</code>. If <code>text</code> is not the empty string, <code>next</code> will
-return a <code>Some</code> value containing a string slice of the first line in <code>text</code>.</p>
-<p>The <code>?</code> extracts the string slice, and we can call <code>chars</code> on that string slice
-to get an iterator of its characters. We’re interested in the last character in
-this first line, so we call <code>last</code> to return the last item in the iterator.
-This is an <code>Option</code> because it’s possible that the first line is the empty
-string, for example if <code>text</code> starts with a blank line but has characters on
-other lines, as in <code>&quot;\nhi&quot;</code>. However, if there is a last character on the first
-line, it will be returned in the <code>Some</code> variant. The <code>?</code> operator in the middle
-gives us a concise way to express this logic, allowing us to implement the
-function in one line. If we couldn’t use the <code>?</code> operator on <code>Option</code>, we’d
-have to implement this logic using more method calls or a <code>match</code> expression.</p>
-<p>Note that you can use the <code>?</code> operator on a <code>Result</code> in a function that returns
-<code>Result</code>, and you can use the <code>?</code> operator on an <code>Option</code> in a function that
-returns <code>Option</code>, but you can’t mix and match. The <code>?</code> operator won’t
-automatically convert a <code>Result</code> to an <code>Option</code> or vice versa; in those cases,
-you can use methods like the <code>ok</code> method on <code>Result</code> or the <code>ok_or</code> method on
-<code>Option</code> to do the conversion explicitly.</p>
-<p>So far, all the <code>main</code> functions we’ve used return <code>()</code>. The <code>main</code> function is
-special because it’s the entry and exit point of executable programs, and there
-are restrictions on what its return type can be for the programs to behave as
-expected.</p>
-<p>Luckily, <code>main</code> can also return a <code>Result&lt;(), E&gt;</code>. Listing 9-12 has the
-code from Listing 9-10 but we’ve changed the return type of <code>main</code> to be
-<code>Result&lt;(), Box&lt;dyn Error&gt;&gt;</code> and added a return value <code>Ok(())</code> to the end. This
-code will now compile:</p>
-<pre><code class="language-Java ignore">use std::error::Error;
-use std::fs::File;
 
-fn main() -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {
-    let greeting_file = File::open(&quot;hello.txt&quot;)?;
+                        <p>The term <span class="newword">node</span> is often used to refer to one of
+                            the objects in a linked data structure. Objects of type <span class="classname">Node</span> can be
+                            chained together as shown in the top part of the above illustration. Each node holds
+                            a <span class="classname">String</span> and a pointer to the next node in the list (if any).
+                            The last node in such a list can always be identified by the fact that the instance variable
+                            <span class="code">next</span> in the last node holds the value <span class="code">null</span> instead of a
+                            pointer to another node.  The purpose of the chain of nodes is to represent a list
+                            of strings.  The first string in the list is stored in the first node, the second
+                            string is stored in the second node, and so on.  The pointers and the node objects
+                            are used to build the structure, but the data that we want to represent
+                            is the list of strings.  Of course, we could just as easily represent a list of integers or
+                            a list of <span class="classname">Colors</span> or a list of any other type of data
+                            by changing the type of the <span class="code">item</span> that is stored in each node.</p>
 
-    Ok(())
+
+
+                        <p>Although the <span class="classname">Nodes</span> in this example are very simple, we can use them
+                            to illustrate the common operations on linked lists. Typical operations include
+                            deleting nodes from the list, inserting new nodes into the list, and searching
+                            for a specified <span class="classname">String</span> among the <span class="code">items</span> in the list. We will
+                            look at subroutines to perform all of these operations, among others.</p>
+
+
+                        <p>For a linked list to be used in a program, that program needs a variable
+                            that refers to the first node in the list. It only needs a pointer to the first
+                            node since all the other nodes in the list can be accessed by starting at the
+                            first node and following links along the list from one node to the next.
+                            In my examples, I will always use a variable named <span class="code">head</span>, of
+                            type <span class="classname">Node</span>, that points to the first node in the linked list. When the
+                            list is empty, the value of <span class="code">head</span> is null.</p>
+
+
+                        <p align="center">
+                            <img src="./images/list-with-head.png" width="459" height="113" alt="A variable pointing to the first node of a list"></p>
+
+
+                       <h3 id="Basic Linked List Processing"><a class="header" href="#Basic Linked List Processing">Basic Linked List Processing</a></h3>
+
+                        <p>It is very common to want to process all the items in a linked list in some way.  The common
+                            pattern is to start at the head of the list, then move from each node to the next
+                            by following the pointer in the node, stopping when the <span class="code">null</span> that marks
+                            the end of the list is reached.  If <span class="code">head</span> is a variable of
+                            type <span class="classname">Node</span> that points to the first node in the list, then
+                            the general form of the code for processing all the items in a linked list is:</p>
+
+
+                        <pre><code class="java">Node runner;    // A pointer that will be used to traverse the list.
+runner = head;  // Start with runner pointing to the head of the list.
+while ( runner != null ) {     // Continue until null is encountered.
+   process( runner.item );     // Do something with the item in the current node.
+   runner = runner.next;       // Move on to the next node in the list.
 }</code></pre>
-<p><span class="caption">Listing 9-12: Changing <code>main</code> to return <code>Result&lt;(), E&gt;</code>
-allows the use of the <code>?</code> operator on <code>Result</code> values</span></p>
-<p>The <code>Box&lt;dyn Error&gt;</code> type is a <em>trait object</em>, which we’ll talk about in the
-<a href="ch17-02-trait-objects.html#using-trait-objects-that-allow-for-values-of-different-types">“Using Trait Objects that Allow for Values of Different
-Types”</a><!-- ignore --> section in Chapter 17. For now, you can
-read <code>Box&lt;dyn Error&gt;</code> to mean “any kind of error.” Using <code>?</code> on a <code>Result</code>
-value in a <code>main</code> function with the error type <code>Box&lt;dyn Error&gt;</code> is allowed,
-because it allows any <code>Err</code> value to be returned early. Even though the body of
-this <code>main</code> function will only ever return errors of type <code>std::io::Error</code>, by
-specifying <code>Box&lt;dyn Error&gt;</code>, this signature will continue to be correct even if
-more code that returns other errors is added to the body of <code>main</code>.</p>
-<p>When a <code>main</code> function returns a <code>Result&lt;(), E&gt;</code>, the executable will
-exit with a value of <code>0</code> if <code>main</code> returns <code>Ok(())</code> and will exit with a
-nonzero value if <code>main</code> returns an <code>Err</code> value. Executables written in C return
-integers when they exit: programs that exit successfully return the integer
-<code>0</code>, and programs that error return some integer other than <code>0</code>. Java also
-returns integers from executables to be compatible with this convention.</p>
-<p>The <code>main</code> function may return any types that implement <a href="../std/process/trait.Termination.html">the
-<code>std::process::Termination</code> trait</a><!-- ignore -->, which contains
-a function <code>report</code> that returns an <code>ExitCode</code>. Consult the standard library
-documentation for more information on implementing the <code>Termination</code> trait for
-your own types.</p>
-<p>Now that we’ve discussed the details of calling <code>panic!</code> or returning <code>Result</code>,
-let’s return to the topic of how to decide which is appropriate to use in which
-cases.</p>
+
+
+                        <p>Our only access to the list is
+                            through the variable <span class="code">head</span>, so we start by getting a copy of the value
+                            in <span class="code">head</span> with the assignment statement <span class="code">runner&nbsp;=&nbsp;head</span>.
+                            We need a <b>copy</b> of <span class="code">head</span> because we are going to change the value
+                            of <span class="code">runner</span>.
+                            We can't change the value of <span class="code">head</span>, or we would lose our only access to
+                            the list! The variable <span class="code">runner</span> will point to each node of the list in
+                            turn.   When <span class="code">runner</span> points to one of the nodes in the list,
+                            <span class="code">runner.next</span> is a pointer to the next node in the list, so the assignment
+                            statement <span class="code">runner&nbsp;= runner.next</span> moves the pointer along the  list
+                            from each node to the next.  We know that we've reached the end of the list when
+                            <span class="code">runner</span> becomes equal to <span class="code">null</span>.
+                            Note that our list-processing code works even for an empty list, since for an empty list the value
+                            of <span class="code">head</span> is <span class="code">null</span> and the body of the while loop is not executed
+                            at all.  As an example, we can print all the strings in a list of <span class="classname">Strings</span>
+                            by saying:</p>
+
+
+                        <pre><code class="java">Node runner = head;
+while ( runner != null ) {
+   System.out.println( runner.item );
+   runner = runner.next;
+}</code></pre>
+
+
+                        <p>The <span class="code">while</span> loop can, by the way, be rewritten as a <span class="code">for</span> loop.
+                            Remember that even though the loop control variable in a <span class="code">for</span> loop is often
+                            numerical, that is not a requirement.  Here is a <span class="code">for</span> loop that is equivalent
+                            to the above <span class="code">while</span> loop:</p>
+
+
+                        <pre><code class="java">for ( Node runner = head; runner != null; runner = runner.next ) {
+   System.out.println( runner.item );
+}</code></pre>
+
+
+                        <p>Similarly, we can traverse a list of integers to add up all the numbers in the list.
+                            A linked list of integers can be constructed using the class</p>
+
+
+                        <pre><code class="java">public class IntNode {
+   int item;       // One of the integers in the list.
+   IntNode next;   // Pointer to the next node in the list.
+}</code></pre>
+
+
+                        <p>If <span class="code">head</span> is a variable of type <span class="classname">IntNode</span> that points
+                            to a linked list of integers, we can find the sum of the integers in the list using:</p>
+
+
+                        <pre><code class="java">int sum = 0;
+IntNode runner = head;
+while ( runner != null ) {
+   sum = sum + runner.item;   // Add current item to the sum.
+   runner = runner.next;
+}
+System.out.println("The sum of the list of items is " + sum);</code></pre>
+
+
+                        <p>It is also possible to use recursion to process a linked list.  Recursion is
+                            rarely the natural way to process a list, since it's so easy to use a loop to
+                            traverse the list.  However, understanding how to apply recursion to lists can
+                            help with understanding the recursive processing of more complex data structures.
+                            A non-empty linked list can be thought of as consisting of two parts: the
+                            <span class="newword">head</span> of the list, which is just the first node in the list,
+                            and the <span class="newword">tail</span> of the list, which consists of the remainder
+                            of the list after the head.  Note that the tail is itself a linked list
+                            and that it is shorter than the original list (by one node).  This is a natural
+                            setup for recursion, where the problem of processing a list can be divided into
+                            processing the head and recursively processing the tail.  The base case occurs
+                            in the case of an empty list (or sometimes in the case of a list of length one).
+                            For example, here is a recursive algorithm for adding up the numbers in a linked list of
+                            integers:</p>
+
+
+                        <pre><code class="java">if the list is empty then
+   return 0 (since there are no numbers to be added up)
+otherwise
+   let listsum = the number in the head node 
+   let tailsum be the sum of the numbers in the tail list (recursively)
+   add tailsum to listsum
+   return listsum</code></pre>
+
+
+                        <p>One remaining question is, how do we get the tail of a non-empty linked list?  If
+                            <span class="code">head</span> is a variable that points to the head node of the list,
+                            then <span class="code">head.next</span> is a variable that points to the second node
+                            of the list&mdash;and that node is in fact the first node of the tail.  So, we
+                            can view <span class="code">head.next</span> as a pointer to the tail of the list.
+                            One special case is when the original list consists of a single node.
+                            In that case, the tail of the list is empty, and <span class="code">head.next</span> is
+                            <span class="code">null</span>.  Since an empty list is represented by a null pointer,
+                            <span class="code">head.next</span> represents the tail of the list even in this special
+                            case.  This allows us to write a recursive list-summing function in Java
+                            as</p>
+
+
+                        <pre><code class="java">/**
+ *  Compute the sum of all the integers in a linked list of integers.
+ *  @param head a pointer to the first node in the linked list
+ */
+public static int addItemsInList( IntNode head ) {
+   if ( head == null ) {
+         // Base case:  The list is empty,  so the sum is zero.
+      return 0;
+   }
+   else {
+         // Recursive case:  The list is non-empty.  Find the sum of
+         // the tail list, and add that to the item in the head node.
+         // (Note that this case could be written simply as
+         //     return head.item + addItemsInList( head.next );)
+      int listsum = head.item;
+      int tailsum = addItemsInList( head.next );
+      listsum = listsum + tailsum;
+      return listsum;
+   }
+}</code></pre>
+
+
+                        <p>I will finish by presenting a list-processing problem that is easy to solve with recursion,
+                            but quite tricky to solve without it.  The problem is to print out all the strings in a
+                            linked list of strings in the <b>reverse</b> of the order in which they occur in the
+                            list.  Note that when we do this, the item in the head of a list is printed out after
+                            all the items in the tail of the list.  This leads to the following recursive routine.
+                            You should convince yourself that it works, and you should think about trying to do the
+                            same thing without using recursion:</p>
+
+
+                        <pre><code class="java">public static void printReversed( Node head ) {
+   if ( head == null ) {
+         // Base case:  The list is empty, and there is nothing to print.
+      return;
+   }
+   else {
+         // Recursive case:  The list is non-empty.
+      printReversed( head.next );  // Print strings from tail, in reverse order.
+      System.out.println( head.item );  // Then print string from head node.
+   }
+}</code></pre>
+
+
+                        <p>In the rest of this section, we'll look at a few more advanced operations on
+                            a linked list of strings.  The subroutines that we consider are instance methods
+                            in a class that I wrote named <span class="classname">StringList</span>.  An object of type <span class="classname">StringList</span>
+                            represents a linked list of
+                            strings. The class has a private instance
+                            variable named <span class="code">head</span> of type <span class="classname">Node</span> that points
+                            to the first node in the list, or is null if the list is empty.  Instance
+                            methods in class <span class="classname">StringList</span> access <span class="code">head</span>
+                            as a global variable.  The source code for <span class="classname">StringList</span> is in
+                            the file <span class="sourceref"><a href="./source/chapter9/StringList.java">StringList.java</a></span>, and it is used in a
+                            sample program named <span class="sourceref"><a href="./source/chapter9/ListDemo.java">ListDemo.java</a></span>, so you can
+                            take a look at the code in context if you want.</p>
+
+
+                        <p>One of the methods in the <span class="classname">StringList</span> class searches the list,
+                            looking for a specified string.  If the string that we are looking for is <span class="code">searchItem</span>,
+                            then we have to compare <span class="code">searchItem</span> to each
+                            <span class="code">item</span> in the list.   This is an example of basic list traversal and
+                            processing. However, in this case, we can stop processing if we find the
+                            item that we are looking for.</p>
+
+
+                        <pre><code class="java">/**
+ * Searches the list for a specified item. 
+ * @param searchItem the item that is to be searched for
+ * @return true if searchItem is one of the items in the list or false if
+ *    searchItem does not occur in the list.
+ */
+public boolean find(String searchItem) {
+
+   Node runner;    // A pointer for traversing the list.
+
+   runner = head;  // Start by looking at the head of the list.
+                   //   (head is an instance variable! )
+   
+   while ( runner != null ) {
+         // Go through the list looking at the string in each
+         // node.  If the string is the one we are looking for,
+         // return true, since the string has been found in the list.
+      if ( runner.item.equals(searchItem) )
+         return true;
+      runner = runner.next;  // Move on to the next node.
+   }
+
+   // At this point, we have looked at all the items in the list
+   // without finding searchItem.  Return false to indicate that
+   // the item does not exist in the list.
+
+   return false;
+
+} // end find()</code></pre>
+
+
+
+                        <p>It is possible that the list is empty, that is, that the value of
+                            <span class="code">head</span> is <span class="code">null</span>. We should be careful that this case is handled
+                            properly. In the above code, if <span class="code">head</span> is <span class="code">null</span>, then the body
+                            of the <span class="code">while</span> loop is never executed at all, so no nodes are processed
+                            and the return value is <span class="code">false</span>.  This is exactly what we want when the
+                            list is empty, since the <span class="code">searchItem</span> can't occur in an empty list.</p>
+                       
+                       <h3 id="Inserting into a Linked List"><a class="header" href="#Inserting into a Linked List">Inserting into a Linked List</a></h3>
+
+                        <p>The problem of inserting a new item into a linked list is more difficult, at least
+                            in the case where the item is inserted into the middle of the list.  (In
+                            fact, it's probably the most difficult operation on linked data structures that
+                            you'll encounter in this chapter.)  In the <span class="classname">StringList</span> class, the
+                            <span class="code">items</span> in the nodes of the linked list are kept in increasing order.
+                            When a new item is inserted into the list, it must be inserted at the correct
+                            position according to this ordering. This means that, usually, we will have to
+                            insert the new item somewhere in the middle of the list, between two existing
+                            nodes. To do this, it's convenient to have two variables of type <span class="classname">Node</span>,
+                            which refer to the existing nodes that will lie on either side of the new node.
+                            In the following illustration, these variables are <span class="code">previous</span> and
+                            <span class="code">runner</span>. Another variable, <span class="code">newNode</span>, refers to the new node. In
+                            order to do the insertion, the link from <span class="code">previous</span> to <span class="code">runner</span>
+                            must be "broken," and new links from <span class="code">previous</span> to <span class="code">newNode</span> and
+                            from <span class="code">newNode</span> to <span class="code">runner</span> must be added:</p>
+
+
+                        <p align="center">
+                            <img src="./images/insert-in-list.png" width="433" height="289" alt="inserting a node"></p>
+
+
+                        <p>Once we have <span class="code">previous</span> and <span class="code">runner</span> pointing to the right nodes,
+                            the command "<span class="code">previous.next&nbsp;= newNode;</span>" can be used to make
+                            <span class="code">previous.next</span> point to the new node.
+                            And the command "<span class="code">newNode.next&nbsp;= runner</span>" will set
+                            <span class="code">newNode.next</span> to point to the correct place.   However, before we can use
+                            these commands, we need to set up <span class="code">runner</span> and <span class="code">previous</span> as
+                            shown in the illustration. The idea is to start at the first node of the list,
+                            and then move along the list past all the items that are less than the new
+                            item. While doing this, we have to be aware of the danger of "falling off the
+                            end of the list." That is, we can't continue if <span class="code">runner</span> reaches the end
+                            of the list and becomes <span class="code">null</span>. If <span class="code">insertItem</span> is the item that
+                            is to be inserted, and if we assume that it does, in fact, belong somewhere in
+                            the middle of the list, then the following code would correctly position
+                            <span class="code">previous</span> and <span class="code">runner</span>:</p>
+
+
+                        <pre><code class="java">Node runner, previous;
+previous = head;     // Start at the beginning of the list.  
+runner = head.next;
+while ( runner != null &amp;&amp; runner.item.compareTo(insertItem) &lt; 0 ) {
+   previous = runner;  // "previous = previous.next" would also work
+   runner = runner.next;
+}</code></pre>
+
+
+                        <p>(This uses the <span class="code">compareTo()</span> instance method from the <span class="classname">String</span>
+                            class to test whether the item in the node is less than the item that is being
+                            inserted. See <a href="ch02-03-ObjectsAndSubroutines.html">Subsection&nbsp;2.3.3</a>.)</p>
+
+
+                        <p>This is fine, except that the assumption that the new node is inserted into
+                            the middle of the list is not always valid. It might be that
+                            <span class="code">insertItem</span> is less than the first item of the list. In that case, the
+                            new node must be inserted at the head of the list. This can be done with the
+                            instructions</p>
+
+
+                        <pre><code class="java">newNode.next = head;   // Make newNode.next point to the old head.
+head = newNode;        // Make newNode the new head of the list.</code></pre>
+
+
+                        <p>It is also possible that the list is empty. In that case, <span class="code">newNode</span>
+                            will become the first and only node in the list. This can be accomplished
+                            simply by setting <span class="code">head = newNode</span>. The following <span class="code">insert()</span>
+                            method from the <span class="classname">StringList</span> class covers all of these
+                            possibilities:</p>
+
+
+                        <pre><code class="java">/**
+ * Insert a specified item into the list, keeping the list in order.
+ * @param insertItem the item that is to be inserted.
+ */
+public void insert(String insertItem) {
+
+   Node newNode;          // A Node to contain the new item.
+   newNode = new Node();
+   newNode.item = insertItem;  // (N.B.  newNode.next is null.)
+
+   if ( head == null ) {
+          // The new item is the first (and only) one in the list.
+          // Set head to point to it.
+      head = newNode;
+   }
+   else if ( head.item.compareTo(insertItem) &gt;= 0 ) {
+          // The new item is less than the first item in the list,
+          // so it has to be inserted at the head of the list.
+      newNode.next = head;
+      head = newNode;
+   }
+   else {
+          // The new item belongs somewhere after the first item
+          // in the list.  Search for its proper position and insert it.
+      Node runner;     // A node for traversing the list.
+      Node previous;   // Always points to the node preceding runner.
+      runner = head.next;   // Start by looking at the SECOND position.
+      previous = head;
+      while ( runner != null &amp;&amp; runner.item.compareTo(insertItem) &lt; 0 ) {
+             // Move previous and runner along the list until runner
+             // falls off the end or hits a list element that is
+             // greater than or equal to insertItem.  When this 
+             // loop ends, previous indicates the position where
+             // insertItem must be inserted.
+         previous = runner;
+         runner = runner.next;
+      }
+      newNode.next = runner;     // Insert newNode after previous.
+      previous.next = newNode;
+   }
+
+}  // end insert()</code></pre>
+
+
+                        <p>If you were paying close attention to the above discussion, you might have
+                            noticed that there is one special case which is not mentioned. What happens if
+                            the new node has to be inserted at the <b>end</b> of the list? This will happen if all
+                            the items in the list are less than the new item. In fact, this case is already
+                            handled correctly by the subroutine, in the last part of the <span class="code">if</span>
+                            statement. If <span class="code">insertItem</span> is greater than all the items in the list, then
+                            the <span class="code">while</span> loop will end when <span class="code">runner</span> has traversed the entire
+                            list and become <span class="code">null</span>. However, when that happens, <span class="code">previous</span>
+                            will be left pointing to the last node in the list. Setting <span class="code">previous.next&nbsp;= newNode</span>
+                            adds <span class="code">newNode</span> onto the end of the list. Since
+                            <span class="code">runner</span> is <span class="code">null</span>, the command <span class="code">newNode.next = runner</span>
+                            sets <span class="code">newNode.next</span> to <span class="code">null</span>, which is exactly what is
+                            needed to mark the end of the list.</p>
+
+
+                       <h3 id="Deleting from a Linked List"><a class="header" href="#Deleting from a Linked List">Deleting from a Linked List</a></h3>
+
+
+                        <p>The delete operation is similar to insert, although a little simpler. There
+                            are still special cases to consider. When the first node in the list is to be
+                            deleted, then the value of <span class="code">head</span> has to be changed to point to what was
+                            previously the second node in the list. Since <span class="code">head.next</span> refers to the
+                            second node in the list, this can be done by setting <span class="code">head&nbsp;=&nbsp;head.next</span>.
+                            (Once again, you should check that this works when <span class="code">head.next</span> is
+                            <span class="code">null</span>, that is, when there is no second node in the list. In that case,
+                            the list becomes empty.)</p>
+
+
+                        <p>If the node that is being deleted is in the middle of the list, then we can
+                            set up <span class="code">previous</span> and <span class="code">runner</span> with <span class="code">runner</span> pointing to
+                            the node that is to be deleted and with <span class="code">previous</span> pointing to the node
+                            that precedes that node in the list. Once that is done, the command
+                            "<span class="code">previous.next&nbsp;= runner.next</span>;" will delete the node. The deleted node
+                            will be garbage collected.  I encourage you to draw a picture for yourself to illustrate
+                            this operation.  Here is the complete code for the <span class="code">delete()</span> method:</p>
+
+
+                        <pre><code class="java">/**
+ * Delete a specified item from the list, if that item is present.
+ * If multiple copies of the item are present in the list, only
+ * the one that comes first in the list is deleted.
+ * @param deleteItem the item to be deleted
+ * @return true if the item was found and deleted, or false if the item
+ *    was not in the list.
+ */
+public boolean delete(String deleteItem) {
+
+   if ( head == null ) {
+          // The list is empty, so it certainly doesn't contain deleteString.
+      return false;
+   }
+   else if ( head.item.equals(deleteItem) ) {
+           // The string is the first item of the list.  Remove it.
+      head = head.next;
+      return true;
+   }
+   else {
+          // The string, if it occurs at all, is somewhere beyond the 
+          // first element of the list.  Search the list.
+      Node runner;     // A node for traversing the list.
+      Node previous;   // Always points to the node preceding runner.
+      runner = head.next;   // Start by looking at the SECOND list node.
+      previous = head;
+      while ( runner != null &amp;&amp; runner.item.compareTo(deleteItem) &lt; 0 ) {
+             // Move previous and runner along the list until runner
+             // falls off the end or hits a list element that is
+             // greater than or equal to deleteItem.  When this 
+             // loop ends, runner indicates the position where
+             // deleteItem must be, if it is in the list.
+         previous = runner;
+         runner = runner.next;
+      }
+      if ( runner != null &amp;&amp; runner.item.equals(deleteItem) ) {
+             // Runner points to the node that is to be deleted.
+             // Remove it by changing the pointer in the previous node.
+         previous.next = runner.next;
+         return true;
+      }
+      else {
+             // The item does not exist in the list.
+         return false;
+      }
+   }
+
+} // end delete()</code></pre>
+
 
                     </main>
 

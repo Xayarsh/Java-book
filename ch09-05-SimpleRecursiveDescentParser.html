@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>To panic! or Not to panic! - Introduction to Programming Using Java</title>
+        <title>A Simple Recursive Descent Parser - Introduction to Programming Using Java</title>
 
 
         <!-- Custom HTML head -->
@@ -148,254 +148,540 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h2 id="to-panic-or-not-to-panic"><a class="header" href="#to-panic-or-not-to-panic">To <code>panic!</code> or Not to <code>panic!</code></a></h2>
-<p>So how do you decide when you should call <code>panic!</code> and when you should return
-<code>Result</code>? When code panics, there’s no way to recover. You could call <code>panic!</code>
-for any error situation, whether there’s a possible way to recover or not, but
-then you’re making the decision that a situation is unrecoverable on behalf of
-the calling code. When you choose to return a <code>Result</code> value, you give the
-calling code options. The calling code could choose to attempt to recover in a
-way that’s appropriate for its situation, or it could decide that an <code>Err</code>
-value in this case is unrecoverable, so it can call <code>panic!</code> and turn your
-recoverable error into an unrecoverable one. Therefore, returning <code>Result</code> is a
-good default choice when you’re defining a function that might fail.</p>
-<p>In situations such as examples, prototype code, and tests, it’s more
-appropriate to write code that panics instead of returning a <code>Result</code>. Let’s
-explore why, then discuss situations in which the compiler can’t tell that
-failure is impossible, but you as a human can. The chapter will conclude with
-some general guidelines on how to decide whether to panic in library code.</p>
-<h3 id="examples-prototype-code-and-tests"><a class="header" href="#examples-prototype-code-and-tests">Examples, Prototype Code, and Tests</a></h3>
-<p>When you’re writing an example to illustrate some concept, also including robust
-error-handling code can make the example less clear. In
-examples, it’s understood that a call to a method like <code>unwrap</code> that could
-panic is meant as a placeholder for the way you’d want your application to
-handle errors, which can differ based on what the rest of your code is doing.</p>
-<p>Similarly, the <code>unwrap</code> and <code>expect</code> methods are very handy when prototyping,
-before you’re ready to decide how to handle errors. They leave clear markers in
-your code for when you’re ready to make your program more robust.</p>
-<p>If a method call fails in a test, you’d want the whole test to fail, even if
-that method isn’t the functionality under test. Because <code>panic!</code> is how a test
-is marked as a failure, calling <code>unwrap</code> or <code>expect</code> is exactly what should
-happen.</p>
-<h3 id="cases-in-which-you-have-more-information-than-the-compiler"><a class="header" href="#cases-in-which-you-have-more-information-than-the-compiler">Cases in Which You Have More Information Than the Compiler</a></h3>
-<p>It would also be appropriate to call <code>unwrap</code> or <code>expect</code> when you have some
-other logic that ensures the <code>Result</code> will have an <code>Ok</code> value, but the logic
-isn’t something the compiler understands. You’ll still have a <code>Result</code> value
-that you need to handle: whatever operation you’re calling still has the
-possibility of failing in general, even though it’s logically impossible in
-your particular situation. If you can ensure by manually inspecting the code
-that you’ll never have an <code>Err</code> variant, it’s perfectly acceptable to call
-<code>unwrap</code>, and even better to document the reason you think you’ll never have an
-<code>Err</code> variant in the <code>expect</code> text. Here’s an example:</p>
-<pre><pre class="playground"><code class="language-Java"><span class="boring">fn main() {
-</span>    use std::net::IpAddr;
+                        <h2 id="A Simple Recursive Descent Parser"><a class="header" href="#A Simple Recursive Descent Parser">A Simple Recursive Descent Parser</a></h2>
+                        <p>
+                            I have always been fascinated by language&mdash;both
+                            natural languages like English and the artificial languages that are used by
+                            computers. There are many difficult questions about how languages can convey
+                            information, how they are structured, and how they can be processed. Natural
+                            and artificial languages are similar enough that the study of programming
+                            languages, which are pretty well understood, can give some insight into the
+                            much more complex and difficult natural languages. And programming languages
+                            raise more than enough interesting issues to make them worth studying in their
+                            own right. How can it be, after all, that computers can be made to "understand"
+                            even the relatively simple languages that are used to write programs?
+                            Computers can only directly use instructions expressed in very
+                            simple machine language. Higher level languages must be translated into machine
+                            language. But the translation is done by a compiler, which is just a program.
+                            How could such a translation program be written?</p>
 
-    let home: IpAddr = &quot;127.0.0.1&quot;
-        .parse()
-        .expect(&quot;Hardcoded IP address should be valid&quot;);
-<span class="boring">}</span></code></pre></pre>
-<p>We’re creating an <code>IpAddr</code> instance by parsing a hardcoded string. We can see
-that <code>127.0.0.1</code> is a valid IP address, so it’s acceptable to use <code>expect</code>
-here. However, having a hardcoded, valid string doesn’t change the return type
-of the <code>parse</code> method: we still get a <code>Result</code> value, and the compiler will
-still make us handle the <code>Result</code> as if the <code>Err</code> variant is a possibility
-because the compiler isn’t smart enough to see that this string is always a
-valid IP address. If the IP address string came from a user rather than being
-hardcoded into the program and therefore <em>did</em> have a possibility of failure,
-we’d definitely want to handle the <code>Result</code> in a more robust way instead.
-Mentioning the assumption that this IP address is hardcoded will prompt us to
-change <code>expect</code> to better error handling code if in the future, we need to get
-the IP address from some other source instead.</p>
-<h3 id="guidelines-for-error-handling"><a class="header" href="#guidelines-for-error-handling">Guidelines for Error Handling</a></h3>
-<p>It’s advisable to have your code panic when it’s possible that your code
-could end up in a bad state. In this context, a <em>bad state</em> is when some
-assumption, guarantee, contract, or invariant has been broken, such as when
-invalid values, contradictory values, or missing values are passed to your
-code—plus one or more of the following:</p>
-<ul>
-<li>The bad state is something that is unexpected, as opposed to something that
-will likely happen occasionally, like a user entering data in the wrong
-format.</li>
-<li>Your code after this point needs to rely on not being in this bad state,
-rather than checking for the problem at every step.</li>
-<li>There’s not a good way to encode this information in the types you use. We’ll
-work through an example of what we mean in the <a href="ch17-03-oo-design-patterns.html#encoding-states-and-behavior-as-types">“Encoding States and Behavior
-as Types”</a><!-- ignore --> section of Chapter 17.</li>
-</ul>
-<p>If someone calls your code and passes in values that don’t make sense, it’s
-best to return an error if you can so the user of the library can decide what
-they want to do in that case. However, in cases where continuing could be
-insecure or harmful, the best choice might be to call <code>panic!</code> and alert the
-person using your library to the bug in their code so they can fix it during
-development. Similarly, <code>panic!</code> is often appropriate if you’re calling
-external code that is out of your control and it returns an invalid state that
-you have no way of fixing.</p>
-<p>However, when failure is expected, it’s more appropriate to return a <code>Result</code>
-than to make a <code>panic!</code> call. Examples include a parser being given malformed
-data or an HTTP request returning a status that indicates you have hit a rate
-limit. In these cases, returning a <code>Result</code> indicates that failure is an
-expected possibility that the calling code must decide how to handle.</p>
-<p>When your code performs an operation that could put a user at risk if it’s
-called using invalid values, your code should verify the values are valid first
-and panic if the values aren’t valid. This is mostly for safety reasons:
-attempting to operate on invalid data can expose your code to vulnerabilities.
-This is the main reason the standard library will call <code>panic!</code> if you attempt
-an out-of-bounds memory access: trying to access memory that doesn’t belong to
-the current data structure is a common security problem. Functions often have
-<em>contracts</em>: their behavior is only guaranteed if the inputs meet particular
-requirements. Panicking when the contract is violated makes sense because a
-contract violation always indicates a caller-side bug and it’s not a kind of
-error you want the calling code to have to explicitly handle. In fact, there’s
-no reasonable way for calling code to recover; the calling <em>programmers</em> need
-to fix the code. Contracts for a function, especially when a violation will
-cause a panic, should be explained in the API documentation for the function.</p>
-<p>However, having lots of error checks in all of your functions would be verbose
-and annoying. Fortunately, you can use Java’s type system (and thus the type
-checking done by the compiler) to do many of the checks for you. If your
-function has a particular type as a parameter, you can proceed with your code’s
-logic knowing that the compiler has already ensured you have a valid value. For
-example, if you have a type rather than an <code>Option</code>, your program expects to
-have <em>something</em> rather than <em>nothing</em>. Your code then doesn’t have to handle
-two cases for the <code>Some</code> and <code>None</code> variants: it will only have one case for
-definitely having a value. Code trying to pass nothing to your function won’t
-even compile, so your function doesn’t have to check for that case at runtime.
-Another example is using an unsigned integer type such as <code>u32</code>, which ensures
-the parameter is never negative.</p>
-<h3 id="creating-custom-types-for-validation"><a class="header" href="#creating-custom-types-for-validation">Creating Custom Types for Validation</a></h3>
-<p>Let’s take the idea of using Java’s type system to ensure we have a valid value
-one step further and look at creating a custom type for validation. Recall the
-guessing game in Chapter 2 in which our code asked the user to guess a number
-between 1 and 100. We never validated that the user’s guess was between those
-numbers before checking it against our secret number; we only validated that
-the guess was positive. In this case, the consequences were not very dire: our
-output of “Too high” or “Too low” would still be correct. But it would be a
-useful enhancement to guide the user toward valid guesses and have different
-behavior when a user guesses a number that’s out of range versus when a user
-types, for example, letters instead.</p>
-<p>One way to do this would be to parse the guess as an <code>i32</code> instead of only a
-<code>u32</code> to allow potentially negative numbers, and then add a check for the
-number being in range, like so:</p>
-<pre><code class="language-Java ignore"><span class="boring">use rand::Rng;
-</span><span class="boring">use std::cmp::Ordering;
-</span><span class="boring">use std::io;
-</span><span class="boring">
-</span><span class="boring">fn main() {
-</span><span class="boring">    println!(&quot;Guess the number!&quot;);
-</span><span class="boring">
-</span><span class="boring">    let secret_number = rand::thread_rng().gen_range(1..=100);
-</span><span class="boring">
-</span>    loop {
-        // --snip--
 
-<span class="boring">        println!(&quot;Please input your guess.&quot;);
-</span><span class="boring">
-</span><span class="boring">        let mut guess = String::new();
-</span><span class="boring">
-</span><span class="boring">        io::stdin()
-</span><span class="boring">            .read_line(&amp;mut guess)
-</span><span class="boring">            .expect(&quot;Failed to read line&quot;);
-</span><span class="boring">
-</span>        let guess: i32 = match guess.trim().parse() {
-            Ok(num) =&gt; num,
-            Err(_) =&gt; continue,
-        };
 
-        if guess &lt; 1 || guess &gt; 100 {
-            println!(&quot;The secret number will be between 1 and 100.&quot;);
-            continue;
-        }
+                        <h3 id="Backus-Naur Form"><a class="header" href="#Backus-Naur Form">Backus-Naur Form</a></h3>
 
-        match guess.cmp(&amp;secret_number) {
-            // --snip--
-<span class="boring">            Ordering::Less =&gt; println!(&quot;Too small!&quot;),
-</span><span class="boring">            Ordering::Greater =&gt; println!(&quot;Too big!&quot;),
-</span><span class="boring">            Ordering::Equal =&gt; {
-</span><span class="boring">                println!(&quot;You win!&quot;);
-</span><span class="boring">                break;
-</span><span class="boring">            }
-</span><span class="boring">        }
-</span>    }
-<span class="boring">}</span></code></pre>
-<p>The <code>if</code> expression checks whether our value is out of range, tells the user
-about the problem, and calls <code>continue</code> to start the next iteration of the loop
-and ask for another guess. After the <code>if</code> expression, we can proceed with the
-comparisons between <code>guess</code> and the secret number knowing that <code>guess</code> is
-between 1 and 100.</p>
-<p>However, this is not an ideal solution: if it was absolutely critical that the
-program only operated on values between 1 and 100, and it had many functions
-with this requirement, having a check like this in every function would be
-tedious (and might impact performance).</p>
-<p>Instead, we can make a new type and put the validations in a function to create
-an instance of the type rather than repeating the validations everywhere. That
-way, it’s safe for functions to use the new type in their signatures and
-confidently use the values they receive. Listing 9-13 shows one way to define a
-<code>Guess</code> type that will only create an instance of <code>Guess</code> if the <code>new</code> function
-receives a value between 1 and 100.</p>
-<!-- Deliberately not using Javadoc_include here; the `main` function in the
-file requires the `rand` crate. We do want to include it for reader
-experimentation purposes, but don't want to include it for Javadoc testing
-purposes. -->
-<pre><pre class="playground"><code class="language-Java"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>pub struct Guess {
-    value: i32,
-}
+                        <p>Natural and artificial languages are similar in that they have a structure
+                            known as grammar or syntax. Syntax can be expressed by a set of rules that
+                            describe what it means to be a legal sentence or program. For programming
+                            languages, syntax rules are often expressed in <span class="newword">BNF</span>
+                            (Backus-Naur Form), a system that was developed by computer scientists John
+                            Backus and Peter Naur in the late 1950s. Interestingly, an equivalent system
+                            was developed independently at about the same time by linguist Noam Chomsky to
+                            describe the grammar of natural language. BNF cannot express all possible
+                            syntax rules. For example, it can't express the fact that a variable must be
+                            defined before it is used. Furthermore, it says nothing about the meaning or
+                            semantics of the language. The problem of specifying the semantics of a
+                            language&mdash;even of an artificial programming language&mdash;is one that is still
+                            far from being completely solved. However, BNF does express the basic structure
+                            of the language, and it plays a central role in the design of compilers.</p>
 
-impl Guess {
-    pub fn new(value: i32) -&gt; Guess {
-        if value &lt; 1 || value &gt; 100 {
-            panic!(&quot;Guess value must be between 1 and 100, got {}.&quot;, value);
-        }
 
-        Guess { value }
-    }
+                        <p>A variety of different notations are used for BNF.  The one that I will use here is
+                            fairly common.  Although other notations are used, they express the same concepts.</p>
 
-    pub fn value(&amp;self) -&gt; i32 {
-        self.value
-    }
-}
-<span class="boring">}</span></code></pre></pre>
-<p><span class="caption">Listing 9-13: A <code>Guess</code> type that will only continue with
-values between 1 and 100</span></p>
-<p>First, we define a struct named <code>Guess</code> that has a field named <code>value</code> that
-holds an <code>i32</code>. This is where the number will be stored.</p>
-<p>Then we implement an associated function named <code>new</code> on <code>Guess</code> that creates
-instances of <code>Guess</code> values. The <code>new</code> function is defined to have one
-parameter named <code>value</code> of type <code>i32</code> and to return a <code>Guess</code>. The code in the
-body of the <code>new</code> function tests <code>value</code> to make sure it’s between 1 and 100.
-If <code>value</code> doesn’t pass this test, we make a <code>panic!</code> call, which will alert
-the programmer who is writing the calling code that they have a bug they need
-to fix, because creating a <code>Guess</code> with a <code>value</code> outside this range would
-violate the contract that <code>Guess::new</code> is relying on. The conditions in which
-<code>Guess::new</code> might panic should be discussed in its public-facing API
-documentation; we’ll cover documentation conventions indicating the possibility
-of a <code>panic!</code> in the API documentation that you create in Chapter 14. If
-<code>value</code> does pass the test, we create a new <code>Guess</code> with its <code>value</code> field set
-to the <code>value</code> parameter and return the <code>Guess</code>.</p>
-<p>Next, we implement a method named <code>value</code> that borrows <code>self</code>, doesn’t have any
-other parameters, and returns an <code>i32</code>. This kind of method is sometimes called
-a <em>getter</em>, because its purpose is to get some data from its fields and return
-it. This public method is necessary because the <code>value</code> field of the <code>Guess</code>
-struct is private. It’s important that the <code>value</code> field be private so code
-using the <code>Guess</code> struct is not allowed to set <code>value</code> directly: code outside
-the module <em>must</em> use the <code>Guess::new</code> function to create an instance of
-<code>Guess</code>, thereby ensuring there’s no way for a <code>Guess</code> to have a <code>value</code> that
-hasn’t been checked by the conditions in the <code>Guess::new</code> function.</p>
-<p>A function that has a parameter or returns only numbers between 1 and 100 could
-then declare in its signature that it takes or returns a <code>Guess</code> rather than an
-<code>i32</code> and wouldn’t need to do any additional checks in its body.</p>
-<h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
-<p>Java’s error handling features are designed to help you write more robust code.
-The <code>panic!</code> macro signals that your program is in a state it can’t handle and
-lets you tell the process to stop instead of trying to proceed with invalid or
-incorrect values. The <code>Result</code> enum uses Java’s type system to indicate that
-operations might fail in a way that your code could recover from. You can use
-<code>Result</code> to tell code that calls your code that it needs to handle potential
-success or failure as well. Using <code>panic!</code> and <code>Result</code> in the appropriate
-situations will make your code more reliable in the face of inevitable problems.</p>
-<p>Now that you’ve seen useful ways that the standard library uses generics with
-the <code>Option</code> and <code>Result</code> enums, we’ll talk about how generics work and how you
-can use them in your code.</p>
+
+                        <p>In English, terms such as "noun", "transitive verb," and "prepositional
+                            phrase" are <span class="newword">syntactic categories</span> that describe
+                            building blocks of sentences. Similarly, "statement", "number," and "while
+                            loop" are syntactic categories that describe building blocks of Java programs.
+                            In BNF, a syntactic category is written as a word enclosed between
+                            "<span class="code">&lt;</span>" and&nbsp;"<span class="code">&gt;</span>". For example: <span class="code">&lt;noun&gt;</span>,
+                            <span class="code">&lt;verb-phrase&gt;</span>, or <span class="code">&lt;while-loop&gt;</span>. A
+                            <span class="newword">rule</span> in BNF specifies the structure of an item in a given
+                            syntactic category, in terms of other syntactic categories and/or basic symbols
+                            of the language. For example, one BNF rule for the English language might
+                            be</p>
+
+
+                        <pre><code class="java">&lt;sentence&gt;  ::=  &lt;noun-phrase&gt; &lt;verb-phrase&gt;</code></pre>
+
+
+                        <p>The symbol "<span class="code">::=</span>" is read "can be", so this rule says that a
+                            <span class="code">&lt;sentence&gt;</span> can be a <span class="code">&lt;noun-phrase&gt;</span> followed by a
+                            <span class="code">&lt;verb-phrase&gt;</span>. (The term is "can be" rather than "is" because
+                            there might be other rules that specify other possible forms for a sentence.)
+                            This rule can be thought of as a recipe for a sentence: If you want to make a
+                            sentence, make a noun-phrase and follow it by a verb-phrase. Noun-phrase and
+                            verb-phrase must, in turn, be defined by other BNF rules.</p>
+
+
+                        <p>In BNF, a choice between alternatives is represented by the symbol "<span class="code">|</span>",
+                            which is read "or". For example, the rule</p>
+
+
+                        <pre><code class="java">&lt;verb-phrase&gt;  ::=  &lt;intransitive-verb&gt;  |
+                    ( &lt;transitive-verb&gt; &lt;noun-phrase&gt; )</code></pre>
+
+
+                        <p>says that a <span class="code">&lt;verb-phrase&gt;</span> can be an
+                            <span class="code">&lt;intransitive-verb&gt;</span>, or a
+                            <span class="code">&lt;transitive-verb&gt;</span> followed by a <span class="code">&lt;noun-phrase&gt;</span>.
+                            Note also that parentheses can be used for grouping. To express the fact that
+                            an item is optional, it can be enclosed between "<span class="code">[</span>" and "<span class="code">]</span>".
+                            An optional item that can be repeated any number of times is enclosed between
+                            "<span class="code">[</span>" and "<span class="code">]...</span>". And a symbol that is an actual part of the
+                            language that is being described is enclosed in quotes. For example,</p>
+
+
+                        <pre><code class="java">&lt;noun-phrase&gt;  ::=  &lt;common-noun&gt; [ "that" &lt;verb-phrase&gt; ]  |
+                    &lt;common-noun&gt; [ &lt;prepositional-phrase&gt; ]...</code></pre>
+
+
+                        <p>says that a <span class="code">&lt;noun-phrase&gt;</span> can be a
+                            <span class="code">&lt;common-noun&gt;</span>, optionally followed by the literal word
+                            "<span class="code">that</span>" and a <span class="code">&lt;verb-phrase&gt;</span>, or it can be a
+                            <span class="code">&lt;common-noun&gt;</span> followed by zero or more
+                            <span class="code">&lt;prepositional-phrase&gt;'s</span>. Obviously, we can describe very
+                            complex structures in this way. The real power comes from the fact that BNF
+                            rules can be <b>recursive</b>. In fact, the two preceding rules, taken together, are
+                            recursive. A <span class="code">&lt;noun-phrase&gt;</span> is defined partly in terms of
+                            <span class="code">&lt;verb-phrase&gt;</span>, while <span class="code">&lt;verb-phrase&gt;</span> is defined
+                            partly in terms of <span class="code">&lt;noun-phrase&gt;</span>. For example, a
+                            <span class="code">&lt;noun-phrase&gt;</span> might be "the rat that ate the cheese", since "ate
+                            the cheese" is a <span class="code">&lt;verb-phrase&gt;</span>. But then we can, recursively,
+                            make the more complex <span class="code">&lt;noun-phrase&gt;</span> "the cat that caught the rat
+                            that ate the cheese" out of the <span class="code">&lt;common-noun&gt;</span> "the cat", the word "that"
+                            and the <span class="code">&lt;verb-phrase&gt;</span> "caught the rat that ate the cheese".
+                            Building from there, we can make the <span class="code">&lt;noun-phrase&gt;</span> "the dog that
+                            chased the cat that caught the rat that ate the cheese". The recursive
+                            structure of language is one of the most fundamental properties of language,
+                            and the ability of BNF to express this recursive structure is what makes it so
+                            useful.</p>
+
+
+                        <p>BNF can be used to describe the syntax of a programming language such as
+                            Java in a formal and precise way. For example, a <span class="code">&lt;while-loop&gt;</span>
+                            can be defined as</p>
+
+
+                        <pre><code class="java">&lt;while-loop&gt;  ::=  "while" "(" &lt;condition&gt; ")" &lt;statement&gt;</code></pre>
+
+
+                        <p>This says that a <span class="code">&lt;while-loop&gt;</span> consists of the word "while",
+                            followed by a left parenthesis, followed by a <span class="code">&lt;condition&gt;</span>,
+                            followed by a right parenthesis, followed by a <span class="code">&lt;statement&gt;</span>. Of
+                            course, it still remains to define what is meant by a condition and by a
+                            statement. Since a statement can be, among other things, a <span class="code">while</span> loop,
+                            we can already see the recursive structure of the Java language. The exact
+                            specification of an <span class="code">if</span> statement, which is hard to express clearly in
+                            words, can be given as</p>
+
+
+                        <pre><code class="java">&lt;if-statement&gt;  ::=
+             "if" "(" &lt;condition&gt; ")" &lt;statement&gt;
+             [ "else" "if" "(" &lt;condition&gt; ")" &lt;statement&gt; ]...
+             [ "else" &lt;statement&gt; ]</code></pre>
+
+
+                        <p>This rule makes it clear that the "<span class="code">else</span>" part is optional and that
+                            there can be, optionally, one or more "<span class="code">else if</span>" parts.</p>
+                        
+
+                        <h3 id="Recursive Descent Parsing"><a class="header" href="#Recursive Descent Parsing">Recursive Descent Parsing</a></h3>
+
+                        <p>In the rest of this section, I will show how a BNF grammar for a language
+                            can be used as a guide for constructing a parser. A parser is a program that
+                            determines the grammatical structure of a phrase in the language. This is the
+                            first step in determining the meaning of the phrase&mdash;which for a programming
+                            language means translating it into machine language. Although we will look at
+                            only a simple example, I hope it will be enough to convince you that compilers
+                            can in fact be written and understood by mortals and to give you some idea of
+                            how that can be done.</p>
+
+
+                        <p>The parsing method that we will use is called <span class="newword">recursive descent parsing</span>.
+                            It is not the only possible parsing
+                            method, or the most efficient, but it is the one most suited for writing
+                            compilers by hand (rather than with the help of so called "parser generator"
+                            programs). In a recursive descent parser, every rule of the BNF grammar is the
+                            model for a subroutine. Not every BNF grammar is suitable for recursive descent
+                            parsing. The grammar must satisfy a certain property. Essentially, while
+                            parsing a phrase, it must be possible to tell what syntactic category is coming
+                            up next just by looking at the next item in the input. Many grammars are
+                            designed with this property in mind.</p>
+
+                        
+                        <p>When we try to parse a phrase that contains a syntax error, we need some way
+                            to respond to the error. A convenient way of doing this is to throw an
+                            exception. I'll use an exception class called <span class="classname">ParseError</span>, defined as
+                            follows:</p>
+
+
+                        <pre><code class="java">/**
+ * An object of type ParseError represents a syntax error found in
+ * the user's input.
+ */
+private static class ParseError extends Exception {
+   ParseError(String message) {
+      super(message);
+   }
+} // end nested class ParseError</code></pre>
+
+
+                        <p>Another general point is that our BNF rules don't say anything about spaces
+                            between items, but in reality we want to be able to insert spaces between items
+                            at will. To allow for this, I'll always call the routine <span class="code">TextIO.skipBlanks()</span>
+                            before trying to look ahead to see what's coming up next in input.
+                            <span class="code">TextIO.skipBlanks()</span> skips past any whitespace, such as spaces and tabs, in the input,
+                            and stops when the next character in the input is either a non-blank character or the
+                            end-of-line character.  (For a discussion of robust handling of <span class="classname">TextIO</span> input, see
+                            <a href="ch08-02-WritingCorrectPrograms.html">Subsection&nbsp;8.2.4</a>.)</p>
+
+
+                        <p>Let's start with a very simple example. A "fully parenthesized expression"
+                            can be specified in BNF by the rules</p>
+
+
+                        <pre><code class="java">&lt;expression&gt;  ::=  &lt;number&gt;  |
+                   "(" &lt;expression&gt; &lt;operator&gt; &lt;expression&gt; ")"
+
+&lt;operator&gt;  ::=  "+" | "-" | "*" | "/"</code></pre>
+
+
+                        <p>where <span class="code">&lt;number&gt;</span> refers to any non-negative real number. An example
+                            of a fully parenthesized expression is "<span class="code">(((34-17)*8)+(2*7))</span>". Since
+                            every operator corresponds to a pair of parentheses, there is no ambiguity
+                            about the order in which the operators are to be applied. Suppose we want a
+                            program that will read and evaluate such expressions. We'll read the
+                            expressions from standard input, using <span class="classname">TextIO</span>. To apply recursive
+                            descent parsing, we need a subroutine for each rule in the grammar.
+                            Corresponding to the rule for <span class="code">&lt;operator&gt;</span>, we get a subroutine
+                            that reads an operator. The operator can be a choice of any of four things. Any
+                            other input will be an error.</p>
+
+
+                        <pre><code class="java">/**
+ * If the next character in input is one of the legal operators,
+ * read it and return it.  Otherwise, throw a ParseError.
+ */
+static char getOperator() throws ParseError {
+   TextIO.skipBlanks();
+   char op = TextIO.peek(); // look ahead at the next char, without reading it
+   if ( op == '+' || op == '-' || op == '*' || op == '/' ) {
+      TextIO.getAnyChar();  // read the operator, to remove it from the input
+      return op;
+   }
+   else if (op == '\n')
+      throw new ParseError("Missing operator at end of line.");
+   else
+      throw new ParseError("Missing operator.  Found \"" +
+            op + "\" instead of +, -, *, or /.");
+} // end getOperator()</code></pre>
+
+
+                        <p>I've tried to give a reasonable error message, depending on whether the next
+                            character is an end-of-line or something else. I use <span class="code">TextIO.peek()</span> to
+                            look ahead at the next character before I read it, and I call
+                            <span class="code">TextIO.skipBlanks()</span> before testing <span class="code">TextIO.peek()</span> in order to ignore
+                            any blanks that separate items. I will follow this same pattern in every
+                            case.</p>
+
+
+                        <p>When we come to the subroutine for <span class="code">&lt;expression&gt;</span>, things are a
+                            little more interesting. The rule says that an expression can be either a
+                            number or an expression enclosed in parentheses. We can tell which it is by
+                            looking ahead at the next character. If the character is a digit, we have to
+                            read a number. If the character is a "(", we have to read the "(", followed by
+                            an expression, followed by an operator, followed by another expression,
+                            followed by a ")". If the next character is anything else, there is an error.
+                            Note that we need recursion to read the nested expressions. The routine doesn't
+                            just read the expression. It also computes and returns its value. This requires
+                            semantical information that is not specified in the BNF rule.</p>
+
+
+                        <pre><code class="java">/**
+ * Read an expression from the current line of input and return its value.
+ * @throws ParseError if the input contains a syntax error
+ */
+private static double expressionValue() throws ParseError {
+   TextIO.skipBlanks();
+   if ( Character.isDigit(TextIO.peek()) ) {
+          // The next item in input is a number, so the expression
+          // must consist of just that number.  Read and return
+          // the number.
+      return TextIO.getDouble();
+   }
+   else if ( TextIO.peek() == '(' ) {
+          // The expression must be of the form
+          //         "(" &lt;expression&gt; &lt;operator&gt; &lt;expression&gt; ")"
+          // Read all these items, perform the operation, and
+          // return the result.
+      TextIO.getAnyChar();  // Read the "("
+      double leftVal = expressionValue();  // Read and evaluate first operand.
+      char op = getOperator();             // Read the operator.
+      double rightVal = expressionValue(); // Read and evaluate second operand.
+      TextIO.skipBlanks();
+      if ( TextIO.peek() != ')' ) {
+             // According to the rule, there must be a ")" here.
+             // Since it's missing, throw a ParseError.
+         throw new ParseError("Missing right parenthesis.");
+      }
+      TextIO.getAnyChar();  // Read the ")"
+      switch (op) {   //  Apply the operator and return the result.
+         case '+':  return leftVal + rightVal;
+         case '-':  return leftVal - rightVal;
+         case '*':  return leftVal * rightVal;
+         case '/':  return leftVal / rightVal;
+         default:   return 0;  // Can't occur since op is one of the above.
+                               // (But Java syntax requires a return value.)
+      }
+   }
+   else {  // No other character can legally start an expression.
+      throw new ParseError("Encountered unexpected character, \"" +
+            TextIO.peek() + "\" in input.");
+   }
+} // end expressionValue()</code></pre>
+
+
+                        <p>I hope that you can see how this routine corresponds to the BNF rule. Where
+                            the rule uses "<span class="code">|</span>" to give a choice between alternatives, there is an
+                            <span class="code">if</span> statement in the routine to determine which choice to take. Where
+                            the rule contains a sequence of items, "(" <span class="code">&lt;expression&gt;</span>
+                            <span class="code">&lt;operator&gt;</span> <span class="code">&lt;expression&gt;</span> ")", there is a sequence
+                            of statements in the subroutine to read each item in turn.</p>
+
+
+                        <p>When <span class="code">expressionValue()</span> is called to evaluate the expression
+                            <span class="code">(((34-17)*8)+(2*7))</span>, it sees the "(" at the beginning of the input, so
+                            the <span class="code">else</span> part of the <span class="code">if</span> statement is executed. The "(" is
+                            read. Then the first recursive call to <span class="code">expressionValue()</span> reads and
+                            evaluates the subexpression <span class="code">((34-17)*8)</span>, the call to
+                            <span class="code">getOperator()</span> reads the "+" operator, and the second recursive call to
+                            <span class="code">expressionValue()</span> reads and evaluates the second subexpression
+                            <span class="code">(2*7)</span>. Finally, the ")" at the end of the expression is read. Of
+                            course, reading the first subexpression, <span class="code">((34-17)*8)</span>, involves further
+                            recursive calls to the <span class="code">expressionValue()</span> routine, but it's better not
+                            to think too deeply about that! Rely on the recursion to handle the
+                            details.</p>
+
+
+                        <p>You'll find a complete program that uses these routines in the file
+                            <span class="sourceref"><a href="./source/chapter9/SimpleParser1.java">SimpleParser1.java</a></span>.</p>
+
+
+
+
+
+                        <p>Fully parenthesized expressions aren't very natural for people to use. But
+                            with ordinary expressions, we have to worry about the question of operator
+                            precedence, which tells us, for example, that the "<span class="code">*</span>" in the
+                            expression "<span class="code">5+3*7</span>" is applied before the "<span class="code">+</span>". The complex expression
+                            "<span class="code">3*6+8*(7+1)/4-24</span>" should be seen as made up of three "terms",
+                            <span class="code">3*6</span>, <span class="code">8*(7+1)/4</span>, and <span class="code">24</span>, combined with "<span class="code">+</span>" and "<span class="code">-</span>"
+                            operators. A term, on the other hand, can be made up of several factors
+                            combined with "<span class="code">*</span>" and "<span class="code">/</span>" operators. For example,
+                            <span class="code">8*(7+1)/4</span> contains the factors <span class="code">8</span>, <span class="code">(7+1)</span> and
+                            <span class="code">4</span>. This example also shows that a factor can be either a number or an
+                            expression in parentheses. To complicate things a bit more, we allow for
+                            leading minus signs in expressions, as in "<span class="code">-(3+4)</span>" or "<span class="code">-7</span>".
+                            (Since a <span class="code">&lt;number&gt;</span> is a positive number, this is the only way we
+                            can get negative numbers. It's done this way to avoid "<span class="code">3&nbsp;*&nbsp;-7</span>", for
+                            example.) This structure can be expressed by the BNF rules</p>
+
+
+                        <pre><code class="java">&lt;expression&gt;  ::=  [ "-" ] &lt;term&gt; [ ( "+" | "-" ) &lt;term&gt; ]...
+&lt;term&gt;  ::=  &lt;factor&gt; [ ( "*" | "/" ) &lt;factor&gt; ]...
+&lt;factor&gt;  ::=  &lt;number&gt;  |  "(" &lt;expression&gt; ")"</code></pre>
+
+
+                        <p>The first rule uses the "<span class="code">[&nbsp;]...</span>" notation, which says that the
+                            items that it encloses can occur zero, one, two, or more times. The rule means that
+                            an <span class="code">&lt;expression&gt;</span> can begin, optionally, with a "-". Then there
+                            must be a <span class="code">&lt;term&gt;</span> which can optionally be followed by one of the
+                            operators "<span class="code">+</span>" or "<span class="code">-</span>" and another <span class="code">&lt;term&gt;</span>, optionally followed by
+                            another operator and <span class="code">&lt;term&gt;</span>, and so on. In a subroutine that
+                            reads and evaluates expressions, this repetition is handled by a <span class="code">while</span>
+                            loop. An <span class="code">if</span> statement is used at the beginning of the loop to test
+                            whether a leading minus sign is present:</p>
+
+
+                        <pre><code class="java">/**
+ * Read an expression from the current line of input and return its value.
+ * @throws ParseError if the input contains a syntax error
+ */
+private static double expressionValue() throws ParseError {
+   TextIO.skipBlanks();
+   boolean negative;  // True if there is a leading minus sign.
+   negative = false;
+   if (TextIO.peek() == '-') {
+      TextIO.getAnyChar();  // Read the minus sign.
+      negative = true;
+   }
+   double val;  // Value of the expression.
+   val = termValue();  // Read and evaluate the first term.
+   if (negative)
+      val = -val;  // Apply the leading minus sign to the first term.
+   TextIO.skipBlanks();
+   while ( TextIO.peek() == '+' || TextIO.peek() == '-' ) {
+          // Read the next term and add it to or subtract it from
+          // the value of previous terms in the expression.
+      char op = TextIO.getAnyChar();  // Read the operator.
+      double nextVal = termValue();    // Read and evaluate the next term.
+      if (op == '+')
+         val += nextVal;
+      else
+         val -= nextVal;
+      TextIO.skipBlanks();
+   }
+   return val;
+} // end expressionValue()</code></pre>
+
+
+                        <p>The subroutine for <span class="code">&lt;term&gt;</span> is very similar to this, and the
+                            subroutine for <span class="code">&lt;factor&gt;</span> is similar to the example given above
+                            for fully parenthesized expressions. A complete program that reads and
+                            evaluates expressions based on the above BNF rules can be found in the file
+                            <span class="sourceref"><a href="./source/chapter9/SimpleParser2.java">SimpleParser2.java</a></span>.</p>
+
+                        
+                        <h3 id="Building an Expression Tree"><a class="header" href="#Building an Expression Tree">Building an Expression Tree</a></h3>
+                        
+
+                        <p>Now, so far, we've only evaluated expressions. What does that have to do
+                            with translating programs into machine language? Well, instead of actually
+                            evaluating the expression, it would be almost as easy to generate the machine
+                            language instructions that are needed to evaluate the expression. If we are
+                            working with a "stack machine," these instructions would be stack operations
+                            such as "push a number" or "apply a <span class="code">+</span> operation". The program
+                            <span class="sourceref"><a href="./source/chapter9/SimpleParser3.java">SimpleParser3.java</a></span> can both evaluate the
+                            expression and print a list of stack machine operations for evaluating the
+                            expression.</p>
+
+
+
+                        <p>It's quite a jump from this program to a recursive descent parser that can
+                            read a program written in Java and generate the equivalent machine language
+                            code&mdash;but the conceptual leap is not huge.</p>
+
+
+                        <p>The <span class="code">SimpleParser3</span> program doesn't actually generate the stack
+                            operations directly as it parses an expression. Instead, it builds an
+                            expression tree, as discussed in <a href="ch09-04-BinaryTrees.html">Subsection&nbsp;9.4.3</a>, to
+                            represent the expression. The expression tree is then used to find the value
+                            and to generate the stack operations. The tree is made up of nodes belonging to
+                            classes <span class="classname">ConstNode</span> and <span class="classname">BinOpNode</span> that are similar to those
+                            given in <a href="ch09-04-BinaryTrees.html">Subsection&nbsp;9.4.3</a>. Another subclass of <span class="classname">ExpNote</span>,
+                            <span class="classname">UnaryMinusNode</span>, has been
+                            introduced to represent the unary minus operation. I've added a method,
+                            <span class="code">printStackCommands()</span>, to each class. This method is responsible for
+                            printing out the stack operations that are necessary to evaluate an expression.
+                            Here for example is the new <span class="code">BinOpNode</span> class from <span class="sourceref"><a href="./source/chapter9/SimpleParser3.java">SimpleParser3.java</a></span>:</p>
+
+
+                        <pre><code class="java">private static class BinOpNode extends ExpNode {
+   char op;        // The operator.
+   ExpNode left;   // The expression for its left operand.
+   ExpNode right;  // The expression for its right operand.
+   BinOpNode(char op, ExpNode left, ExpNode right) {
+          // Construct a BinOpNode containing the specified data.
+      assert op == '+' || op == '-' || op == '*' || op == '/';
+      assert left != null &amp;&amp; right != null;
+           // (for assert statements, see <a href="ch08-04-AssertionsAnnotations.html">Subsection&nbsp;8.4.1</a>)
+      this.op = op;
+      this.left = left;
+      this.right = right;
+   }
+   double value() {
+          // The value is obtained by evaluating the left and right
+          // operands and combining the values with the operator.
+      double x = left.value();
+      double y = right.value();
+      switch (op) {
+      case '+':
+         return x + y;
+      case '-':
+         return x - y;
+      case '*':
+         return x * y;
+      case '/':
+         return x / y;
+      default:
+         return Double.NaN;  // Bad operator! Should not be possible.
+      }
+   }
+   void  printStackCommands() {
+          // To evaluate the expression on a stack machine, first do
+          // whatever is necessary to evaluate the left operand, leaving
+          // the answer on the stack.  Then do the same thing for the
+          // second operand.  Then apply the operator (which means popping
+          // the operands, applying the operator, and pushing the result).
+      left.printStackCommands();
+      right.printStackCommands();
+      System.out.println("  Operator " + op);
+   }
+}</code></pre>
+
+
+                        <p>It's also interesting to look at the new parsing subroutines. Instead of
+                            computing a value, each subroutine builds an expression tree. For example, the
+                            subroutine corresponding to the rule for <span class="code">&lt;expression&gt;</span>
+                            becomes</p>
+
+
+                        <pre><code class="java">
+    static ExpNode expressionTree() throws ParseError {
+           // Read an expression from the current line of input and
+           // return an expression tree representing the expression.
+           // (The return value is a pointer to the root of the tree.)
+       TextIO.skipBlanks();
+       boolean negative;  // True if there is a leading minus sign.
+       negative = false;
+       if (TextIO.peek() == '-') {
+          TextIO.getAnyChar();
+          negative = true;
+       }
+       ExpNode exp;   // The expression tree for the expression.
+       exp = termTree();  // Start with a tree for first term.
+       if (negative) {
+              // Build the tree that corresponds to applying a
+              // unary minus operator to the term we've
+              // just read.
+          exp = new UnaryMinusNode(exp);
+       }
+       TextIO.skipBlanks();
+       while ( TextIO.peek() == '+' || TextIO.peek() == '-' ) {
+                // Read the next term and combine it with the
+                // previous terms into a bigger expression tree.
+           char op = TextIO.getAnyChar();
+           ExpNode nextTerm = termTree();
+                // Create a tree that applies the binary operator
+                // to the previous tree and the term we just read.
+           exp = new BinOpNode(op, exp, nextTerm);
+           TextIO.skipBlanks();
+       }
+       return exp;
+    } // end expressionTree()
+
+</code></pre>
+
+
+                        <p>In some real compilers, the parser creates a tree to represent the program
+                            that is being parsed. This tree is called a <span class="newword">parse tree</span>
+                            or <span class="newword">abstract syntax tree</span>.
+                            Parse trees are somewhat different in form from expression trees,
+                            but the purpose is the same. Once you have the tree, there are a number of
+                            things you can do with it. For one thing, it can be used to generate machine
+                            language code. But there are also techniques for examining the tree and
+                            detecting certain types of programming errors, such as an attempt to reference
+                            a local variable before it has been assigned a value. (The Java compiler, of
+                            course, will reject the program if it contains such an error.) It's also
+                            possible to manipulate the tree to <span class="newword">optimize</span> the
+                            program. In optimization, the tree is transformed to make the program more
+                            efficient before the code is generated.</p>
+
+
+                        <p>And so we are back where we started in <a href="ch01-00-Overview.html">Chapter&nbsp;1</a>, looking at programming
+                            languages, compilers, and machine language. But looking at them, I hope, with a
+                            lot more understanding and a much wider perspective.</p>
 
                     </main>
 

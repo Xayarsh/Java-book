@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Traits: Defining Shared Behavior - Introduction to Programming Using Java</title>
+        <title>Lists and Sets - Introduction to Programming Using Java</title>
 
 
         <!-- Custom HTML head -->
@@ -148,551 +148,669 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h2 id="traits-defining-shared-behavior"><a class="header" href="#traits-defining-shared-behavior">Traits: Defining Shared Behavior</a></h2>
-<p>A <em>trait</em> defines functionality a particular type has and can share with other
-types. We can use traits to define shared behavior in an abstract way. We can
-use <em>trait bounds</em> to specify that a generic type can be any type that has
-certain behavior.</p>
-<blockquote>
-<p>Note: Traits are similar to a feature often called <em>interfaces</em> in other
-languages, although with some differences.</p>
-</blockquote>
-<h3 id="defining-a-trait"><a class="header" href="#defining-a-trait">Defining a Trait</a></h3>
-<p>A type’s behavior consists of the methods we can call on that type. Different
-types share the same behavior if we can call the same methods on all of those
-types. Trait definitions are a way to group method signatures together to
-define a set of behaviors necessary to accomplish some purpose.</p>
-<p>For example, let’s say we have multiple structs that hold various kinds and
-amounts of text: a <code>NewsArticle</code> struct that holds a news story filed in a
-particular location and a <code>Tweet</code> that can have at most 280 characters along
-with metadata that indicates whether it was a new tweet, a retweet, or a reply
-to another tweet.</p>
-<p>We want to make a media aggregator library crate named <code>aggregator</code> that can
-display summaries of data that might be stored in a <code>NewsArticle</code> or <code>Tweet</code>
-instance. To do this, we need a summary from each type, and we’ll request
-that summary by calling a <code>summarize</code> method on an instance. Listing 10-12
-shows the definition of a public <code>Summary</code> trait that expresses this behavior.</p>
-<p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-Java noplayground">pub trait Summary {
-    fn summarize(&amp;self) -&gt; String;
-}</code></pre>
-<p><span class="caption">Listing 10-12: A <code>Summary</code> trait that consists of the
-behavior provided by a <code>summarize</code> method</span></p>
-<p>Here, we declare a trait using the <code>trait</code> keyword and then the trait’s name,
-which is <code>Summary</code> in this case. We’ve also declared the trait as <code>pub</code> so that
-crates depending on this crate can make use of this trait too, as we’ll see in
-a few examples. Inside the curly brackets, we declare the method signatures
-that describe the behaviors of the types that implement this trait, which in
-this case is <code>fn summarize(&amp;self) -&gt; String</code>.</p>
-<p>After the method signature, instead of providing an implementation within curly
-brackets, we use a semicolon. Each type implementing this trait must provide
-its own custom behavior for the body of the method. The compiler will enforce
-that any type that has the <code>Summary</code> trait will have the method <code>summarize</code>
-defined with this signature exactly.</p>
-<p>A trait can have multiple methods in its body: the method signatures are listed
-one per line and each line ends in a semicolon.</p>
-<h3 id="implementing-a-trait-on-a-type"><a class="header" href="#implementing-a-trait-on-a-type">Implementing a Trait on a Type</a></h3>
-<p>Now that we’ve defined the desired signatures of the <code>Summary</code> trait’s methods,
-we can implement it on the types in our media aggregator. Listing 10-13 shows
-an implementation of the <code>Summary</code> trait on the <code>NewsArticle</code> struct that uses
-the headline, the author, and the location to create the return value of
-<code>summarize</code>. For the <code>Tweet</code> struct, we define <code>summarize</code> as the username
-followed by the entire text of the tweet, assuming that tweet content is
-already limited to 280 characters.</p>
-<p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-Java noplayground"><span class="boring">pub trait Summary {
-</span><span class="boring">    fn summarize(&amp;self) -&gt; String;
-</span><span class="boring">}
-</span><span class="boring">
-</span>pub struct NewsArticle {
-    pub headline: String,
-    pub location: String,
-    pub author: String,
-    pub content: String,
+                        <h2 id="Lists and Sets"><a class="header" href="#Lists and Sets">Lists and Sets</a></h2>
+                        <p>
+                            In the previous section, we looked at the general
+                            properties of collection classes in Java. In this section, we look at some
+                            specific collection classes and how to use them. These classes can be divided
+                            into two main categories: lists and sets. A list consists of a sequence of items
+                            arranged in a linear order. A list has a definite order, but is not necessarily sorted.
+                            A set is a collection that has no duplicate
+                            entries. The elements of a set might or might not be arranged into some
+                            definite order.  I will also briefly discuss a third category of
+                            collection known as a "priority queue."</p>
+
+
+                        <h3 id="ArrayList and LinkedList"><a class="header" href="#ArrayList and LinkedList">ArrayList and LinkedList</a></h3>
+
+                        <p>There are two obvious ways to represent a list: as a dynamic array and as a
+                            linked list. We've encountered these already in
+                            <a href="ch07-03-ArrayLists.html">Section&nbsp;7.3</a> and <a href="ch09-02-LinkedDataStructures.html">Section&nbsp;9.2</a>. Both of these
+                            options are available in generic form as the collection classes
+                            <span class="code">java.util.ArrayList</span> and <span class="code">java.util.LinkedList</span>. These
+                            classes are part of the Java Collection Framework.  Each implements the interface
+                            <span class="classname">List&lt;T&gt;</span>, and therefore the interface <span class="classname">Collection&lt;T&gt;</span>.
+                            An object of type <span class="classname">ArrayList&lt;T&gt;</span>
+                            represents an ordered sequence of objects of type <span class="classname">T</span>,
+                            stored in an array that will grow in size whenever necessary as new items are added. An object of type
+                            <span class="classname">LinkedList&lt;T&gt;</span> also
+                            represents an ordered sequence of objects of type <span class="classname">T</span>, but
+                            the objects are stored in nodes that are linked
+                            together with pointers.</p>
+
+
+                        <p>Both list classes support the basic list operations that are defined in
+                            the interface <span class="classname">List&lt;T&gt;</span>, and an abstract data
+                            type is defined by its operations, not by its representation. So why two
+                            classes? Why not a single List class with a single representation? The problem
+                            is that there <b>is</b> no single representation of lists for which all list
+                            operations are efficient. For some operations, linked lists are more efficient
+                            than arrays. For others, arrays are more efficient. In a particular application
+                            of lists, it's likely that only a few operations will be used frequently. You
+                            want to choose the representation for which the frequently used operations will
+                            be as efficient as possible.</p>
+
+
+                        <p>Broadly speaking, the <span class="classname">LinkedList</span> class is more efficient in
+                            applications where items will often be added or removed at the beginning of the
+                            list or in the middle of the list. In an array, these operations require moving
+                            a large number of items up or down one position in the array, to make a space
+                            for a new item or to fill in the hole left by the removal of an item.  In terms
+                            of asymptotic analysis (<a href="ch08-05-AnalysisofAlgorithms.html">Section&nbsp;8.5</a>), adding an element at the beginning
+                            or in the middle of an array has run time&nbsp;Θ(n), where n is the number
+                            of items in the array.  In a
+                            linked list, nodes can be added or removed at any position by changing a few
+                            pointer values, an operation that has run time Θ(1).  That is, the
+                            operation takes only some constant amount of time, independent of how many
+                            items are in the list.</p>
+
+
+                        <p>On the other hand, the <span class="classname">ArrayList</span> class is more efficient when
+                            <span class="newword">random access</span> to items is required.  Random access
+                            means accessing the k-th item in the list, for any integer&nbsp;k.  Random access
+                            is used when you get or change the value stored at a specified position in the list.
+                            This is trivial for an array, with run time Θ(1).
+                            But for a linked list it means starting at the beginning
+                            of the list and moving from node to node along the list for k steps, an
+                            operation that has run time Θ(k).</p>
+
+
+                        <p>Operations that can be done efficiently for both types of lists include sorting and adding
+                            an item at the end of the list.</p>
+
+
+                        <p>All lists implement the methods from interface <span class="classname">Collection&lt;T&gt;</span>
+                            that were discussed in <a href="ch10-01-GenericProgramming.html">Subsection&nbsp;10.1.4</a>.  These methods include  <span class="code">size()</span>,
+                            <span class="code">isEmpty()</span>, <span class="code">add(T)</span>, <span class="code">remove(Object)</span>, and
+                            <span class="code">clear()</span>. The <span class="code">add(T)</span> method adds the object at the end of
+                            the list. The <span class="code">remove(Object)</span> method involves first finding the object,
+                            which uses linear search and is not very efficient for any list since it involves going through the
+                            items in the list from beginning to end until the object is found. The interface
+                            <span class="classname">List&lt;T&gt;</span>  adds some methods for accessing list items according to
+                            their numerical positions in the list.  Suppose that <span class="code">list</span> is an object
+                            of type <span class="classname">List&lt;T&gt;</span>.  Then we have the methods:</p>
+
+
+                        <ul>
+
+                            <li>
+                                <span class="codedef">list.get(index)</span> &mdash; returns the
+                                object of type <span class="classname">T</span> that is
+                                at position <span class="code">index</span> in the list, where <span class="code">index</span> is
+                                an integer. Items are numbered 0, 1, 2, ..., <span class="code">list.size()-1</span>. The
+                                parameter must be in this range, or an <span class="classname">IndexOutOfBoundsException</span> is
+                                thrown.</li>
+
+
+                            <li>
+                                <span class="codedef">list.set(index,obj)</span> &mdash; stores the
+                                object <span class="code">obj</span> at position number <span class="code">index</span> in the list, replacing
+                                the object that was there previously. The object <span class="code">obj</span> must be of
+                                type <span class="classname">T</span>.  This does not change the number of
+                                elements in the list or move any of the other elements.</li>
+
+
+                            <li>
+                                <span class="codedef">list.add(index,obj)</span> &mdash; inserts an
+                                object <span class="code">obj</span> into the list at position number <span class="code">index</span>,
+                                where <span class="code">obj</span> must be of type <span class="classname">T</span>.  The number
+                                of items in the list increases by one, and items that come after position
+                                <span class="code">index</span> move down one position to make room for the new item. The value of
+                                <span class="code">index</span> must be in the range 0 to <span class="code">list.size()</span>, inclusive.
+                                If <span class="code">index</span> is equal to <span class="code">list.size()</span>, then <span class="code">obj</span>
+                                is added at the end of the list.</li>
+
+
+                            <li>
+                                <span class="codedef">list.remove(index)</span> &mdash; removes the
+                                object at position number <span class="code">index</span>, and returns that object
+                                as the return value of the method.
+                                Items after this position move up one
+                                space in the list to fill the hole, and the size of the list decreases by one.
+                                The value of <span class="code">index</span> must be in the range 0 to <span class="code">list.size()-1</span>.</li>
+
+
+                            <li>
+                                <span class="codedef">list.indexOf(obj)</span> &mdash; returns an
+                                <span class="ptype">int</span> that gives the position of <span class="code">obj</span> in the list, if it occurs.
+                                If it does not occur, the return value is <span class="code">-1</span>.  The object <span class="code">obj</span>
+                                can be of any type, not just of type&nbsp;<span class="classname">T</span>.  If <span class="code">obj</span> occurs
+                                more than once in the list, the index of the first occurrence is returned.</li>
+
+                        </ul>
+
+
+                        <p>These methods are defined both in class <span class="classname">ArrayList&lt;T&gt;</span> and in class
+                            <span class="classname">LinkedList&lt;T&gt;</span>, although some of them&mdash;such as <span class="code">get</span>
+                            and <span class="code">set</span>&mdash;are only efficient for
+                            <span class="classname">ArrayLists</span>. The class <span class="classname">LinkedList&lt;T&gt;</span> adds a few additional
+                            methods, which are not defined for an <span class="classname">ArrayList</span>. If
+                            <span class="code">linkedlist</span> is an object of type <span class="classname">LinkedList&lt;T&gt;</span>, then we have</p>
+
+
+                        <ul>
+
+                            <li>
+                                <span class="codedef">linkedlist.getFirst()</span> &mdash; returns the
+                                object of type <span class="classname">T</span> that is the first item in the list. The list is not
+                                modified.  If the list is empty when the method is called, an exception of type
+                                <span class="classname">NoSuchElementException</span> is thrown (the same is true for the
+                                next three methods as well).</li>
+
+
+                            <li>
+                                <span class="codedef">linkedlist.getLast()</span> &mdash; returns the
+                                object of type <span class="classname">T</span> that is the last item in the list. The list is not
+                                modified.</li>
+
+
+                            <li>
+                                <span class="codedef">linkedlist.removeFirst()</span> &mdash; removes
+                                the first item from the list, and returns that object of type <span class="classname">T</span> as its return
+                                value.  The functions <span class="codedef">linkedlist.remove()</span> and <span class="codedef">linkedlist.pop()</span>
+                                are also defined, with the same meaning as <span class="code">removeFirst()</span>.</li>
+
+
+                            <li>
+                                <span class="codedef">linkedlist.removeLast()</span> &mdash; removes
+                                the last item from the list, and returns that object of type <span class="classname">T</span> as its return
+                                value.</li>
+
+
+                            <li>
+                                <span class="codedef">linkedlist.addFirst(obj)</span> &mdash; adds the
+                                <span class="code">obj</span>, which must be of type <span class="classname">T</span>, to the beginning of the list.
+                                The function <span class="codedef">linkedlist.push(obj)</span> has the same meaning.</li>
+
+
+                            <li>
+                                <span class="codedef">linkedlist.addLast(obj)</span> &mdash; adds the
+                                object <span class="code">obj</span>, which must be of type <span class="classname">T</span>, to the end of the list.
+                                This is exactly the same as <span class="code">linkedlist.add(obj)</span> but is defined to keep the
+                                naming consistent.</li>
+
+                        </ul>
+
+
+                        <p>There is some redundancy here, apparently to make it easy to use a
+                            <span class="classname">LinkedList</span> as if it were a stack or a queue. (See
+                            <a href="ch09-03-StacksQueuesADTs.html">Section&nbsp;9.3</a>.) For example, we can use a
+                            <span class="classname">LinkedList</span> as a stack by using the methods named <span class="code">push()</span>
+                            and <span class="code">pop()</span>, or as a queue by using <span class="code">add()</span> and <span class="code">remove()</span>
+                            to implement the enqueue and dequeue operations.</p>
+
+
+                        <p>If <span class="code">list</span> is an object of type <span class="classname">List&lt;T&gt;</span>, then the method
+                            <span class="code">list.iterator()</span>, defined in the interface <span class="classname">Collection&lt;T&gt;</span>, returns
+                            an <span class="classname">Iterator</span> that can be used to traverse the list from beginning to
+                            end. However, for <span class="classname">Lists</span>, there is a special type of <span class="classname">Iterator</span>,
+                            called a <span class="classname">ListIterator</span>, which offers additional capabilities.
+                            <span class="classname">ListIterator&lt;T&gt;</span> is an interface that extends the
+                            interface <span class="classname">Iterator&lt;T&gt;</span>.
+                            The method <span class="code">list.listIterator()</span> returns an object of type
+                            <span class="classname">ListIterator&lt;T&gt;</span>.</p>
+
+
+                        <p>A <span class="classname">ListIterator</span> has the usual <span class="classname">Iterator</span> methods,
+                            <span class="code">hasNext()</span>, <span class="code">next()</span>, and <span class="code">remove()</span>, but it also has methods
+                            <span class="code">hasPrevious()</span>, <span class="code">previous()</span>, <span class="code">add(obj)</span>, and <span class="code">set(obj)</span>
+                            that make it possible to move backwards in the list, to add an item at the
+                            current position of the iterator, and to replace one of the items in the list.
+                            To understand how these work, it's best to think of an
+                            iterator as pointing to a position <b>between</b> two list elements, or at
+                            the beginning or end of the list. In this diagram, the items in a list are
+                            represented by squares, and arrows indicate the possible positions of an
+                            iterator:</p>
+
+
+                        <p align="center">
+                            <img src="./images/list-positions.png" width="320" height="73" alt="Iterator Positions"></p>
+
+
+
+                        <p>If <span class="code">iter</span> is of type <span class="classname">ListIterator&lt;T&gt;</span>, then
+                            <span class="code">iter.next()</span> moves
+                            the iterator one space to the right along the list and returns the item that
+                            the iterator passes as it moves. The method <span class="code">iter.previous()</span> moves the
+                            iterator one space to the left along the list and returns the item that it
+                            passes. The method <span class="code">iter.remove()</span> removes an item from the list; the
+                            item that is removed is the item that the iterator passed most recently in a
+                            call to either <span class="code">iter.next()</span> or <span class="code">iter.previous()</span>.  The method
+                            <span class="code">iter.set(obj)</span> works similarly; it replaces the item that would be removed
+                            by <span class="code">iter.remove()</span>.  There is also
+                            a method <span class="code">iter.add(obj)</span> that adds the specified object to the list
+                            at the current position of the iterator (where <span class="code">obj</span> must be of type
+                            <span class="classname">T</span>).  This can be between two existing items
+                            or at the beginning of the list or at the end of the list.</p>
+
+
+                        <p>(By the way, the lists that are used in class <span class="code">LinkedList&lt;T&gt;</span> are
+                            <span class="newword">doubly linked lists</span>. That is, each node in the
+                            list contains two pointers&mdash;one to the next node in the list and one to the
+                            previous node. This makes it possible to efficiently implement both the
+                            <span class="code">next()</span> and <span class="code">previous()</span> methods of a <span class="code">ListIterator</span>.
+                            Also, to make the <span class="code">addLast()</span> and <span class="code">getLast()</span> methods of a
+                            <span class="classname">LinkedList</span> efficient, the class <span class="classname">LinkedList&lt;T&gt;</span>
+                            includes a "tail pointer" that points to the last node in the list.)</p>
+
+
+                        <p>As an example of using a <span class="classname">ListIterator</span>, suppose that we want to
+                            maintain a list of items that is always sorted into increasing order. When
+                            adding an item to the list, we can use a <span class="classname">ListIterator</span> to find the
+                            position in the list where the item should be added.  Once the position has been
+                            found, we use the same list iterator to place the item in that position.
+                            The idea is to start at
+                            the beginning of the list and to move the iterator forward past all the items
+                            that are smaller than the item that is being inserted. At that point, the
+                            iterator's <span class="code">add()</span> method can be used to insert the item.
+                            To be more definite, suppose that
+                            <span class="code">stringList</span> is a variable of type <span class="classname">List&lt;String&gt;</span>.
+                            Assume that the strings that are already in the list are stored in
+                            ascending order and that <span class="code">newItem</span> is a string that we would
+                            like to insert into the list.  The following code will place <span class="code">newItem</span>
+                            in the list in its correct position, so that the modified list is still in
+                            ascending order:</p>
+
+
+                        <pre><code class="java">ListIterator&lt;String&gt; iter = stringList.listIterator();
+
+// Move the iterator so that it points to the position where
+// newItem should be inserted into the list.  If newItem is
+// bigger than all the items in the list, then the while loop
+// will end when iter.hasNext() becomes false, that is, when
+// the iterator has reached the end of the list.
+
+while (iter.hasNext()) {
+   String item = iter.next();
+   if (newItem.compareTo(item) &lt;= 0) {
+         // newItem should come BEFORE item in the list.
+         // Move the iterator back one space so that
+         // it points to the correct insertion point,
+         // and end the loop.
+      iter.previous();
+      break;
+   }
 }
 
-impl Summary for NewsArticle {
-    fn summarize(&amp;self) -&gt; String {
-        format!(&quot;{}, by {} ({})&quot;, self.headline, self.author, self.location)
-    }
-}
+iter.add(newItem);</code></pre>
 
-pub struct Tweet {
-    pub username: String,
-    pub content: String,
-    pub reply: bool,
-    pub retweet: bool,
-}
 
-impl Summary for Tweet {
-    fn summarize(&amp;self) -&gt; String {
-        format!(&quot;{}: {}&quot;, self.username, self.content)
-    }
+                        <p>Here, <span class="code">stringList</span> might be of type <span class="classname">ArrayList&lt;String&gt;</span>
+                            or of type <span class="classname">LinkedList&lt;String&gt;</span>.  The
+                            algorithm that is used to insert <span class="code">newItem</span> into the list will be
+                            about equally efficient for both types of lists, and it will even work for other classes that
+                            implement the interface <span class="classname">List&lt;String&gt;</span>.
+                            You would probably find it
+                            easier to design an insertion algorithm that uses array-like indexing with
+                            the methods <span class="code">get(index)</span> and <span class="code">add(index,obj)</span>. However, that
+                            algorithm would be horribly inefficient for <span class="classname">LinkedLists</span> because
+                            random access is so inefficient for linked lists.  (By the way, the insertion
+                            algorithm works when the list is empty, and it works when the new item has to
+                            be inserted at the beginning or at the end of the list.  It might be useful
+                            for you to think about why this is true.)</p>
+
+
+                        <h3 id="Sorting"><a class="header" href="#Sorting">Sorting</a></h3>
+
+                        <p>Sorting a list is a fairly common operation, and there should really be a
+                            sorting method in the <span class="classname">List</span> interface. There is not,
+                            presumably because it only makes sense to sort lists of certain types of objects.
+                            However, methods for sorting lists are available as <span class="code">static</span> methods
+                            in the class <span class="code">java.util.Collections</span>. This class contains a variety of
+                            static utility methods for working with collections.  The methods are generic;
+                            that is, they will work for collections of objects of various types.
+                            (You have already seen similar methods for arrays in the <span class="classname">Arrays</span> class.)
+                            Suppose that <span class="code">list</span> is of type <span class="classname">List&lt;T&gt;</span>.
+                            The command</p>
+
+
+                        <pre><code class="java">Collections.sort(list);</code></pre>
+
+
+                        <p>can be used to sort the list into ascending order.  The items in the list should
+                            implement the interface <span class="classname">Comparable&lt;T&gt;</span>
+                            (see <a href="ch10-01-GenericProgramming.html">Subsection&nbsp;10.1.6</a>).
+                            The method <span class="code">Collections.sort()</span> will work, for
+                            example, for lists of <span class="classname">String</span> and for lists
+                            of any of the wrapper classes such as <span class="classname">Integer</span> and
+                            <span class="classname">Double</span>.  There is also a sorting method that takes
+                            a <span class="classname">Comparator</span> as its second argument:</p>
+
+
+                        <pre><code class="java">Collections.sort(list,comparator);</code></pre>
+
+
+                        <p>In this method, the <span class="code">comparator</span> will be used to compare the items in the list. As
+                            mentioned in the <a href="ch10-01-GenericProgramming.html">previous section</a>,
+                            a <span class="classname">Comparator</span> is an object that
+                            defines a <span class="code">compare()</span> method that can be used to compare two objects.
+                            We'll see an example of using a <span class="classname">Comparator</span> in
+                            <a href="ch10-04-JCF.html">Section&nbsp;10.4</a>.</p>
+
+
+                        <p>The sorting method that is used by <span class="code">Collections.sort()</span> is the
+                            so-called "merge sort" algorithm, which has both worst-case
+                            and average-case run times that are Θ(n*log(n)) for a list of size&nbsp;n.
+                            Although the average run time for MergeSort is a little slower than that of
+                            QuickSort, its worst-case performance is much better than QuickSort's.
+                            (QuickSort was covered in <a href="ch09-01-Recursion.html">Subsection&nbsp;9.1.3</a>.)
+                            MergeSort also has a nice property called "stability" that we will encounter
+                            at the end of <a href="ch10-04-JCF.html">Subsection&nbsp;10.4.3</a>.</p>
+
+
+                        <p>The <span class="classname">Collections</span> class has at least two other useful methods for
+                            modifying lists. <span class="code">Collections.shuffle(list)</span> will rearrange the elements
+                            of the list into a random order. <span class="code">Collections.reverse(list)</span> will
+                            reverse the order of the elements, so that the last element is moved to the
+                            beginning of the list, the next-to-last element to the second position, and so
+                            on.</p>
+
+
+                        <p>Since an efficient sorting method is provided for <span class="classname">Lists</span>, there is
+                            no need to write one yourself.</p>
+
+
+                        <h3 id="TreeSet and HashSet"><a class="header" href="#TreeSet and HashSet">TreeSet and HashSet</a></h3>
+
+                        <p>A set is a collection of objects in which no object occurs more
+                            than once. Sets implement all the methods in the interface
+                            <span class="classname">Collection&lt;T&gt;</span>, but do so
+                            in a way that ensures that no element occurs twice in the set. For example, if
+                            <span class="code">set</span> is an object of type <span class="classname">Set&lt;T&gt;</span>,
+                            then <span class="code">set.add(obj)</span> will
+                            have no effect on the set if <span class="code">obj</span> is already an element of the set.
+                            Java has two classes that implement the interface <span class="classname">Set&lt;T&gt;</span>:
+                            <span class="code">java.util.TreeSet</span> and <span class="code">java.util.HashSet</span>.</p>
+
+
+                        <p>In addition to being a <span class="classname">Set</span>, a <span class="classname">TreeSet</span> has the property
+                            that the elements of the set are arranged into ascending sorted order. That is, an
+                            <span class="classname">Iterator</span> (or a for-each loop)
+                            for a <span class="code">TreeSet</span> will always visit the elements of the
+                            set in ascending order.</p>
+
+
+                        <p>A <span class="classname">TreeSet</span> cannot hold arbitrary objects, since there must be a way
+                            to determine the sorted order of the objects it contains. Ordinarily, this
+                            means that the objects in a set of type <span class="classname">TreeSet&lt;T&gt;</span> should implement the
+                            interface <span class="classname">Comparable&lt;T&gt;</span>
+                            and that <span class="code">obj1.compareTo(obj2)</span> should be
+                            defined in a reasonable way for any two objects <span class="code">obj1</span> and <span class="code">obj2</span>
+                            in the set. Alternatively, an object of type
+                            <span class="classname">Comparator&lt;T&gt;</span> can be provided as a parameter
+                            to the constructor when the <span class="classname">TreeSet</span> is created. In that case, the
+                            <span class="code">compare()</span> method of the
+                            <span class="classname">Comparator</span> will be used to compare objects that are added to the
+                            set.</p>
+
+
+                        <p>A <span class="classname">TreeSet</span> does not use the <span class="code">equals()</span> method to
+                            test whether two objects are the same.  Instead, it uses the <span class="code">compareTo()</span> or <span class="code">compare()</span>
+                            method.  This can be a problem.  Recall from <a href="ch10-01-GenericProgramming.html">Subsection&nbsp;10.1.6</a> that
+                            the <span class="code">compare()</span> method of a <span class="classname">Comparator</span>
+                            might consider two objects to be the same for the purpose
+                            of the comparison even though the objects are not equal.  (This is less likely, but still
+                            possible for a properly defined <span class="code">compareTo</span>() method.)
+                            For a <span class="classname">TreeSet</span> that uses the <span class="classname">Comparator</span>,
+                            this means that only <b>one</b> of those objects can be in the set.  For example,
+                            if the <span class="classname">TreeSet</span> contains mailing addresses
+                            and if the <span class="code">compare()</span> method
+                            for addresses just compares their zip codes, then the set can contain only
+                            one address in each zip code.  Clearly, this is not right!  But that only means
+                            that you have to be aware of the semantics of <span class="classname">TreeSets</span>,
+                            and you need to make sure that the <span class="code">compare()</span> or <span class="code">compareTo()</span>
+                            is defined in a reasonable
+                            way for objects that you put into a <span class="classname">TreeSet</span>.  This will be
+                            true, by the way, for <span class="classname">Strings</span>, <span class="classname">Integers</span>,
+                            and many other built-in types, since the <span class="code">compareTo()</span> method for these
+                            types considers two objects to be the same only if they are actually equal.</p>
+
+
+                        <p>In the implementation of a <span class="classname">TreeSet</span>, the elements are stored in
+                            something similar to a binary sort tree. (See <a href="ch09-04-BinaryTrees.html">Subsection&nbsp;9.4.2</a>.)
+                            However, the data structure that is used is <b>balanced</b>
+                            in the sense that the left and right subtrees of any node in the tree are at
+                            about the same size.  This ensures that
+                            all the basic operations&mdash;inserting, deleting, and searching&mdash;are
+                            efficient, with worst-case run time Θ(log(n)), where n is the
+                            number of items in the set.</p>
+
+
+                        <p>The fact that a <span class="classname">TreeSet</span> sorts its elements and removes duplicates
+                            makes it very useful in some applications. <a href="ch07-07-Exercises.html">Exercise&nbsp;7.6</a> asked
+                            you to write a program that would read a file and output an alphabetical list of
+                            all the words that occurred in the file, with duplicates removed.  The words
+                            were to be stored in an <span class="classname">ArrayList</span>, so it was up to you to
+                            make sure that the list was sorted and contained no duplicates.
+                            The same task can be programmed much more easily using a <span class="classname">TreeSet</span>
+                            instead of a list.  A <span class="classname">TreeSet</span> automatically eliminates
+                            duplicates, and an iterator for the set will automatically visit the items in
+                            the set in sorted order.  An algorithm for the program, using
+                            a <span class="classname">TreeSet</span>, would be:</p>
+
+
+                        <pre><code class="java">TreeSet&lt;String&gt; words = new TreeSet&lt;String&gt;();
+
+while there is more data in the input file:
+   Let word = the next word from the file
+   Convert word to lower case
+   words.add(word)   // Adds the word only if not already present.
+
+for ( String w : words ) // for each String w in words
+   Output w  // words are output in sorted order</code></pre>
+
+
+                        <p>If you would like to see a complete, working program, you can find it in the
+                            file <span class="sourceref"><a href="./source/chapter10/WordListWithTreeSet.java">WordListWithTreeSet.java</a></span>.</p>
+
+
+                        <p>As another example, suppose that <span class="code">coll</span> is any <span class="code">Collection</span> of
+                            <span class="classname">Strings</span>. (This would also work for any other type for which
+                            <span class="code">compareTo()</span> is properly
+                            defined.) We can use a <span class="classname">TreeSet</span> to sort the items of <span class="code">coll</span> and
+                            remove the duplicates simply by saying:</p>
+
+
+                        <pre><code class="java">TreeSet&lt;String&gt; set = new TreeSet&lt;String&gt;();
+set.addAll(coll);</code></pre>
+
+
+                        <p>The second statement adds all the elements of the collection to the set.
+                            Since it's a <span class="classname">Set</span>, duplicates are ignored. Since it's a
+                            <span class="classname">TreeSet</span>, the elements of the set are sorted. If you would like to have
+                            the data in some other type of data structure, it's easy to copy the data from
+                            the set. For example, to place the answer in an <span class="classname">ArrayList</span>, you could
+                            say:</p>
+
+
+                        <pre><code class="java">TreeSet&lt;String&gt; set = new TreeSet&lt;String&gt;();
+set.addAll(coll);
+ArrayList&lt;String&gt; list = new ArrayList&lt;String&gt;();
+list.addAll(set);</code></pre>
+
+
+                        <p>Now, in fact, every one of Java's collection classes has a constructor that
+                            takes a <span class="classname">Collection</span> as an argument. All the items in that
+                            <span class="classname">Collection</span> are added to the new collection when it is created. So,
+                            if <span class="code">coll</span> is of type <span class="classname">Collection&lt;String&gt;</span>, then
+                            "<span class="code">new&nbsp;TreeSet&lt;String&gt;(coll)</span>" creates a <span class="classname">TreeSet</span>
+                            that contains the same elements as <span class="code">coll</span>, but with duplicates removed and
+                            in sorted order.  This means that we can
+                            abbreviate the four lines in the above example to the single command:</p>
+
+
+                        <pre><code class="java">ArrayList&lt;String&gt; list = new ArrayList&lt;&gt;( new TreeSet&lt;&gt;(coll) );</code></pre>
+
+
+                        <p>This makes a sorted list of the elements of <span class="code">coll</span> with no
+                            duplicates. This is a nice example of the power of generic programming.
+                            (Note that the type parameter, <span class="code">String</span>, is optional in the two
+                            constructors in this example, since it can be deduced by the compiler.)</p>
+
+
+
+
+
+                        <p>A <span class="classname">HashSet</span> stores its elements in a <span class="newword">hash table</span>,
+                            a type of data structure that I will discuss in the <a href="ch10-03-Maps.html">next
+                                section</a>. The operations of finding, adding, and removing
+                            elements are implemented very efficiently in hash tables, even more so than for
+                            <span class="classname">TreeSets</span>. The elements of a <span class="classname">HashSet</span> are not stored in any
+                            particular order, and so do not need to implement the <span class="classname">Comparable</span> interface.
+                            (They do, however, need to define a proper "hash code," as we'll see in the next section.)</p>
+
+
+                        <p>The <span class="code">equals()</span> method is used to determine whether two objects in
+                            a <span class="classname">HashSet</span> are to be considered the same.
+                            An <span class="classname">Iterator</span> for a <span class="classname">HashSet</span> will visit its
+                            elements in what seems to be a completely arbitrary order, and it's even possible
+                            for the order to change when a new element is added.
+                            Use a <span class="classname">HashSet</span> instead of a
+                            <span class="classname">TreeSet</span> when the elements it contains are not comparable, or when the
+                            order is not important, or when the small advantage in efficiency is important.</p>
+
+
+
+
+
+                        <p>A note about the mathematics of sets:  In mathematical set theory, the items in a
+                            set are called <span class="newword">members</span> or <span class="newword">elements</span> of that set.
+                            Important operations include adding an element to a set, removing an element from a
+                            set, and testing whether a given entity is an element of a set.
+                            Operations that can be performed on two sets include <span class="newword">union</span>,
+                            <span class="newword">intersection</span>, and <span class="newword">set difference</span>.
+                            All these operations are defined in Java for objects of type <span class="classname">Set</span>,
+                            but with different names.  Suppose that <span class="code">A</span> and <span class="code">B</span> are <span class="classname">Sets</span>.
+                            Then:</p>
+
+
+                        <ul>
+
+                            <li>
+                                <span class="code">A.add(x)</span> <b>adds</b> the element <span class="code">x</span> to the set <span class="code">A</span>.</li>
+
+                            <li>
+                                <span class="code">A.remove(x)</span> <b>removes</b> the element <span class="code">x</span> from the set <span class="code">A</span>.</li>
+
+                            <li>
+                                <span class="code">A.contains(x)</span> <b>tests</b> whether <span class="code">x</span> is an element of the set <span class="code">A</span>.</li>
+
+                            <li>
+                                <span class="code">A.addAll(B)</span> computes the <b>union</b> of <span class="code">A</span> and <span class="code">B</span>.</li>
+
+                            <li>
+                                <span class="code">A.retainAll(B)</span> computes the <b>intersection</b> of <span class="code">A</span> and <span class="code">B</span>.</li>
+
+                            <li>
+                                <span class="code">A.removeAll(B)</span> computes the <b>set difference</b>, <span class="code">A - B</span>.</li>
+
+                        </ul>
+
+
+                        <p>There are of course, differences between mathematical sets and sets in Java.
+                            Most important, perhaps, sets in Java must be finite, while in mathematics, most of
+                            the fun in set theory comes from working with infinity.  In mathematics, a set can
+                            contain arbitrary elements, while in Java, a set of type <span class="classname">Set&lt;T&gt;</span>
+                            can only contain elements of type <span class="classname">T</span>.  The operation
+                            <span class="code">A.addAll(B)</span> acts by modifying the value of <span class="code">A</span>, while in
+                            mathematics the operation <span class="code">A</span> union <span class="code">B</span> computes a new set,
+                            without changing the value of <span class="code">A</span> or <span class="code">B</span>.  See
+                            <a href="ch10-07-Exercises.html">Exercise&nbsp;10.2</a> for an example of mathematical set operations in Java.</p>
+
+
+
+                        <h3 id="Priority Queues"><a class="header" href="#Priority Queues">Priority Queues</a></h3>
+
+                        <p>A <span class="newword">priority queue</span> is an abstract data type that represents a collection of
+                            items, where each item has an assigned "priority" that allows any two items
+                            to be compared.  Operations on a priority queue include <i>add</i>, which adds
+                            an item to the collection, and <i>remove</i>, which removes and returns an item
+                            from the collection that has the minimum priority among items currently in
+                            the collection. (Maximum priority would also be possible, but in Java's version,
+                            the <i>remove</i> operation removes a minimum priority item.)</p>
+
+
+                        <p>A simple implementation of priority queue could be achieved by using a linked list
+                            to store the items in the queue in order of increasing priority.  In that case,
+                            <i>remove</i> would simply remove and return the first item in the list.
+                            However, <i>add</i> would have to insert the new item into its correct position
+                            in the list, an operation with average run time Θ(n), where n is the number of items
+                            in the list.  In fact, priority queues can be implemented so that both <i>add</i>
+                            and <i>remove</i> have run time Θ(log(n)), which is much more efficient.  (The efficient
+                            implementation uses something called a "heap," which is not to be confused with the
+                            heap where objects are created.  I will not discuss the implementation here.)</p>
+
+
+                        <p>The parameterized class <span class="classname">PriorityQueue&lt;T&gt;</span> implements a
+                            priority queue of objects of type <span class="classname">T</span>.  This class implements
+                            the interface <span class="classname">Collection&lt;T&gt;</span>.  So, if <span class="code">pq</span>
+                            is a <span class="classname">PriorityQueue</span>, then it has all the methods defined in
+                            that interface.  But the essential priority queue operations are</p>
+
+
+                        <ul>
+
+                            <li>
+                                <span class="codedef">pq.add(obj)</span> &mdash; adds <span class="code">obj</span> to the priority queue, where
+                                <span class="code">obj</span> must be an object of type <span class="classname">T</span>
+                            </li>
+
+                            <li>
+                                <span class="codedef">pq.remove()</span> &mdash; removes and returns an item of minimal priority.
+                                The return value is an object of type <span class="classname">T</span>.  Throws an exception if
+                                the queue is empty.</li>
+
+                            <li>
+                                <span class="codedef">pq.isEmpty()</span> &mdash; tests whether the priority queue is empty.</li>
+
+                        </ul>
+
+
+                        <p>You've probably noticed that I haven't yet mentioned how the priority of items in the
+                            priority queue are determined.  The situation is much like sorting: We need to be able to compare
+                            any two items in the queue.  As with sorting, there are two solutions.  If the items implement
+                            the <span class="classname">Comparable</span> interface, then they can be compared using the
+                            <span class="code">compareTo()</span> method from that interface.   Alternatively, a <span class="classname">Comparator</span>
+                            object can be provided as a parameter to the <span class="classname">PriorityQueue</span> constructor.
+                            In that case, the Comparator's <span class="code">compare()</span> method will be used to compare items.</p>
+
+
+                        <p>Classes such as <span class="classname">String</span>, <span class="classname">Integer</span>, and
+                            <span class="classname">Date</span> that implement <span class="classname">Comparable</span> can be used
+                            in a priority queue.  For example, a <span class="classname">PriorityQueue&lt;String&gt;</span> can be
+                            used to sort strings into lexicographic order: Just <i>add</i> all the strings to the
+                            priority queue, then <i>remove</i> them one-by-one.  Since items are removed from the queue
+                            in order of priority, they will be removed in lexicographic order.  Earlier, I showed how to
+                            use a <span class="classname">TreeSet</span> to sort and remove duplicates from a collection.
+                            A <span class="classname">PriorityQueue</span> can be used in a similar way to sort a collection
+                            without removing duplicates.  For example, if <span class="code">coll</span> is of type
+                            <span class="classname">Collection&lt;String&gt;</span>, then the following code segment will print all the
+                            items from <span class="code">coll</span> in order, including duplicates:</p>
+
+
+                        <pre><code class="java">PriorityQueue&lt;String&gt; pq = new PriorityQueue&lt;&gt;();
+pq.addAll( coll );
+while ( ! pq.isEmpty() ) {
+    System.out.println( pq.remove() );
 }</code></pre>
-<p><span class="caption">Listing 10-13: Implementing the <code>Summary</code> trait on the
-<code>NewsArticle</code> and <code>Tweet</code> types</span></p>
-<p>Implementing a trait on a type is similar to implementing regular methods. The
-difference is that after <code>impl</code>, we put the trait name we want to implement,
-then use the <code>for</code> keyword, and then specify the name of the type we want to
-implement the trait for. Within the <code>impl</code> block, we put the method signatures
-that the trait definition has defined. Instead of adding a semicolon after each
-signature, we use curly brackets and fill in the method body with the specific
-behavior that we want the methods of the trait to have for the particular type.</p>
-<p>Now that the library has implemented the <code>Summary</code> trait on <code>NewsArticle</code> and
-<code>Tweet</code>, users of the crate can call the trait methods on instances of
-<code>NewsArticle</code> and <code>Tweet</code> in the same way we call regular methods. The only
-difference is that the user must bring the trait into scope as well as the
-types. Here’s an example of how a binary crate could use our <code>aggregator</code>
-library crate:</p>
-<pre><code class="language-Java ignore">use aggregator::{Summary, Tweet};
 
-fn main() {
-    let tweet = Tweet {
-        username: String::from(&quot;horse_ebooks&quot;),
-        content: String::from(
-            &quot;of course, as you probably already know, people&quot;,
-        ),
-        reply: false,
-        retweet: false,
-    };
 
-    println!(&quot;1 new tweet: {}&quot;, tweet.summarize());
-}</code></pre>
-<p>This code prints <code>1 new tweet: horse_ebooks: of course, as you probably already know, people</code>.</p>
-<p>Other crates that depend on the <code>aggregator</code> crate can also bring the <code>Summary</code>
-trait into scope to implement <code>Summary</code> on their own types. One restriction to
-note is that we can implement a trait on a type only if at least one of the
-trait or the type is local to our crate. For example, we can implement standard
-library traits like <code>Display</code> on a custom type like <code>Tweet</code> as part of our
-<code>aggregator</code> crate functionality, because the type <code>Tweet</code> is local to our
-<code>aggregator</code> crate. We can also implement <code>Summary</code> on <code>Vec&lt;T&gt;</code> in our
-<code>aggregator</code> crate, because the trait <code>Summary</code> is local to our <code>aggregator</code>
-crate.</p>
-<p>But we can’t implement external traits on external types. For example, we can’t
-implement the <code>Display</code> trait on <code>Vec&lt;T&gt;</code> within our <code>aggregator</code> crate,
-because <code>Display</code> and <code>Vec&lt;T&gt;</code> are both defined in the standard library and
-aren’t local to our <code>aggregator</code> crate. This restriction is part of a property
-called <em>coherence</em>, and more specifically the <em>orphan rule</em>, so named because
-the parent type is not present. This rule ensures that other people’s code
-can’t break your code and vice versa. Without the rule, two crates could
-implement the same trait for the same type, and Java wouldn’t know which
-implementation to use.</p>
-<h3 id="default-implementations"><a class="header" href="#default-implementations">Default Implementations</a></h3>
-<p>Sometimes it’s useful to have default behavior for some or all of the methods
-in a trait instead of requiring implementations for all methods on every type.
-Then, as we implement the trait on a particular type, we can keep or override
-each method’s default behavior.</p>
-<p>In Listing 10-14 we specify a default string for the <code>summarize</code> method of the
-<code>Summary</code> trait instead of only defining the method signature, as we did in
-Listing 10-12.</p>
-<p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-Java noplayground">pub trait Summary {
-    fn summarize(&amp;self) -&gt; String {
-        String::from(&quot;(Read more...)&quot;)
-    }
-}
-<span class="boring">
-</span><span class="boring">pub struct NewsArticle {
-</span><span class="boring">    pub headline: String,
-</span><span class="boring">    pub location: String,
-</span><span class="boring">    pub author: String,
-</span><span class="boring">    pub content: String,
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">impl Summary for NewsArticle {}
-</span><span class="boring">
-</span><span class="boring">pub struct Tweet {
-</span><span class="boring">    pub username: String,
-</span><span class="boring">    pub content: String,
-</span><span class="boring">    pub reply: bool,
-</span><span class="boring">    pub retweet: bool,
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">impl Summary for Tweet {
-</span><span class="boring">    fn summarize(&amp;self) -&gt; String {
-</span><span class="boring">        format!(&quot;{}: {}&quot;, self.username, self.content)
-</span><span class="boring">    }
-</span><span class="boring">}</span></code></pre>
-<p><span class="caption">Listing 10-14: Defining a <code>Summary</code> trait with a default
-implementation of the <code>summarize</code> method</span></p>
-<p>To use a default implementation to summarize instances of <code>NewsArticle</code>, we
-specify an empty <code>impl</code> block with <code>impl Summary for NewsArticle {}</code>.</p>
-<p>Even though we’re no longer defining the <code>summarize</code> method on <code>NewsArticle</code>
-directly, we’ve provided a default implementation and specified that
-<code>NewsArticle</code> implements the <code>Summary</code> trait. As a result, we can still call
-the <code>summarize</code> method on an instance of <code>NewsArticle</code>, like this:</p>
-<pre><code class="language-Java ignore"><span class="boring">use aggregator::{self, NewsArticle, Summary};
-</span><span class="boring">
-</span><span class="boring">fn main() {
-</span>    let article = NewsArticle {
-        headline: String::from(&quot;Penguins win the Stanley Cup Championship!&quot;),
-        location: String::from(&quot;Pittsburgh, PA, USA&quot;),
-        author: String::from(&quot;Iceburgh&quot;),
-        content: String::from(
-            &quot;The Pittsburgh Penguins once again are the best \
-             hockey team in the NHL.&quot;,
-        ),
-    };
+                        <p>Note, by the way, that we can't use an iterator or a for-each loop to print the
+                            items in this example, since iterators and for-each loops do not traverse a
+                            priority queue in ascending order.</p>
 
-    println!(&quot;New article available! {}&quot;, article.summarize());
-<span class="boring">}</span></code></pre>
-<p>This code prints <code>New article available! (Read more...)</code>.</p>
-<p>Creating a default implementation doesn’t require us to change anything about
-the implementation of <code>Summary</code> on <code>Tweet</code> in Listing 10-13. The reason is that
-the syntax for overriding a default implementation is the same as the syntax
-for implementing a trait method that doesn’t have a default implementation.</p>
-<p>Default implementations can call other methods in the same trait, even if those
-other methods don’t have a default implementation. In this way, a trait can
-provide a lot of useful functionality and only require implementors to specify
-a small part of it. For example, we could define the <code>Summary</code> trait to have a
-<code>summarize_author</code> method whose implementation is required, and then define a
-<code>summarize</code> method that has a default implementation that calls the
-<code>summarize_author</code> method:</p>
-<pre><code class="language-Java noplayground">pub trait Summary {
-    fn summarize_author(&amp;self) -&gt; String;
 
-    fn summarize(&amp;self) -&gt; String {
-        format!(&quot;(Read more from {}...)&quot;, self.summarize_author())
-    }
-}
-<span class="boring">
-</span><span class="boring">pub struct Tweet {
-</span><span class="boring">    pub username: String,
-</span><span class="boring">    pub content: String,
-</span><span class="boring">    pub reply: bool,
-</span><span class="boring">    pub retweet: bool,
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">impl Summary for Tweet {
-</span><span class="boring">    fn summarize_author(&amp;self) -&gt; String {
-</span><span class="boring">        format!(&quot;@{}&quot;, self.username)
-</span><span class="boring">    }
-</span><span class="boring">}</span></code></pre>
-<p>To use this version of <code>Summary</code>, we only need to define <code>summarize_author</code>
-when we implement the trait on a type:</p>
-<pre><code class="language-Java ignore"><span class="boring">pub trait Summary {
-</span><span class="boring">    fn summarize_author(&amp;self) -&gt; String;
-</span><span class="boring">
-</span><span class="boring">    fn summarize(&amp;self) -&gt; String {
-</span><span class="boring">        format!(&quot;(Read more from {}...)&quot;, self.summarize_author())
-</span><span class="boring">    }
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">pub struct Tweet {
-</span><span class="boring">    pub username: String,
-</span><span class="boring">    pub content: String,
-</span><span class="boring">    pub reply: bool,
-</span><span class="boring">    pub retweet: bool,
-</span><span class="boring">}
-</span><span class="boring">
-</span>impl Summary for Tweet {
-    fn summarize_author(&amp;self) -&gt; String {
-        format!(&quot;@{}&quot;, self.username)
-    }
-}</code></pre>
-<p>After we define <code>summarize_author</code>, we can call <code>summarize</code> on instances of the
-<code>Tweet</code> struct, and the default implementation of <code>summarize</code> will call the
-definition of <code>summarize_author</code> that we’ve provided. Because we’ve implemented
-<code>summarize_author</code>, the <code>Summary</code> trait has given us the behavior of the
-<code>summarize</code> method without requiring us to write any more code.</p>
-<pre><code class="language-Java ignore"><span class="boring">use aggregator::{self, Summary, Tweet};
-</span><span class="boring">
-</span><span class="boring">fn main() {
-</span>    let tweet = Tweet {
-        username: String::from(&quot;horse_ebooks&quot;),
-        content: String::from(
-            &quot;of course, as you probably already know, people&quot;,
-        ),
-        reply: false,
-        retweet: false,
-    };
+                        <p>The sample program <span class="sourceref"><a href="./source/chapter10/WordListWithPriorityQueue.java">WordListWithPriorityQueue.java</a></span> makes a sorted list of
+                            words from a file without removing duplicates, using a priority queue to hold the words.
+                            It is a minor modification of <span class="sourceref"><a href="./source/chapter10/WordListWithTreeSet.java">WordListWithTreeSet.java</a></span>.</p>
 
-    println!(&quot;1 new tweet: {}&quot;, tweet.summarize());
-<span class="boring">}</span></code></pre>
-<p>This code prints <code>1 new tweet: (Read more from @horse_ebooks...)</code>.</p>
-<p>Note that it isn’t possible to call the default implementation from an
-overriding implementation of that same method.</p>
-<h3 id="traits-as-parameters"><a class="header" href="#traits-as-parameters">Traits as Parameters</a></h3>
-<p>Now that you know how to define and implement traits, we can explore how to use
-traits to define functions that accept many different types. We'll use the
-<code>Summary</code> trait we implemented on the <code>NewsArticle</code> and <code>Tweet</code> types in
-Listing 10-13 to define a <code>notify</code> function that calls the <code>summarize</code> method
-on its <code>item</code> parameter, which is of some type that implements the <code>Summary</code>
-trait. To do this, we use the <code>impl Trait</code> syntax, like this:</p>
-<pre><code class="language-Java ignore"><span class="boring">pub trait Summary {
-</span><span class="boring">    fn summarize(&amp;self) -&gt; String;
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">pub struct NewsArticle {
-</span><span class="boring">    pub headline: String,
-</span><span class="boring">    pub location: String,
-</span><span class="boring">    pub author: String,
-</span><span class="boring">    pub content: String,
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">impl Summary for NewsArticle {
-</span><span class="boring">    fn summarize(&amp;self) -&gt; String {
-</span><span class="boring">        format!(&quot;{}, by {} ({})&quot;, self.headline, self.author, self.location)
-</span><span class="boring">    }
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">pub struct Tweet {
-</span><span class="boring">    pub username: String,
-</span><span class="boring">    pub content: String,
-</span><span class="boring">    pub reply: bool,
-</span><span class="boring">    pub retweet: bool,
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">impl Summary for Tweet {
-</span><span class="boring">    fn summarize(&amp;self) -&gt; String {
-</span><span class="boring">        format!(&quot;{}: {}&quot;, self.username, self.content)
-</span><span class="boring">    }
-</span><span class="boring">}
-</span><span class="boring">
-</span>pub fn notify(item: &amp;impl Summary) {
-    println!(&quot;Breaking news! {}&quot;, item.summarize());
-}</code></pre>
-<p>Instead of a concrete type for the <code>item</code> parameter, we specify the <code>impl</code>
-keyword and the trait name. This parameter accepts any type that implements the
-specified trait. In the body of <code>notify</code>, we can call any methods on <code>item</code>
-that come from the <code>Summary</code> trait, such as <code>summarize</code>. We can call <code>notify</code>
-and pass in any instance of <code>NewsArticle</code> or <code>Tweet</code>. Code that calls the
-function with any other type, such as a <code>String</code> or an <code>i32</code>, won’t compile
-because those types don’t implement <code>Summary</code>.</p>
-<!-- Old headings. Do not remove or links may break. -->
-<p><a id="fixing-the-largest-function-with-trait-bounds"></a></p>
-<h4 id="trait-bound-syntax"><a class="header" href="#trait-bound-syntax">Trait Bound Syntax</a></h4>
-<p>The <code>impl Trait</code> syntax works for straightforward cases but is actually syntax
-sugar for a longer form known as a <em>trait bound</em>; it looks like this:</p>
-<pre><code class="language-Java ignore">pub fn notify&lt;T: Summary&gt;(item: &amp;T) {
-    println!(&quot;Breaking news! {}&quot;, item.summarize());
-}</code></pre>
-<p>This longer form is equivalent to the example in the previous section but is
-more verbose. We place trait bounds with the declaration of the generic type
-parameter after a colon and inside angle brackets.</p>
-<p>The <code>impl Trait</code> syntax is convenient and makes for more concise code in simple
-cases, while the fuller trait bound syntax can express more complexity in other
-cases. For example, we can have two parameters that implement <code>Summary</code>. Doing
-so with the <code>impl Trait</code> syntax looks like this:</p>
-<pre><code class="language-Java ignore">pub fn notify(item1: &amp;impl Summary, item2: &amp;impl Summary) {</code></pre>
-<p>Using <code>impl Trait</code> is appropriate if we want this function to allow <code>item1</code> and
-<code>item2</code> to have different types (as long as both types implement <code>Summary</code>). If
-we want to force both parameters to have the same type, however, we must use a
-trait bound, like this:</p>
-<pre><code class="language-Java ignore">pub fn notify&lt;T: Summary&gt;(item1: &amp;T, item2: &amp;T) {</code></pre>
-<p>The generic type <code>T</code> specified as the type of the <code>item1</code> and <code>item2</code>
-parameters constrains the function such that the concrete type of the value
-passed as an argument for <code>item1</code> and <code>item2</code> must be the same.</p>
-<h4 id="specifying-multiple-trait-bounds-with-the--syntax"><a class="header" href="#specifying-multiple-trait-bounds-with-the--syntax">Specifying Multiple Trait Bounds with the <code>+</code> Syntax</a></h4>
-<p>We can also specify more than one trait bound. Say we wanted <code>notify</code> to use
-display formatting as well as <code>summarize</code> on <code>item</code>: we specify in the <code>notify</code>
-definition that <code>item</code> must implement both <code>Display</code> and <code>Summary</code>. We can do
-so using the <code>+</code> syntax:</p>
-<pre><code class="language-Java ignore">pub fn notify(item: &amp;(impl Summary + Display)) {</code></pre>
-<p>The <code>+</code> syntax is also valid with trait bounds on generic types:</p>
-<pre><code class="language-Java ignore">pub fn notify&lt;T: Summary + Display&gt;(item: &amp;T) {</code></pre>
-<p>With the two trait bounds specified, the body of <code>notify</code> can call <code>summarize</code>
-and use <code>{}</code> to format <code>item</code>.</p>
-<h4 id="clearer-trait-bounds-with-where-clauses"><a class="header" href="#clearer-trait-bounds-with-where-clauses">Clearer Trait Bounds with <code>where</code> Clauses</a></h4>
-<p>Using too many trait bounds has its downsides. Each generic has its own trait
-bounds, so functions with multiple generic type parameters can contain lots of
-trait bound information between the function’s name and its parameter list,
-making the function signature hard to read. For this reason, Java has alternate
-syntax for specifying trait bounds inside a <code>where</code> clause after the function
-signature. So instead of writing this:</p>
-<pre><code class="language-Java ignore">fn some_function&lt;T: Display + Clone, U: Clone + Debug&gt;(t: &amp;T, u: &amp;U) -&gt; i32 {</code></pre>
-<p>we can use a <code>where</code> clause, like this:</p>
-<pre><code class="language-Java ignore">fn some_function&lt;T, U&gt;(t: &amp;T, u: &amp;U) -&gt; i32
-where
-    T: Display + Clone,
-    U: Clone + Debug,
-{
-<span class="boring">    unimplemented!()
-</span><span class="boring">}</span></code></pre>
-<p>This function’s signature is less cluttered: the function name, parameter list,
-and return type are close together, similar to a function without lots of trait
-bounds.</p>
-<h3 id="returning-types-that-implement-traits"><a class="header" href="#returning-types-that-implement-traits">Returning Types that Implement Traits</a></h3>
-<p>We can also use the <code>impl Trait</code> syntax in the return position to return a
-value of some type that implements a trait, as shown here:</p>
-<pre><code class="language-Java ignore"><span class="boring">pub trait Summary {
-</span><span class="boring">    fn summarize(&amp;self) -&gt; String;
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">pub struct NewsArticle {
-</span><span class="boring">    pub headline: String,
-</span><span class="boring">    pub location: String,
-</span><span class="boring">    pub author: String,
-</span><span class="boring">    pub content: String,
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">impl Summary for NewsArticle {
-</span><span class="boring">    fn summarize(&amp;self) -&gt; String {
-</span><span class="boring">        format!(&quot;{}, by {} ({})&quot;, self.headline, self.author, self.location)
-</span><span class="boring">    }
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">pub struct Tweet {
-</span><span class="boring">    pub username: String,
-</span><span class="boring">    pub content: String,
-</span><span class="boring">    pub reply: bool,
-</span><span class="boring">    pub retweet: bool,
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">impl Summary for Tweet {
-</span><span class="boring">    fn summarize(&amp;self) -&gt; String {
-</span><span class="boring">        format!(&quot;{}: {}&quot;, self.username, self.content)
-</span><span class="boring">    }
-</span><span class="boring">}
-</span><span class="boring">
-</span>fn returns_summarizable() -&gt; impl Summary {
-    Tweet {
-        username: String::from(&quot;horse_ebooks&quot;),
-        content: String::from(
-            &quot;of course, as you probably already know, people&quot;,
-        ),
-        reply: false,
-        retweet: false,
-    }
-}</code></pre>
-<p>By using <code>impl Summary</code> for the return type, we specify that the
-<code>returns_summarizable</code> function returns some type that implements the <code>Summary</code>
-trait without naming the concrete type. In this case, <code>returns_summarizable</code>
-returns a <code>Tweet</code>, but the code calling this function doesn’t need to know that.</p>
-<p>The ability to specify a return type only by the trait it implements is
-especially useful in the context of closures and iterators, which we cover in
-Chapter 13. Closures and iterators create types that only the compiler knows or
-types that are very long to specify. The <code>impl Trait</code> syntax lets you concisely
-specify that a function returns some type that implements the <code>Iterator</code> trait
-without needing to write out a very long type.</p>
-<p>However, you can only use <code>impl Trait</code> if you’re returning a single type. For
-example, this code that returns either a <code>NewsArticle</code> or a <code>Tweet</code> with the
-return type specified as <code>impl Summary</code> wouldn’t work:</p>
-<pre><code class="language-Java ignore does_not_compile"><span class="boring">pub trait Summary {
-</span><span class="boring">    fn summarize(&amp;self) -&gt; String;
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">pub struct NewsArticle {
-</span><span class="boring">    pub headline: String,
-</span><span class="boring">    pub location: String,
-</span><span class="boring">    pub author: String,
-</span><span class="boring">    pub content: String,
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">impl Summary for NewsArticle {
-</span><span class="boring">    fn summarize(&amp;self) -&gt; String {
-</span><span class="boring">        format!(&quot;{}, by {} ({})&quot;, self.headline, self.author, self.location)
-</span><span class="boring">    }
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">pub struct Tweet {
-</span><span class="boring">    pub username: String,
-</span><span class="boring">    pub content: String,
-</span><span class="boring">    pub reply: bool,
-</span><span class="boring">    pub retweet: bool,
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">impl Summary for Tweet {
-</span><span class="boring">    fn summarize(&amp;self) -&gt; String {
-</span><span class="boring">        format!(&quot;{}: {}&quot;, self.username, self.content)
-</span><span class="boring">    }
-</span><span class="boring">}
-</span><span class="boring">
-</span>fn returns_summarizable(switch: bool) -&gt; impl Summary {
-    if switch {
-        NewsArticle {
-            headline: String::from(
-                &quot;Penguins win the Stanley Cup Championship!&quot;,
-            ),
-            location: String::from(&quot;Pittsburgh, PA, USA&quot;),
-            author: String::from(&quot;Iceburgh&quot;),
-            content: String::from(
-                &quot;The Pittsburgh Penguins once again are the best \
-                 hockey team in the NHL.&quot;,
-            ),
-        }
-    } else {
-        Tweet {
-            username: String::from(&quot;horse_ebooks&quot;),
-            content: String::from(
-                &quot;of course, as you probably already know, people&quot;,
-            ),
-            reply: false,
-            retweet: false,
-        }
-    }
-}</code></pre>
-<p>Returning either a <code>NewsArticle</code> or a <code>Tweet</code> isn’t allowed due to restrictions
-around how the <code>impl Trait</code> syntax is implemented in the compiler. We’ll cover
-how to write a function with this behavior in the <a href="ch17-02-trait-objects.html#using-trait-objects-that-allow-for-values-of-different-types">“Using Trait Objects That
-Allow for Values of Different
-Types”</a><!--
-ignore --> section of Chapter 17.</p>
-<h3 id="using-trait-bounds-to-conditionally-implement-methods"><a class="header" href="#using-trait-bounds-to-conditionally-implement-methods">Using Trait Bounds to Conditionally Implement Methods</a></h3>
-<p>By using a trait bound with an <code>impl</code> block that uses generic type parameters,
-we can implement methods conditionally for types that implement the specified
-traits. For example, the type <code>Pair&lt;T&gt;</code> in Listing 10-15 always implements the
-<code>new</code> function to return a new instance of <code>Pair&lt;T&gt;</code> (recall from the
-<a href="ch05-03-An%20Example.html#defining-methods">“Defining Methods”</a><!-- ignore --> section of Chapter 5 that <code>Self</code>
-is a type alias for the type of the <code>impl</code> block, which in this case is
-<code>Pair&lt;T&gt;</code>). But in the next <code>impl</code> block, <code>Pair&lt;T&gt;</code> only implements the
-<code>cmp_display</code> method if its inner type <code>T</code> implements the <code>PartialOrd</code> trait
-that enables comparison <em>and</em> the <code>Display</code> trait that enables printing.</p>
-<p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-Java noplayground">use std::fmt::Display;
 
-struct Pair&lt;T&gt; {
-    x: T,
-    y: T,
-}
-
-impl&lt;T&gt; Pair&lt;T&gt; {
-    fn new(x: T, y: T) -&gt; Self {
-        Self { x, y }
-    }
-}
-
-impl&lt;T: Display + PartialOrd&gt; Pair&lt;T&gt; {
-    fn cmp_display(&amp;self) {
-        if self.x &gt;= self.y {
-            println!(&quot;The largest member is x = {}&quot;, self.x);
-        } else {
-            println!(&quot;The largest member is y = {}&quot;, self.y);
-        }
-    }
-}</code></pre>
-<p><span class="caption">Listing 10-15: Conditionally implementing methods on a
-generic type depending on trait bounds</span></p>
-<p>We can also conditionally implement a trait for any type that implements
-another trait. Implementations of a trait on any type that satisfies the trait
-bounds are called <em>blanket implementations</em> and are extensively used in the
-Java standard library. For example, the standard library implements the
-<code>ToString</code> trait on any type that implements the <code>Display</code> trait. The <code>impl</code>
-block in the standard library looks similar to this code:</p>
-<pre><code class="language-Java ignore">impl&lt;T: Display&gt; ToString for T {
-    // --snip--
-}</code></pre>
-<p>Because the standard library has this blanket implementation, we can call the
-<code>to_string</code> method defined by the <code>ToString</code> trait on any type that implements
-the <code>Display</code> trait. For example, we can turn integers into their corresponding
-<code>String</code> values like this because integers implement <code>Display</code>:</p>
-<pre><pre class="playground"><code class="language-Java"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>let s = 3.to_string();
-<span class="boring">}</span></code></pre></pre>
-<p>Blanket implementations appear in the documentation for the trait in the
-“Implementors” section.</p>
-<p>Traits and trait bounds let us write code that uses generic type parameters to
-reduce duplication but also specify to the compiler that we want the generic
-type to have particular behavior. The compiler can then use the trait bound
-information to check that all the concrete types used with our code provide the
-correct behavior. In dynamically typed languages, we would get an error at
-runtime if we called a method on a type which didn’t define the method. But Java
-moves these errors to compile time so we’re forced to fix the problems before
-our code is even able to run. Additionally, we don’t have to write code that
-checks for behavior at runtime because we’ve already checked at compile time.
-Doing so improves performance without having to give up the flexibility of
-generics.</p>
+                        <p>Although priority queues can be used for sorting, they have other natural applications.
+                            For example, consider the problem of scheduling "jobs" to be executed on a computer,
+                            where each job is assigned a priority and jobs with lower priority should always be executed
+                            before jobs with higher priority.  Jobs can be placed into a priority queue as they are
+                            created.  When the computer removes jobs from the queue for execution, they will be removed
+                            in order of increasing priority.</p>
 
                     </main>
 

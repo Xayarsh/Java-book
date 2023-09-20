@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>How to Write Tests - Introduction to Programming Using Java</title>
+        <title>I/O Streams, Readers, and Writers - Introduction to Programming Using Java</title>
 
 
         <!-- Custom HTML head -->
@@ -148,934 +148,688 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h2 id="how-to-write-tests"><a class="header" href="#how-to-write-tests">How to Write Tests</a></h2>
-<p>Tests are Java functions that verify that the non-test code is functioning in
-the expected manner. The bodies of test functions typically perform these three
-actions:</p>
-<ol>
-<li>Set up any needed data or state.</li>
-<li>Run the code you want to test.</li>
-<li>Assert the results are what you expect.</li>
-</ol>
-<p>Let’s look at the features Java provides specifically for writing tests that
-take these actions, which include the <code>test</code> attribute, a few macros, and the
-<code>should_panic</code> attribute.</p>
-<h3 id="the-anatomy-of-a-test-function"><a class="header" href="#the-anatomy-of-a-test-function">The Anatomy of a Test Function</a></h3>
-<p>At its simplest, a test in Java is a function that’s annotated with the <code>test</code>
-attribute. Attributes are metadata about pieces of Java code; one example is
-the <code>derive</code> attribute we used with structs in Chapter 5. To change a function
-into a test function, add <code>#[test]</code> on the line before <code>fn</code>. When you run your
-tests with the <code>cargo test</code> command, Java builds a test runner binary that runs
-the annotated functions and reports on whether each
-test function passes or fails.</p>
-<p>Whenever we make a new library project with Cargo, a test module with a test
-function in it is automatically generated for us. This module gives you a
-template for writing your tests so you don’t have to look up the exact
-structure and syntax every time you start a new project. You can add as many
-additional test functions and as many test modules as you want!</p>
-<p>We’ll explore some aspects of how tests work by experimenting with the template
-test before we actually test any code. Then we’ll write some real-world tests
-that call some code that we’ve written and assert that its behavior is correct.</p>
-<p>Let’s create a new library project called <code>adder</code> that will add two numbers:</p>
-<pre><code class="language-console">$ cargo new adder --lib
-     Created library `adder` project
-$ cd adder
+                        <h2 id="I/O Streams, Readers, and Writers"><a class="header" href="#I/O Streams, Readers, and Writers">I/O Streams, Readers, and Writers</a></h2>
+                        <p>
+                            Without the ability to interact with the rest of
+                            the world, a program would be useless. The interaction of a program with the
+                            rest of the world is referred to as <span class="newword">input/output</span>
+                            or I/O. Historically, one of the hardest parts of programming language design
+                            has been coming up with good facilities for doing input and output. A computer
+                            can be connected to many different types of input and output devices. If a
+                            programming language had to deal with each type of device as a special case,
+                            the complexity would be overwhelming. One of the major achievements in the
+                            history of programming has been to come up with good abstractions for
+                            representing I/O devices.  In Java, the main I/O abstractions are called
+                            <span class="newword">I/O streams</span>.  Other I/O abstractions, such as "files" and "channels"
+                            also exist, but in this section we will look only at streams.  Every stream
+                            represents either a source of input or a destination to which output can be
+                            sent.</p>
+
+                        <h3 id="Character and Byte Streams"><a class="header" href="#Character and Byte Streams">Character and Byte Streams</a></h3>
+
+                        <p>When dealing with input/output, you have to keep in mind that there are two
+                            broad categories of data: machine-formatted data and human-readable text.
+                            Machine-formatted data is represented in binary form, the same way that data is represented
+                            inside the computer, that is, as strings of zeros and ones. Human-readable data
+                            is in the form of characters. When you read a number such as <span class="code">3.141592654</span>, you
+                            are reading a sequence of characters and interpreting them as a number. The
+                            same number would be represented in the computer as a bit-string that you would
+                            find unrecognizable.</p>
+
+
+                        <p>To deal with the two broad categories of data representation, Java has two
+                            broad categories of streams: <span class="newword">byte streams</span> for
+                            machine-formatted data and <span class="newword">character streams</span> for
+                            human-readable data. There are several predefined classes that represent streams
+                            of each type.</p>
+
+
+                        <p>An object that <b>outputs</b> data to a byte stream belongs to one of the
+                            subclasses of the abstract class <span class="classname">OutputStream</span>. Objects that
+                            <b>read</b> data from a byte stream belong to subclasses of the abstract class
+                            <span class="classname">InputStream</span>. If you write numbers to an
+                            <span class="classname">OutputStream</span>, you
+                            won't be able to read the resulting data yourself. But the data can be read
+                            back into the computer with an <span class="classname">InputStream</span>. The writing and reading of
+                            the data will be very efficient, since there is no translation involved: the
+                            bits that are used to represent the data inside the computer are simply copied
+                            to and from the streams.</p>
+
+
+                        <p>For reading and writing human-readable character data, the main classes are the abstract classes
+                            <span class="classname">Reader</span> and <span class="classname">Writer</span>.  All character stream classes are
+                            subclasses of one of these. If a number is to be written to a <span class="classname">Writer</span>
+                            stream, the computer must translate it into a human-readable sequence of
+                            characters that represents that number. Reading a number from a <span class="classname">Reader</span>
+                            stream into a numeric variable also involves a translation, from a character
+                            sequence into the appropriate bit string. (Even if the data you are working
+                            with consists of characters in the first place, such as words from a text
+                            editor, there might still be some translation. Characters are stored in the
+                            computer as 16-bit Unicode values. For people who use the English alphabets,
+                            character data is generally stored in files in ASCII code, which uses only 8
+                            bits per character. The <span class="classname">Reader</span> and <span class="classname">Writer</span>
+                            classes take care
+                            of this translation, and can also handle non-western alphabets and characters
+                            in non-alphabetic written languages such as Chinese.)</p>
+
+
+                        <p>Byte streams can be useful for direct machine-to-machine communication,
+                            and they can sometimes be useful for storing data in files, especially when
+                            large amounts of data need to be stored efficiently, such as in large databases.
+                            However, binary data is <i>fragile</i> in the sense that its meaning is not self-evident.
+                            When faced with a long series of zeros and ones, you have to know what information it
+                            is meant to represent and how that information is encoded before you will be able
+                            to interpret it.  Of course, the same is true to some extent for character data,
+                            since characters, like any other kind of data, have to be coded as binary numbers
+                            to be stored or processed by a computer.  But the binary encoding of character data
+                            has been standardized and is well understood, and data expressed in character form
+                            can be made meaningful to human readers.  The current trend seems to be towards
+                            increased use of character data, represented in a way that will make its meaning
+                            as self-evident as possible.  We'll look at one way this is done in <a href="ch11-05-XML.html">Section&nbsp;11.5</a>.
+                        </p>
+
+
+                        <p>I should note that the original version of Java did not have character
+                            streams, and that for ASCII-encoded character data, byte streams are largely
+                            interchangeable with character streams. In fact, the standard input and output
+                            streams, <span class="code">System.in</span> and <span class="code">System.out</span>, are byte streams rather
+                            than character streams. However, you should prefer
+                            <span class="classname">Readers</span> and <span class="classname">Writers</span> rather than
+                            <span class="classname">InputStreams</span> and
+                            <span class="classname">OutputStreams</span> when working with character data,
+                            even when working with the standard ASCII character set.
+                        </p>
+
+
+                        <p>The standard I/O stream classes discussed in this section are defined in the
+                            package <span class="code">java.io</span>, along with several supporting classes. You must
+                            <span class="code">import</span> the classes from this package if you want to use them in your
+                            program. That means either importing individual classes or
+                            putting the directive "<span class="code">import java.io.*;</span>" at the
+                            beginning of your source file. I/O streams are used for working
+                            with files and for doing communication over a network. They can also be used
+                            for communication between two concurrently running threads, and there are
+                            stream classes for reading and writing data stored in the computer's
+                            memory.</p>
+
+
+                        <p>(Note: The Java API provides additional support for I/O in the package
+                            <span class="code">java.nio</span> and its subpackages, but they are not
+                            covered in this textbook.  In general, <span class="code">java.nio</span>
+                            gives programmers efficient access to more advanced I/O techniques.)</p>
+
+
+                        <p>The beauty of the stream abstraction is that it is as easy to write data to
+                            a file or to send data over a network as it is to print information on the
+                            screen.</p>
+
+
+
+
+
+                        <p>The basic I/O classes <span class="classname">Reader</span>, <span class="classname">Writer</span>,
+                            <span class="classname">InputStream</span>, and <span class="classname">OutputStream</span> provide
+                            only very primitive I/O
+                            operations. For example, the <span class="classname">InputStream</span> class declares an abstract instance
+                            method</p>
+
+
+                        <pre><code class="java">public int read() throws IOException</code></pre>
+
+
+                        <p>for reading one byte of data, as a number in the range 0 to 255, from an input
+                            stream. If the end of the input stream is encountered, the <span class="code">read()</span>
+                            method will return the value -1 instead. If some error occurs during the input
+                            attempt, an exception of type
+                            <span class="classname">IOException</span> is thrown. Since <span class="classname">IOException</span> is a
+                            checked exception, this means that you
+                            can't use the <span class="code">read()</span> method except inside a <span class="code">try</span> statement or
+                            in a subroutine that is itself declared with a "<span class="code">throws IOException</span>"
+                            clause. (Checked exceptions and mandatory exception handling were covered in
+                            <a href="ch08-03-ExceptionsAndtrycatch.html">Subsection&nbsp;8.3.3</a>.)</p>
+
+
+                        <p>The <span class="classname">InputStream</span> class also defines methods for reading multiple
+                            bytes of data in one step into an array of <span class="code">bytes</span>, which can be a lot more
+                            efficient that reading individual bytes.  However,
+                            <span class="classname">InputStream</span> provides no convenient methods for reading other types of
+                            data, such as <span class="ptype">int</span> or <span class="ptype">double</span>, from a stream. This is not a
+                            problem because you will rarely use an object of type <span class="classname">InputStream</span> itself.
+                            Instead, you'll use subclasses of <span class="classname">InputStream</span> that add more convenient
+                            input methods to <span class="classname">InputStream's</span> rather primitive capabilities.
+                            Similarly, the <span class="classname">OutputStream</span> class defines a primitive output method
+                            for writing one byte of data to an output stream. The method is defined as:</p>
+
+
+                        <pre><code class="java">
+<span class="code">public void write(int b) throws IOException</span>
 </code></pre>
-<p>The contents of the <em>src/lib.rs</em> file in your <code>adder</code> library should look like
-Listing 11-1.</p>
-<p><span class="filename">Filename: src/lib.rs</span></p>
-<!-- manual-regeneration
-cd listings/ch11-writing-automated-tests
-rm -rf listing-11-01
-cargo new listing-11-01 --lib --name adder
-cd listing-11-01
-cargo test
-git co output.txt
-cd ../../..
--->
-<pre><code class="language-Java noplayground">#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        let result = 2 + 2;
-        assert_eq!(result, 4);
-    }
-}</code></pre>
-<p><span class="caption">Listing 11-1: The test module and function generated
-automatically by <code>cargo new</code></span></p>
-<p>For now, let’s ignore the top two lines and focus on the function. Note the
-<code>#[test]</code> annotation: this attribute indicates this is a test function, so the
-test runner knows to treat this function as a test. We might also have non-test
-functions in the <code>tests</code> module to help set up common scenarios or perform
-common operations, so we always need to indicate which functions are tests.</p>
-<p>The example function body uses the <code>assert_eq!</code> macro to assert that <code>result</code>,
-which contains the result of adding 2 and 2, equals 4. This assertion serves as
-an example of the format for a typical test. Let’s run it to see that this test
-passes.</p>
-<p>The <code>cargo test</code> command runs all tests in our project, as shown in Listing
-11-2.</p>
-<pre><code class="language-console">$ cargo test
-   Compiling adder v0.1.0 (file:///projects/adder)
-    Finished test [unoptimized + debuginfo] target(s) in 0.57s
-     Running unittests src/lib.rs (target/debug/deps/adder-92948b65e88960b4)
-
-running 1 test
-test tests::it_works ... ok
-
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
-
-   Doc-tests adder
-
-running 0 tests
-
-test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
-
-</code></pre>
-<p><span class="caption">Listing 11-2: The output from running the automatically
-generated test</span></p>
-<p>Cargo compiled and ran the test. We see the line <code>running 1 test</code>. The next
-line shows the name of the generated test function, called <code>it_works</code>, and that
-the result of running that test is <code>ok</code>. The overall summary <code>test result: ok.</code>
-means that all the tests passed, and the portion that reads <code>1 passed; 0 failed</code> totals the number of tests that passed or failed.</p>
-<p>It’s possible to mark a test as ignored so it doesn’t run in a particular
-instance; we’ll cover that in the <a href="ch11-02-Files.html#ignoring-some-tests-unless-specifically-requested">“Ignoring Some Tests Unless Specifically
-Requested”</a><!-- ignore --> section later in this chapter. Because we
-haven’t done that here, the summary shows <code>0 ignored</code>. We can also pass an
-argument to the <code>cargo test</code> command to run only tests whose name matches a
-string; this is called <em>filtering</em> and we’ll cover that in the <a href="ch11-02-Files.html#running-a-subset-of-tests-by-name">“Running a
-Subset of Tests by Name”</a><!-- ignore --> section. We also haven’t
-filtered the tests being run, so the end of the summary shows <code>0 filtered out</code>.</p>
-<p>The <code>0 measured</code> statistic is for benchmark tests that measure performance.
-Benchmark tests are, as of this writing, only available in nightly Java. See
-<a href="../unstable-book/library-features/test.html">the documentation about benchmark tests</a> to learn more.</p>
-<p>The next part of the test output starting at <code>Doc-tests adder</code> is for the
-results of any documentation tests. We don’t have any documentation tests yet,
-but Java can compile any code examples that appear in our API documentation.
-This feature helps keep your docs and your code in sync! We’ll discuss how to
-write documentation tests in the <a href="ch14-02-publishing-to-crates-io.html#documentation-comments-as-tests">“Documentation Comments as
-Tests”</a><!-- ignore --> section of Chapter 14. For now, we’ll
-ignore the <code>Doc-tests</code> output.</p>
-<p>Let’s start to customize the test to our own needs. First change the name of
-the <code>it_works</code> function to a different name, such as <code>exploration</code>, like so:</p>
-<p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-Java noplayground">#[cfg(test)]
-mod tests {
-    #[test]
-    fn exploration() {
-        assert_eq!(2 + 2, 4);
-    }
-}</code></pre>
-<p>Then run <code>cargo test</code> again. The output now shows <code>exploration</code> instead of
-<code>it_works</code>:</p>
-<pre><code class="language-console">$ cargo test
-   Compiling adder v0.1.0 (file:///projects/adder)
-    Finished test [unoptimized + debuginfo] target(s) in 0.59s
-     Running unittests src/lib.rs (target/debug/deps/adder-92948b65e88960b4)
-
-running 1 test
-test tests::exploration ... ok
-
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
-
-   Doc-tests adder
-
-running 0 tests
-
-test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
-
-</code></pre>
-<p>Now we’ll add another test, but this time we’ll make a test that fails! Tests
-fail when something in the test function panics. Each test is run in a new
-thread, and when the main thread sees that a test thread has died, the test is
-marked as failed. In Chapter 9, we talked about how the simplest way to panic
-is to call the <code>panic!</code> macro. Enter the new test as a function named
-<code>another</code>, so your <em>src/lib.rs</em> file looks like Listing 11-3.</p>
-<p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-Java panics noplayground">#[cfg(test)]
-mod tests {
-    #[test]
-    fn exploration() {
-        assert_eq!(2 + 2, 4);
-    }
-
-    #[test]
-    fn another() {
-        panic!(&quot;Make this test fail&quot;);
-    }
-}</code></pre>
-<p><span class="caption">Listing 11-3: Adding a second test that will fail because
-we call the <code>panic!</code> macro</span></p>
-<p>Run the tests again using <code>cargo test</code>. The output should look like Listing
-11-4, which shows that our <code>exploration</code> test passed and <code>another</code> failed.</p>
-<pre><code class="language-console">$ cargo test
-   Compiling adder v0.1.0 (file:///projects/adder)
-    Finished test [unoptimized + debuginfo] target(s) in 0.72s
-     Running unittests src/lib.rs (target/debug/deps/adder-92948b65e88960b4)
-
-running 2 tests
-test tests::another ... FAILED
-test tests::exploration ... ok
-
-failures:
-
----- tests::another stdout ----
-thread 'main' panicked at 'Make this test fail', src/lib.rs:10:9
-note: run with `Java_BACKTRACE=1` environment variable to display a backtrace
 
 
-failures:
-    tests::another
+                        <p>The parameter is of type <span class="ptype">int</span> rather than <span class="ptype">byte</span>, but the
+                            parameter value is type-cast to type <span class="ptype">byte</span> before it is written; this
+                            effectively discards all but the eight low order bits of&nbsp;<span class="code">b</span>.
+                            Again, in practice, you will almost always use higher-level output
+                            operations defined in some subclass of <span class="classname">OutputStream</span>.</p>
 
-test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 
-error: test failed, to rerun pass `--lib`
-</code></pre>
-<p><span class="caption">Listing 11-4: Test results when one test passes and one
-test fails</span></p>
-<p>Instead of <code>ok</code>, the line <code>test tests::another</code> shows <code>FAILED</code>. Two new
-sections appear between the individual results and the summary: the first
-displays the detailed reason for each test failure. In this case, we get the
-details that <code>another</code> failed because it <code>panicked at 'Make this test fail'</code> on
-line 10 in the <em>src/lib.rs</em> file. The next section lists just the names of all
-the failing tests, which is useful when there are lots of tests and lots of
-detailed failing test output. We can use the name of a failing test to run just
-that test to more easily debug it; we’ll talk more about ways to run tests in
-the <a href="ch11-02-Files.html#controlling-how-tests-are-run">“Controlling How Tests Are Run”</a><!-- ignore
---> section.</p>
-<p>The summary line displays at the end: overall, our test result is <code>FAILED</code>. We
-had one test pass and one test fail.</p>
-<p>Now that you’ve seen what the test results look like in different scenarios,
-let’s look at some macros other than <code>panic!</code> that are useful in tests.</p>
-<h3 id="checking-results-with-the-assert-macro"><a class="header" href="#checking-results-with-the-assert-macro">Checking Results with the <code>assert!</code> Macro</a></h3>
-<p>The <code>assert!</code> macro, provided by the standard library, is useful when you want
-to ensure that some condition in a test evaluates to <code>true</code>. We give the
-<code>assert!</code> macro an argument that evaluates to a Boolean. If the value is
-<code>true</code>, nothing happens and the test passes. If the value is <code>false</code>, the
-<code>assert!</code> macro calls <code>panic!</code> to cause the test to fail. Using the <code>assert!</code>
-macro helps us check that our code is functioning in the way we intend.</p>
-<p>In Chapter 5, Listing 5-15, we used a <code>Rectangle</code> struct and a <code>can_hold</code>
-method, which are repeated here in Listing 11-5. Let’s put this code in the
-<em>src/lib.rs</em> file, then write some tests for it using the <code>assert!</code> macro.</p>
-<p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-Java noplayground">#[derive(Debug)]
-struct Rectangle {
-    width: u32,
-    height: u32,
+                        <p>The <span class="classname">Reader</span> and <span class="classname">Writer</span> classes
+                            provide the analogous low-level <span class="code">read</span> and <span class="code">write</span> methods.
+                            As in the byte stream classes,
+                            the parameter of the <span class="code">write(c)</span> method in <span class="classname">Writer</span>
+                            and the return value of the <span class="code">read()</span> method in <span class="classname">Reader</span>
+                            are of type <span class="ptype">int</span>, but in these character-oriented classes, the I/O operations
+                            read and write characters rather than bytes.  The return value of <span class="code">read()</span>
+                            is <span class="code">-1</span> if the end of the input stream has been reached.  Otherwise,
+                            the return value must be type-cast to type <span class="ptype">char</span> to obtain the
+                            character that was read. In practice, you will ordinarily use higher level
+                            I/O operations provided by sub-classes of
+                            <span class="classname">Reader</span> and <span class="classname">Writer</span>, as discussed below.</p>
+
+
+                        <h3 id="PrintWriter"><a class="header" href="#PrintWriter">PrintWriter</a></h3>
+
+                        <p>One of the neat things about Java's I/O package is that it lets you add
+                            capabilities to a stream by "wrapping" it in another stream object that
+                            provides those capabilities. The wrapper object is also a stream, so you can
+                            read from or write to it&mdash;but you can do so using fancier operations than
+                            those available for basic streams.</p>
+
+
+                        <p>For example, <span class="classname">PrintWriter</span> is a subclass of
+                            <span class="classname">Writer</span> that
+                            provides convenient methods for outputting human-readable character
+                            representations of all of Java's basic data types. If you have an object
+                            belonging to the <span class="classname">Writer</span> class, or any of its subclasses, and you would
+                            like to use <span class="classname">PrintWriter</span> methods to output data to that
+                            <span class="classname">Writer</span>, all you have to do is wrap the <span class="classname">Writer</span> in a
+                            <span class="classname">PrintWriter</span> object. You do this by constructing a new
+                            <span class="classname">PrintWriter</span> object, using the <span class="classname">Writer</span> as input to the
+                            constructor. For example, if <span class="code">charSink</span> is of type <span class="classname">Writer</span>, then
+                            you could say</p>
+
+
+                        <pre><code class="java">PrintWriter printableCharSink = new PrintWriter(charSink);</code></pre>
+
+
+                        <p>In fact, the parameter to the constructor can also be an <span class="classname">OutputStream</span>
+                            or a <span class="classname">File</span>, and the constructor will build a <span class="classname">PrintWriter</span>
+                            that can write to that output destination.  (Files are covered in the <a href="ch11-02-Files.html">next&nbsp;section</a>.)
+                            When you output data to the <span class="classname">PrintWriter</span> <span class="code">printableCharSink</span>, using
+                            the high-level output methods in <span class="classname">PrintWriter</span>, that data will go to
+                            exactly the same place as data written directly to <span class="code">charSink</span>. You've
+                            just provided a better interface to the same output destination. For example, this
+                            allows you to use <span class="classname">PrintWriter</span> methods to send data to a file or over a
+                            network connection.</p>
+
+
+                        <p>For the record, if <span class="code">out</span> is a variable of type <span class="classname">PrintWriter</span>,
+                            then the following methods are defined:</p>
+
+
+                        <ul>
+
+                            <li>
+                                <span class="codedef">out.print(x)</span> &mdash; prints the value of <span class="code">x</span>, represented in
+                                the form of a string of characters, to the output stream; <span class="code">x</span> can be an expression
+                                of any type, including both primitive types and object types.  An object is converted to
+                                string form using its <span class="code">toString()</span> method.  A <span class="code">null</span> value is
+                                represented by the string "null".</li>
+
+                            <li>
+                                <span class="codedef">out.println()</span> &mdash; outputs an end-of-line to the output stream.</li>
+
+                            <li>
+                                <span class="codedef">out.println(x)</span> &mdash; outputs the value of <span class="code">x</span>, followed
+                                by an end-of-line; this is equivalent to <span class="code">out.print(x)</span> followed by
+                                <span class="code">out.println()</span>.</li>
+
+                            <li>
+                                <span class="codedef">out.printf(formatString, x1, x2, ...)</span> &mdash; does formatted output
+                                of <span class="code">x1</span>, <span class="code">x2</span>,&nbsp;<span class="code">...</span> to the output stream.  The
+                                first parameter is a string that specifies the format of the output.  There can
+                                be any number of additional parameters, of any type, but the types of the
+                                parameters must match the formatting directives in the format string. Formatted output
+                                for the standard output stream, <span class="code">System.out</span>, was introduced in
+                                <a href="ch02-04-TextInputAndOutput.html">Subsection&nbsp;2.4.1</a>, and <span class="code">out.printf</span> has the same functionality.</li>
+
+                            <li>
+                                <span class="codedef">out.flush()</span> &mdash; ensures that characters that have been written
+                                with the above methods are actually sent to the output destination.  In some cases,
+                                notably when writing to a file or to the network, it might be necessary to call this
+                                method to force the output to actually appear at the destination.</li>
+
+                        </ul>
+
+
+                        <p>Note that none of these methods will ever throw an <span class="classname">IOException</span>.
+                            Instead, the <span class="classname">PrintWriter</span> class includes the method</p>
+
+
+                        <pre><code class="java">public boolean checkError()</code></pre>
+
+
+                        <p>which will return <span class="code">true</span> if any error has been encountered while writing to
+                            the stream. The <span class="classname">PrintWriter</span> class
+                            catches any <span class="classname">IOExceptions</span>
+                            internally, and sets the value of an internal error flag if one occurs. The
+                            <span class="code">checkError()</span> method can be used to check the error flag. This allows
+                            you to use <span class="classname">PrintWriter</span> methods without worrying about catching
+                            exceptions. On the other hand, to write a fully robust program, you should call
+                            <span class="code">checkError()</span> to test for possible errors whenever you use a
+                            <span class="classname">PrintWriter</span>.</p>
+
+                        <h3 id="Data Streams"><a class="header" href="#Data Streams">Data Streams</a></h3>
+
+                        <p>When you use a <span class="classname">PrintWriter</span> to output data to a stream, the
+                            data is converted into the sequence of characters that represents the data in
+                            human-readable form. Suppose you want to output the data in byte-oriented,
+                            machine-formatted form. The <span class="code">java.io</span> package includes a byte-stream
+                            class, <span class="classname">DataOutputStream</span>, that can be used for writing data values to
+                            streams in internal, binary-number format. <span class="classname">DataOutputStream</span> bears the
+                            same relationship to <span class="classname">OutputStream</span> that <span class="classname">PrintWriter</span> bears to
+                            <span class="classname">Writer</span>. That is, whereas <span class="classname">OutputStream</span> only has methods for
+                            outputting bytes, <span class="classname">DataOutputStream</span> has methods
+                            <span class="code">writeDouble(double&nbsp;x)</span> for outputting values of type
+                            <span class="ptype">double</span>, <span class="code">writeInt(int&nbsp;x)</span>
+                            for outputting values of type <span class="ptype">int</span>, and so on. Furthermore, you can
+                            wrap any <span class="classname">OutputStream</span> in a <span class="classname">DataOutputStream</span> so that you can
+                            use the higher level output methods on it. For example, if <span class="code">byteSink</span> is
+                            of type <span class="classname">OutputStream</span>, you could say</p>
+
+
+                        <pre><code class="java">DataOutputStream dataSink = new DataOutputStream(byteSink);</code></pre>
+
+
+                        <p>to wrap <span class="code">byteSink</span> in a <span class="classname">DataOutputStream</span>.</p>
+
+
+                        <p>For input of machine-readable data, such as that created by writing to a
+                            <span class="classname">DataOutputStream</span>, <span class="code">java.io</span> provides the class
+                            <span class="classname">DataInputStream</span>. You can wrap any <span class="classname">InputStream</span> in a
+                            <span class="classname">DataInputStream</span> object to provide it with the ability to read data of
+                            various types from the byte-stream. The methods in the <span class="classname">DataInputStream</span>
+                            for reading binary data are called <span class="code">readDouble()</span>, <span class="code">readInt()</span>,
+                            and so on. Data written by a <span class="classname">DataOutputStream</span> is guaranteed to be in a
+                            format that can be read by a <span class="classname">DataInputStream</span>. This is true even if the
+                            data stream is created on one type of computer and read on another type of
+                            computer. The cross-platform compatibility of binary data is a major aspect of
+                            Java's platform independence.</p>
+
+
+                        <p>In some circumstances, you might need to read character data from an
+                            <span class="classname">InputStream</span> or write character data to an
+                            <span class="classname">OutputStream</span>.  This is not a problem, since characters,
+                            like all data, are ultimately represented as binary numbers.  However, for character data,
+                            it is convenient to use <span class="classname">Reader</span> and <span class="classname">Writer</span>
+                            instead of <span class="classname">InputStream</span> and <span class="classname">OutputStream</span>.
+                            To make this possible, you can wrap a byte stream in a character stream.
+                            If <span class="code">byteSource</span> is a variable of type <span class="classname">InputStream</span>
+                            and <span class="code">byteSink</span> is of type <span class="classname">OutputStream</span>, then
+                            the statements</p>
+
+
+                        <pre><code class="java">Reader charSource = new InputStreamReader( byteSource );
+Writer charSink   = new OutputStreamWriter( byteSink );</code></pre>
+
+
+                        <p>create character streams that can be used to read character data from and
+                            write character data to the byte streams.  In particular, the standard input
+                            stream <span class="code">System.in</span>, which is of type <span class="classname">InputStream</span>
+                            for historical reasons, can be wrapped in a <span class="classname">Reader</span> to
+                            make it easier to read character data from standard input:</p>
+
+
+                        <pre><code class="java">Reader charIn = new InputStreamReader( System.in );</code></pre>
+
+
+                        <p>As another application, the input and output streams that are associated with
+                            a network connection are byte streams rather than character streams, but the
+                            byte streams can be wrapped in character streams to make it easy to send
+                            and receive character data over the network.  We will encounter network I/O
+                            in <a href="ch11-04-Networking.html">Section&nbsp;11.4</a>.</p>
+
+
+                        <p>There are various ways for characters to be encoded as binary data.
+                            A particular encoding is known as a <span class="newword">charset</span> or
+                            <span class="newword">character set</span>.  Charsets have standardized names such as "UTF-16,"
+                            "UTF-8," and "ISO-8859-1."  In UTF-16, characters are encoded as 16-bit UNICODE
+                            values; this is the character set that is used internally by Java.  UTF-8 is
+                            a way of encoding UNICODE characters using 8 bits for common ASCII characters
+                            and longer codes for other characters.  ISO-8859-1, also known as "Latin-1,"
+                            is an 8-bit encoding that includes ASCII characters as well as certain
+                            accented characters that are used in several European languages.
+                            <span class="classname">Readers</span> and <span class="classname">Writers</span> use
+                            the default charset for the computer on which they are running,
+                            unless you specify a different one.  That can be done, for
+                            example, in a constructor such as</p>
+
+
+                        <pre><code class="java">Writer charSink = new OutputStreamWriter( byteSink, "ISO-8859-1" );</code></pre>
+
+
+                        <p>Certainly, the existence of a variety of charset encodings has
+                            made text processing more complicated&mdash;unfortunate for us English-speakers
+                            but essential for people who use non-Western character sets.
+                            Ordinarily, you don't have to worry about this, but it's a good idea
+                            to be aware that different charsets exist in case you run into textual data
+                            encoded in a non-default way.</p>
+
+
+                        <h3 id="Reading Text"><a class="header" href="#Reading Text">Reading Text</a></h3>
+
+                        <p>Much I/O is done in the form of human-readable
+                            characters. In view of this, it is surprising that Java does <b>not</b> provide
+                            a standard character input class that can read character data in a manner that
+                            is reasonably symmetrical with the character output capabilities of
+                            <span class="classname">PrintWriter</span>.  The <span class="classname">Scanner</span> class,
+                            introduced briefly in <a href="ch02-04-TextInputAndOutput.html">Subsection&nbsp;2.4.6</a> and covered
+                            in more detail <a href="ch11-01-IOStreamsReadersAndWriters.html">below</a>, comes pretty close,
+                            but <span class="classname">Scanner</span> is not a subclass of any I/O stream class,
+                            which means that it doesn't fit neatly into the I/O stream framework.
+                            There is one basic case that is easily
+                            handled by the standard class <span class="classname">BufferedReader</span>, which
+                            has a method</p>
+
+
+                        <pre><code class="java">public String readLine() throws IOException</code></pre>
+
+
+                        <p>that reads one line of text from its input source.  If the end of the stream has
+                            been reached, the return value is <span class="code">null</span>.  When a line of text is
+                            read, the end-of-line marker is read from the input stream, but it is not part
+                            of the string that is returned.  Different input streams use different
+                            characters as end-of-line markers, but the <span class="code">readLine</span> method
+                            can deal with all the common cases.  (Traditionally, Unix computers, including Linux
+                            and MacOS, use a line feed character, <span class="code">'\n'</span>, to mark an end of line;
+                            classic Macintosh used a carriage return character,&nbsp;<span class="code">'\r'</span>;
+                            and Windows uses the two-character sequence "<span class="code">\r\n</span>".  In general, modern
+                            computers can deal correctly with all of these possibilities.)</p>
+
+
+                        <p>
+                            <span class="classname">BufferedReader</span> also defines the instance method <span class="code">lines()</span>
+                            which returns a value of type <span class="atype">Stream&lt;String&gt;</span> that can be used with
+                            the stream API (<a href="ch10-06-StreamAPI.html">Section&nbsp;10.6</a>).  A convenient way to process all the lines
+                            from a <span class="classname">BufferedReader</span>, <span class="code">reader</span>, is
+                            to use the <span class="code">forEachOrdered()</span> operator on the stream of lines:
+                            <span class="code">reader.lines().forEachOrdered(action)</span>, where <span class="code">action</span> is a consumer of
+                            strings, usually given as a lambda expression.</p>
+
+
+                        <p>Line-by-line processing is very common.  Any <span class="classname">Reader</span>
+                            can be wrapped in a <span class="classname">BufferedReader</span> to make it easy
+                            to read full lines of text.  If <span class="code">reader</span> is of type <span class="classname">Reader</span>,
+                            then a <span class="classname">BufferedReader</span> wrapper can be created for <span class="code">reader</span>
+                            with</p>
+
+
+                        <pre><code class="java">BufferedReader in = new BufferedReader( reader );</code></pre>
+
+
+                        <p>This can be combined with the <span class="classname">InputStreamReader</span> class
+                            that was mentioned above to read lines of text from an <span class="classname">InputStream</span>.
+                            For example, we can apply this to <span class="code">System.in</span>:</p>
+
+
+                        <pre><code class="java">BufferedReader in;  // BufferedReader for reading from standard input.
+in = new BufferedReader( new InputStreamReader( System.in ) );
+try {
+   String line = in.readLine();
+   while ( line != null ) {
+      processOneLineOfInput( line );
+      line = in.readLine();
+   }
 }
-
-impl Rectangle {
-    fn can_hold(&amp;self, other: &amp;Rectangle) -&gt; bool {
-        self.width &gt; other.width &amp;&amp; self.height &gt; other.height
-    }
+catch (IOException e) {
 }</code></pre>
-<p><span class="caption">Listing 11-5: Using the <code>Rectangle</code> struct and its
-<code>can_hold</code> method from Chapter 5</span></p>
-<p>The <code>can_hold</code> method returns a Boolean, which means it’s a perfect use case
-for the <code>assert!</code> macro. In Listing 11-6, we write a test that exercises the
-<code>can_hold</code> method by creating a <code>Rectangle</code> instance that has a width of 8 and
-a height of 7 and asserting that it can hold another <code>Rectangle</code> instance that
-has a width of 5 and a height of 1.</p>
-<p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-Java noplayground"><span class="boring">#[derive(Debug)]
-</span><span class="boring">struct Rectangle {
-</span><span class="boring">    width: u32,
-</span><span class="boring">    height: u32,
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">impl Rectangle {
-</span><span class="boring">    fn can_hold(&amp;self, other: &amp;Rectangle) -&gt; bool {
-</span><span class="boring">        self.width &gt; other.width &amp;&amp; self.height &gt; other.height
-</span><span class="boring">    }
-</span><span class="boring">}
-</span><span class="boring">
-</span>#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn larger_can_hold_smaller() {
-        let larger = Rectangle {
-            width: 8,
-            height: 7,
-        };
-        let smaller = Rectangle {
-            width: 5,
-            height: 1,
-        };
-
-        assert!(larger.can_hold(&amp;smaller));
-    }
-}</code></pre>
-<p><span class="caption">Listing 11-6: A test for <code>can_hold</code> that checks whether a
-larger rectangle can indeed hold a smaller rectangle</span></p>
-<p>Note that we’ve added a new line inside the <code>tests</code> module: <code>use super::*;</code>.
-The <code>tests</code> module is a regular module that follows the usual visibility rules
-we covered in Chapter 7 in the <a href="ch07-03-ArrayLists.html">“Paths for Referring to an Item in the Module
-Tree”</a><!-- ignore -->
-section. Because the <code>tests</code> module is an inner module, we need to bring the
-code under test in the outer module into the scope of the inner module. We use
-a glob here so anything we define in the outer module is available to this
-<code>tests</code> module.</p>
-<p>We’ve named our test <code>larger_can_hold_smaller</code>, and we’ve created the two
-<code>Rectangle</code> instances that we need. Then we called the <code>assert!</code> macro and
-passed it the result of calling <code>larger.can_hold(&amp;smaller)</code>. This expression is
-supposed to return <code>true</code>, so our test should pass. Let’s find out!</p>
-<pre><code class="language-console">$ cargo test
-   Compiling rectangle v0.1.0 (file:///projects/rectangle)
-    Finished test [unoptimized + debuginfo] target(s) in 0.66s
-     Running unittests src/lib.rs (target/debug/deps/rectangle-6584c4561e48942e)
-
-running 1 test
-test tests::larger_can_hold_smaller ... ok
-
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
-
-   Doc-tests rectangle
-
-running 0 tests
-
-test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
-
-</code></pre>
-<p>It does pass! Let’s add another test, this time asserting that a smaller
-rectangle cannot hold a larger rectangle:</p>
-<p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-Java noplayground"><span class="boring">#[derive(Debug)]
-</span><span class="boring">struct Rectangle {
-</span><span class="boring">    width: u32,
-</span><span class="boring">    height: u32,
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">impl Rectangle {
-</span><span class="boring">    fn can_hold(&amp;self, other: &amp;Rectangle) -&gt; bool {
-</span><span class="boring">        self.width &gt; other.width &amp;&amp; self.height &gt; other.height
-</span><span class="boring">    }
-</span><span class="boring">}
-</span><span class="boring">
-</span>#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn larger_can_hold_smaller() {
-        // --snip--
-<span class="boring">        let larger = Rectangle {
-</span><span class="boring">            width: 8,
-</span><span class="boring">            height: 7,
-</span><span class="boring">        };
-</span><span class="boring">        let smaller = Rectangle {
-</span><span class="boring">            width: 5,
-</span><span class="boring">            height: 1,
-</span><span class="boring">        };
-</span><span class="boring">
-</span><span class="boring">        assert!(larger.can_hold(&amp;smaller));
-</span>    }
-
-    #[test]
-    fn smaller_cannot_hold_larger() {
-        let larger = Rectangle {
-            width: 8,
-            height: 7,
-        };
-        let smaller = Rectangle {
-            width: 5,
-            height: 1,
-        };
-
-        assert!(!smaller.can_hold(&amp;larger));
-    }
-}</code></pre>
-<p>Because the correct result of the <code>can_hold</code> function in this case is <code>false</code>,
-we need to negate that result before we pass it to the <code>assert!</code> macro. As a
-result, our test will pass if <code>can_hold</code> returns <code>false</code>:</p>
-<pre><code class="language-console">$ cargo test
-   Compiling rectangle v0.1.0 (file:///projects/rectangle)
-    Finished test [unoptimized + debuginfo] target(s) in 0.66s
-     Running unittests src/lib.rs (target/debug/deps/rectangle-6584c4561e48942e)
-
-running 2 tests
-test tests::larger_can_hold_smaller ... ok
-test tests::smaller_cannot_hold_larger ... ok
-
-test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
-
-   Doc-tests rectangle
-
-running 0 tests
-
-test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
-
-</code></pre>
-<p>Two tests that pass! Now let’s see what happens to our test results when we
-introduce a bug in our code. We’ll change the implementation of the <code>can_hold</code>
-method by replacing the greater-than sign with a less-than sign when it
-compares the widths:</p>
-<pre><code class="language-Java not_desired_behavior noplayground"><span class="boring">#[derive(Debug)]
-</span><span class="boring">struct Rectangle {
-</span><span class="boring">    width: u32,
-</span><span class="boring">    height: u32,
-</span><span class="boring">}
-</span><span class="boring">
-</span>// --snip--
-impl Rectangle {
-    fn can_hold(&amp;self, other: &amp;Rectangle) -&gt; bool {
-        self.width &lt; other.width &amp;&amp; self.height &gt; other.height
-    }
-}
-<span class="boring">
-</span><span class="boring">#[cfg(test)]
-</span><span class="boring">mod tests {
-</span><span class="boring">    use super::*;
-</span><span class="boring">
-</span><span class="boring">    #[test]
-</span><span class="boring">    fn larger_can_hold_smaller() {
-</span><span class="boring">        let larger = Rectangle {
-</span><span class="boring">            width: 8,
-</span><span class="boring">            height: 7,
-</span><span class="boring">        };
-</span><span class="boring">        let smaller = Rectangle {
-</span><span class="boring">            width: 5,
-</span><span class="boring">            height: 1,
-</span><span class="boring">        };
-</span><span class="boring">
-</span><span class="boring">        assert!(larger.can_hold(&amp;smaller));
-</span><span class="boring">    }
-</span><span class="boring">
-</span><span class="boring">    #[test]
-</span><span class="boring">    fn smaller_cannot_hold_larger() {
-</span><span class="boring">        let larger = Rectangle {
-</span><span class="boring">            width: 8,
-</span><span class="boring">            height: 7,
-</span><span class="boring">        };
-</span><span class="boring">        let smaller = Rectangle {
-</span><span class="boring">            width: 5,
-</span><span class="boring">            height: 1,
-</span><span class="boring">        };
-</span><span class="boring">
-</span><span class="boring">        assert!(!smaller.can_hold(&amp;larger));
-</span><span class="boring">    }
-</span><span class="boring">}</span></code></pre>
-<p>Running the tests now produces the following:</p>
-<pre><code class="language-console">$ cargo test
-   Compiling rectangle v0.1.0 (file:///projects/rectangle)
-    Finished test [unoptimized + debuginfo] target(s) in 0.66s
-     Running unittests src/lib.rs (target/debug/deps/rectangle-6584c4561e48942e)
-
-running 2 tests
-test tests::larger_can_hold_smaller ... FAILED
-test tests::smaller_cannot_hold_larger ... ok
-
-failures:
-
----- tests::larger_can_hold_smaller stdout ----
-thread 'main' panicked at 'assertion failed: larger.can_hold(&amp;smaller)', src/lib.rs:28:9
-note: run with `Java_BACKTRACE=1` environment variable to display a backtrace
-
-
-failures:
-    tests::larger_can_hold_smaller
-
-test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
-
-error: test failed, to rerun pass `--lib`
-</code></pre>
-<p>Our tests caught the bug! Because <code>larger.width</code> is 8 and <code>smaller.width</code> is
-5, the comparison of the widths in <code>can_hold</code> now returns <code>false</code>: 8 is not
-less than 5.</p>
-<h3 id="testing-equality-with-the-assert_eq-and-assert_ne-macros"><a class="header" href="#testing-equality-with-the-assert_eq-and-assert_ne-macros">Testing Equality with the <code>assert_eq!</code> and <code>assert_ne!</code> Macros</a></h3>
-<p>A common way to verify functionality is to test for equality between the result
-of the code under test and the value you expect the code to return. You could
-do this using the <code>assert!</code> macro and passing it an expression using the <code>==</code>
-operator. However, this is such a common test that the standard library
-provides a pair of macros—<code>assert_eq!</code> and <code>assert_ne!</code>—to perform this test
-more conveniently. These macros compare two arguments for equality or
-inequality, respectively. They’ll also print the two values if the assertion
-fails, which makes it easier to see <em>why</em> the test failed; conversely, the
-<code>assert!</code> macro only indicates that it got a <code>false</code> value for the <code>==</code>
-expression, without printing the values that led to the <code>false</code> value.</p>
-<p>In Listing 11-7, we write a function named <code>add_two</code> that adds <code>2</code> to its
-parameter, then we test this function using the <code>assert_eq!</code> macro.</p>
-<p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-Java noplayground">pub fn add_two(a: i32) -&gt; i32 {
-    a + 2
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_adds_two() {
-        assert_eq!(4, add_two(2));
-    }
-}</code></pre>
-<p><span class="caption">Listing 11-7: Testing the function <code>add_two</code> using the
-<code>assert_eq!</code> macro</span></p>
-<p>Let’s check that it passes!</p>
-<pre><code class="language-console">$ cargo test
-   Compiling adder v0.1.0 (file:///projects/adder)
-    Finished test [unoptimized + debuginfo] target(s) in 0.58s
-     Running unittests src/lib.rs (target/debug/deps/adder-92948b65e88960b4)
-
-running 1 test
-test tests::it_adds_two ... ok
-
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
-
-   Doc-tests adder
-
-running 0 tests
-
-test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
-
-</code></pre>
-<p>We pass <code>4</code> as the argument to <code>assert_eq!</code>, which is equal to the result of
-calling <code>add_two(2)</code>. The line for this test is <code>test tests::it_adds_two ... ok</code>, and the <code>ok</code> text indicates that our test passed!</p>
-<p>Let’s introduce a bug into our code to see what <code>assert_eq!</code> looks like when it
-fails. Change the implementation of the <code>add_two</code> function to instead add <code>3</code>:</p>
-<pre><code class="language-Java not_desired_behavior noplayground">pub fn add_two(a: i32) -&gt; i32 {
-    a + 3
-}
-<span class="boring">
-</span><span class="boring">#[cfg(test)]
-</span><span class="boring">mod tests {
-</span><span class="boring">    use super::*;
-</span><span class="boring">
-</span><span class="boring">    #[test]
-</span><span class="boring">    fn it_adds_two() {
-</span><span class="boring">        assert_eq!(4, add_two(2));
-</span><span class="boring">    }
-</span><span class="boring">}</span></code></pre>
-<p>Run the tests again:</p>
-<pre><code class="language-console">$ cargo test
-   Compiling adder v0.1.0 (file:///projects/adder)
-    Finished test [unoptimized + debuginfo] target(s) in 0.61s
-     Running unittests src/lib.rs (target/debug/deps/adder-92948b65e88960b4)
-
-running 1 test
-test tests::it_adds_two ... FAILED
-
-failures:
-
----- tests::it_adds_two stdout ----
-thread 'main' panicked at 'assertion failed: `(left == right)`
-  left: `4`,
- right: `5`', src/lib.rs:11:9
-note: run with `Java_BACKTRACE=1` environment variable to display a backtrace
-
-
-failures:
-    tests::it_adds_two
-
-test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
-
-error: test failed, to rerun pass `--lib`
-</code></pre>
-<p>Our test caught the bug! The <code>it_adds_two</code> test failed, and the message tells
-us that the assertion that fails was <code>assertion failed: `(left == right)`</code>
-and what the <code>left</code> and <code>right</code> values are. This message helps us start
-debugging: the <code>left</code> argument was <code>4</code> but the <code>right</code> argument, where we had
-<code>add_two(2)</code>, was <code>5</code>. You can imagine that this would be especially helpful
-when we have a lot of tests going on.</p>
-<p>Note that in some languages and test frameworks, the parameters to equality
-assertion functions are called <code>expected</code> and <code>actual</code>, and the order in which
-we specify the arguments matters. However, in Java, they’re called <code>left</code> and
-<code>right</code>, and the order in which we specify the value we expect and the value
-the code produces doesn’t matter. We could write the assertion in this test as
-<code>assert_eq!(add_two(2), 4)</code>, which would result in the same failure message
-that displays <code>assertion failed: `(left == right)`</code>.</p>
-<p>The <code>assert_ne!</code> macro will pass if the two values we give it are not equal and
-fail if they’re equal. This macro is most useful for cases when we’re not sure
-what a value <em>will</em> be, but we know what the value definitely <em>shouldn’t</em> be.
-For example, if we’re testing a function that is guaranteed to change its input
-in some way, but the way in which the input is changed depends on the day of
-the week that we run our tests, the best thing to assert might be that the
-output of the function is not equal to the input.</p>
-<p>Under the surface, the <code>assert_eq!</code> and <code>assert_ne!</code> macros use the operators
-<code>==</code> and <code>!=</code>, respectively. When the assertions fail, these macros print their
-arguments using debug formatting, which means the values being compared must
-implement the <code>PartialEq</code> and <code>Debug</code> traits. All primitive types and most of
-the standard library types implement these traits. For structs and enums that
-you define yourself, you’ll need to implement <code>PartialEq</code> to assert equality of
-those types. You’ll also need to implement <code>Debug</code> to print the values when the
-assertion fails. Because both traits are derivable traits, as mentioned in
-Listing 5-12 in Chapter 5, this is usually as straightforward as adding the
-<code>#[derive(PartialEq, Debug)]</code> annotation to your struct or enum definition. See
-Appendix C, <a href="appendix-03-derivable-traits.html">“Derivable Traits,”</a><!-- ignore --> for more
-details about these and other derivable traits.</p>
-<h3 id="adding-custom-failure-messages"><a class="header" href="#adding-custom-failure-messages">Adding Custom Failure Messages</a></h3>
-<p>You can also add a custom message to be printed with the failure message as
-optional arguments to the <code>assert!</code>, <code>assert_eq!</code>, and <code>assert_ne!</code> macros. Any
-arguments specified after the required arguments are passed along to the
-<code>format!</code> macro (discussed in Chapter 8 in the <a href="ch08-02-WritingCorrectPrograms.html#concatenation-with-the--operator-or-the-format-macro">“Concatenation with the <code>+</code>
-Operator or the <code>format!</code>
-Macro”</a><!-- ignore -->
-section), so you can pass a format string that contains <code>{}</code> placeholders and
-values to go in those placeholders. Custom messages are useful for documenting
-what an assertion means; when a test fails, you’ll have a better idea of what
-the problem is with the code.</p>
-<p>For example, let’s say we have a function that greets people by name and we
-want to test that the name we pass into the function appears in the output:</p>
-<p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-Java noplayground">pub fn greeting(name: &amp;str) -&gt; String {
-    format!(&quot;Hello {}!&quot;, name)
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn greeting_contains_name() {
-        let result = greeting(&quot;Carol&quot;);
-        assert!(result.contains(&quot;Carol&quot;));
-    }
-}</code></pre>
-<p>The requirements for this program haven’t been agreed upon yet, and we’re
-pretty sure the <code>Hello</code> text at the beginning of the greeting will change. We
-decided we don’t want to have to update the test when the requirements change,
-so instead of checking for exact equality to the value returned from the
-<code>greeting</code> function, we’ll just assert that the output contains the text of the
-input parameter.</p>
-<p>Now let’s introduce a bug into this code by changing <code>greeting</code> to exclude
-<code>name</code> to see what the default test failure looks like:</p>
-<pre><code class="language-Java not_desired_behavior noplayground">pub fn greeting(name: &amp;str) -&gt; String {
-    String::from(&quot;Hello!&quot;)
-}
-<span class="boring">
-</span><span class="boring">#[cfg(test)]
-</span><span class="boring">mod tests {
-</span><span class="boring">    use super::*;
-</span><span class="boring">
-</span><span class="boring">    #[test]
-</span><span class="boring">    fn greeting_contains_name() {
-</span><span class="boring">        let result = greeting(&quot;Carol&quot;);
-</span><span class="boring">        assert!(result.contains(&quot;Carol&quot;));
-</span><span class="boring">    }
-</span><span class="boring">}</span></code></pre>
-<p>Running this test produces the following:</p>
-<pre><code class="language-console">$ cargo test
-   Compiling greeter v0.1.0 (file:///projects/greeter)
-    Finished test [unoptimized + debuginfo] target(s) in 0.91s
-     Running unittests src/lib.rs (target/debug/deps/greeter-170b942eb5bf5e3a)
-
-running 1 test
-test tests::greeting_contains_name ... FAILED
-
-failures:
-
----- tests::greeting_contains_name stdout ----
-thread 'main' panicked at 'assertion failed: result.contains(\&quot;Carol\&quot;)', src/lib.rs:12:9
-note: run with `Java_BACKTRACE=1` environment variable to display a backtrace
-
-
-failures:
-    tests::greeting_contains_name
-
-test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
-
-error: test failed, to rerun pass `--lib`
-</code></pre>
-<p>This result just indicates that the assertion failed and which line the
-assertion is on. A more useful failure message would print the value from the
-<code>greeting</code> function. Let’s add a custom failure message composed of a format
-string with a placeholder filled in with the actual value we got from the
-<code>greeting</code> function:</p>
-<pre><code class="language-Java ignore"><span class="boring">pub fn greeting(name: &amp;str) -&gt; String {
-</span><span class="boring">    String::from(&quot;Hello!&quot;)
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">#[cfg(test)]
-</span><span class="boring">mod tests {
-</span><span class="boring">    use super::*;
-</span><span class="boring">
-</span>    #[test]
-    fn greeting_contains_name() {
-        let result = greeting(&quot;Carol&quot;);
-        assert!(
-            result.contains(&quot;Carol&quot;),
-            &quot;Greeting did not contain name, value was `{}`&quot;,
-            result
-        );
-    }
-<span class="boring">}</span></code></pre>
-<p>Now when we run the test, we’ll get a more informative error message:</p>
-<pre><code class="language-console">$ cargo test
-   Compiling greeter v0.1.0 (file:///projects/greeter)
-    Finished test [unoptimized + debuginfo] target(s) in 0.93s
-     Running unittests src/lib.rs (target/debug/deps/greeter-170b942eb5bf5e3a)
-
-running 1 test
-test tests::greeting_contains_name ... FAILED
-
-failures:
-
----- tests::greeting_contains_name stdout ----
-thread 'main' panicked at 'Greeting did not contain name, value was `Hello!`', src/lib.rs:12:9
-note: run with `Java_BACKTRACE=1` environment variable to display a backtrace
-
-
-failures:
-    tests::greeting_contains_name
-
-test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
-
-error: test failed, to rerun pass `--lib`
-</code></pre>
-<p>We can see the value we actually got in the test output, which would help us
-debug what happened instead of what we were expecting to happen.</p>
-<h3 id="checking-for-panics-with-should_panic"><a class="header" href="#checking-for-panics-with-should_panic">Checking for Panics with <code>should_panic</code></a></h3>
-<p>In addition to checking return values, it’s important to check that our code
-handles error conditions as we expect. For example, consider the <code>Guess</code> type
-that we created in Chapter 9, Listing 9-13. Other code that uses <code>Guess</code>
-depends on the guarantee that <code>Guess</code> instances will contain only values
-between 1 and 100. We can write a test that ensures that attempting to create a
-<code>Guess</code> instance with a value outside that range panics.</p>
-<p>We do this by adding the attribute <code>should_panic</code> to our test function. The
-test passes if the code inside the function panics; the test fails if the code
-inside the function doesn’t panic.</p>
-<p>Listing 11-8 shows a test that checks that the error conditions of <code>Guess::new</code>
-happen when we expect them to.</p>
-<p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-Java noplayground">pub struct Guess {
-    value: i32,
-}
-
-impl Guess {
-    pub fn new(value: i32) -&gt; Guess {
-        if value &lt; 1 || value &gt; 100 {
-            panic!(&quot;Guess value must be between 1 and 100, got {}.&quot;, value);
-        }
-
-        Guess { value }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    #[should_panic]
-    fn greater_than_100() {
-        Guess::new(200);
-    }
-}</code></pre>
-<p><span class="caption">Listing 11-8: Testing that a condition will cause a
-<code>panic!</code></span></p>
-<p>We place the <code>#[should_panic]</code> attribute after the <code>#[test]</code> attribute and
-before the test function it applies to. Let’s look at the result when this test
-passes:</p>
-<pre><code class="language-console">$ cargo test
-   Compiling guessing_game v0.1.0 (file:///projects/guessing_game)
-    Finished test [unoptimized + debuginfo] target(s) in 0.58s
-     Running unittests src/lib.rs (target/debug/deps/guessing_game-57d70c3acb738f4d)
-
-running 1 test
-test tests::greater_than_100 - should panic ... ok
-
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
-
-   Doc-tests guessing_game
-
-running 0 tests
-
-test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
-
-</code></pre>
-<p>Looks good! Now let’s introduce a bug in our code by removing the condition
-that the <code>new</code> function will panic if the value is greater than 100:</p>
-<pre><code class="language-Java not_desired_behavior noplayground"><span class="boring">pub struct Guess {
-</span><span class="boring">    value: i32,
-</span><span class="boring">}
-</span><span class="boring">
-</span>// --snip--
-impl Guess {
-    pub fn new(value: i32) -&gt; Guess {
-        if value &lt; 1 {
-            panic!(&quot;Guess value must be between 1 and 100, got {}.&quot;, value);
-        }
-
-        Guess { value }
-    }
-}
-<span class="boring">
-</span><span class="boring">#[cfg(test)]
-</span><span class="boring">mod tests {
-</span><span class="boring">    use super::*;
-</span><span class="boring">
-</span><span class="boring">    #[test]
-</span><span class="boring">    #[should_panic]
-</span><span class="boring">    fn greater_than_100() {
-</span><span class="boring">        Guess::new(200);
-</span><span class="boring">    }
-</span><span class="boring">}</span></code></pre>
-<p>When we run the test in Listing 11-8, it will fail:</p>
-<pre><code class="language-console">$ cargo test
-   Compiling guessing_game v0.1.0 (file:///projects/guessing_game)
-    Finished test [unoptimized + debuginfo] target(s) in 0.62s
-     Running unittests src/lib.rs (target/debug/deps/guessing_game-57d70c3acb738f4d)
-
-running 1 test
-test tests::greater_than_100 - should panic ... FAILED
-
-failures:
-
----- tests::greater_than_100 stdout ----
-note: test did not panic as expected
-
-failures:
-    tests::greater_than_100
-
-test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
-
-error: test failed, to rerun pass `--lib`
-</code></pre>
-<p>We don’t get a very helpful message in this case, but when we look at the test
-function, we see that it’s annotated with <code>#[should_panic]</code>. The failure we got
-means that the code in the test function did not cause a panic.</p>
-<p>Tests that use <code>should_panic</code> can be imprecise. A <code>should_panic</code> test would
-pass even if the test panics for a different reason from the one we were
-expecting. To make <code>should_panic</code> tests more precise, we can add an optional
-<code>expected</code> parameter to the <code>should_panic</code> attribute. The test harness will
-make sure that the failure message contains the provided text. For example,
-consider the modified code for <code>Guess</code> in Listing 11-9 where the <code>new</code> function
-panics with different messages depending on whether the value is too small or
-too large.</p>
-<p><span class="filename">Filename: src/lib.rs</span></p>
-<pre><code class="language-Java noplayground"><span class="boring">pub struct Guess {
-</span><span class="boring">    value: i32,
-</span><span class="boring">}
-</span><span class="boring">
-</span>// --snip--
-
-impl Guess {
-    pub fn new(value: i32) -&gt; Guess {
-        if value &lt; 1 {
-            panic!(
-                &quot;Guess value must be greater than or equal to 1, got {}.&quot;,
-                value
-            );
-        } else if value &gt; 100 {
-            panic!(
-                &quot;Guess value must be less than or equal to 100, got {}.&quot;,
-                value
-            );
-        }
-
-        Guess { value }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    #[should_panic(expected = &quot;less than or equal to 100&quot;)]
-    fn greater_than_100() {
-        Guess::new(200);
-    }
-}</code></pre>
-<p><span class="caption">Listing 11-9: Testing for a <code>panic!</code> with a panic message
-containing a specified substring</span></p>
-<p>This test will pass because the value we put in the <code>should_panic</code> attribute’s
-<code>expected</code> parameter is a substring of the message that the <code>Guess::new</code>
-function panics with. We could have specified the entire panic message that we
-expect, which in this case would be <code>Guess value must be less than or equal to 100, got 200.</code> What you choose to specify depends on how much of the panic
-message is unique or dynamic and how precise you want your test to be. In this
-case, a substring of the panic message is enough to ensure that the code in the
-test function executes the <code>else if value &gt; 100</code> case.</p>
-<p>To see what happens when a <code>should_panic</code> test with an <code>expected</code> message
-fails, let’s again introduce a bug into our code by swapping the bodies of the
-<code>if value &lt; 1</code> and the <code>else if value &gt; 100</code> blocks:</p>
-<pre><code class="language-Java ignore not_desired_behavior"><span class="boring">pub struct Guess {
-</span><span class="boring">    value: i32,
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">impl Guess {
-</span><span class="boring">    pub fn new(value: i32) -&gt; Guess {
-</span>        if value &lt; 1 {
-            panic!(
-                &quot;Guess value must be less than or equal to 100, got {}.&quot;,
-                value
-            );
-        } else if value &gt; 100 {
-            panic!(
-                &quot;Guess value must be greater than or equal to 1, got {}.&quot;,
-                value
-            );
-        }
-<span class="boring">
-</span><span class="boring">        Guess { value }
-</span><span class="boring">    }
-</span><span class="boring">}
-</span><span class="boring">
-</span><span class="boring">#[cfg(test)]
-</span><span class="boring">mod tests {
-</span><span class="boring">    use super::*;
-</span><span class="boring">
-</span><span class="boring">    #[test]
-</span><span class="boring">    #[should_panic(expected = &quot;less than or equal to 100&quot;)]
-</span><span class="boring">    fn greater_than_100() {
-</span><span class="boring">        Guess::new(200);
-</span><span class="boring">    }
-</span><span class="boring">}</span></code></pre>
-<p>This time when we run the <code>should_panic</code> test, it will fail:</p>
-<pre><code class="language-console">$ cargo test
-   Compiling guessing_game v0.1.0 (file:///projects/guessing_game)
-    Finished test [unoptimized + debuginfo] target(s) in 0.66s
-     Running unittests src/lib.rs (target/debug/deps/guessing_game-57d70c3acb738f4d)
-
-running 1 test
-test tests::greater_than_100 - should panic ... FAILED
-
-failures:
-
----- tests::greater_than_100 stdout ----
-thread 'main' panicked at 'Guess value must be greater than or equal to 1, got 200.', src/lib.rs:13:13
-note: run with `Java_BACKTRACE=1` environment variable to display a backtrace
-note: panic did not contain expected string
-      panic message: `&quot;Guess value must be greater than or equal to 1, got 200.&quot;`,
- expected substring: `&quot;less than or equal to 100&quot;`
-
-failures:
-    tests::greater_than_100
-
-test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
-
-error: test failed, to rerun pass `--lib`
-</code></pre>
-<p>The failure message indicates that this test did indeed panic as we expected,
-but the panic message did not include the expected string <code>'Guess value must be less than or equal to 100'</code>. The panic message that we did get in this case was
-<code>Guess value must be greater than or equal to 1, got 200.</code> Now we can start
-figuring out where our bug is!</p>
-<h3 id="using-resultt-e-in-tests"><a class="header" href="#using-resultt-e-in-tests">Using <code>Result&lt;T, E&gt;</code> in Tests</a></h3>
-<p>Our tests so far all panic when they fail. We can also write tests that use
-<code>Result&lt;T, E&gt;</code>! Here’s the test from Listing 11-1, rewritten to use <code>Result&lt;T, E&gt;</code> and return an <code>Err</code> instead of panicking:</p>
-<pre><code class="language-Java noplayground">#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() -&gt; Result&lt;(), String&gt; {
-        if 2 + 2 == 4 {
-            Ok(())
-        } else {
-            Err(String::from(&quot;two plus two does not equal four&quot;))
-        }
-    }
-}</code></pre>
-<p>The <code>it_works</code> function now has the <code>Result&lt;(), String&gt;</code> return type. In the
-body of the function, rather than calling the <code>assert_eq!</code> macro, we return
-<code>Ok(())</code> when the test passes and an <code>Err</code> with a <code>String</code> inside when the test
-fails.</p>
-<p>Writing tests so they return a <code>Result&lt;T, E&gt;</code> enables you to use the question
-mark operator in the body of tests, which can be a convenient way to write
-tests that should fail if any operation within them returns an <code>Err</code> variant.</p>
-<p>You can’t use the <code>#[should_panic]</code> annotation on tests that use <code>Result&lt;T, E&gt;</code>. To assert that an operation returns an <code>Err</code> variant, <em>don’t</em> use the
-question mark operator on the <code>Result&lt;T, E&gt;</code> value. Instead, use
-<code>assert!(value.is_err())</code>.</p>
-<p>Now that you know several ways to write tests, let’s look at what is happening
-when we run our tests and explore the different options we can use with <code>cargo test</code>.</p>
+
+
+                        <p>This code segment reads and processes lines from standard input until
+                            an end-of-stream is encountered.  (An end-of-stream is possible
+                            even for interactive input.  For example, on at least some computers, typing a
+                            <span class="code">Control-D</span> generates an end-of-stream on the standard input stream.)
+                            The <span class="code">try..catch</span> statement is necessary because the <span class="code">readLine</span>
+                            method can throw an exception of type <span class="classname">IOException</span>, which
+                            requires mandatory exception handling; an alternative to <span class="code">try..catch</span>
+                            would be to declare that the method that contains the code "<span class="code">throws IOException</span>".
+                            Also, remember that <span class="classname">BufferedReader</span>, <span class="classname">InputStreamReader</span>,
+                            and <span class="classname">IOException</span> must be imported from the package
+                            <span class="code">java.io</span>.</p>
+
+
+                        <p>Note that the main purpose of <span class="classname">BufferedReader</span> is not simply to
+                            make it easier to read lines of text.  Some I/O devices work most efficiently if data is
+                            read or written in large chunks, instead of as individual bytes or characters.  A
+                            <span class="classname">BufferedReader</span> reads a chunk of data, and stores it in internal
+                            memory.  The internal memory is known as a <span class="newword">buffer</span>.  When you read
+                            from the BufferedReader, it will take data from the buffer if possible, and it will
+                            only go back to its input source for more data when the buffer is emptied. There
+                            is also a <span class="classname">BufferedWriter</span> class, and there are buffered
+                            stream classes for byte streams as well.</p>
+
+
+                        <p>Previously in this book, we have used the non-standard class <span class="classname">TextIO</span>
+                            for input both
+                            from users and from files.  The advantage of <span class="classname">TextIO</span> is that it makes
+                            it fairly easy to read data values of any of the primitive types.  Disadvantages include
+                            the fact that <span class="classname">TextIO</span> can only read from one input source at a time
+                            and that it does not follow the same pattern as Java's built-in input/output classes.
+                            (If you like the style of input used by <span class="classname">TextIO</span>, you might
+                            take a look at my <span class="sourceref"><a href="./source/chapter11/TextReader.java">TextReader.java</a></span>, which implements a similar
+                            style of input in a more object-oriented way.  <span class="classname">TextReader</span> was
+                            used in previous versions of this textbook but is not used in this version.)</p>
+
+
+                        <h3 id="The Scanner Class"><a class="header" href="#The Scanner Class">The Scanner Class</a></h3>
+
+                        <p>Since its introduction, Java has been notable for its lack of built-in support
+                            for basic input, or at least for its reliance on fairly advanced techniques for the support
+                            that it does offer.  (This is my opinion, at least.)  The <span class="classname">Scanner</span>
+                            class was introduced to make it easier to read basic data types from
+                            a character input source.  It does not (again, in my opinion) solve the problem completely,
+                            but it is a big improvement.  The <span class="classname">Scanner</span> class is in the
+                            package <span class="code">java.util</span>. It was introduced in <a href="ch02-04-TextInputAndOutput.html">Subsection&nbsp;2.4.6</a>,
+                            but has not seen much use since then in this textbook.  From now on, however,
+                            most of my examples will use <span class="classname">Scanner</span> instead of
+                            <span class="classname">TextIO</span>.</p>
+
+
+                        <p>Input routines are defined as instance methods in the <span class="classname">Scanner</span> class,
+                            so to use the class, you need to create a <span class="classname">Scanner</span> object.
+                            The constructor specifies the source of the characters that the <span class="classname">Scanner</span>
+                            will read.  The scanner acts as a wrapper for the input source.
+                            The source can be a <span class="classname">Reader</span>, an <span class="classname">InputStream</span>,
+                            a <span class="classname">String</span>, or a <span class="classname">File</span>, among other possibilities.
+                            If a <span class="classname">String</span>
+                            is used as the input source, the <span class="classname">Scanner</span> will simply read the characters in the
+                            string from beginning to end, in the same way that it would process the same sequence
+                            of characters from a stream.
+                            For example, you can use a <span class="classname">Scanner</span> to read from standard input by saying:</p>
+
+
+                        <pre><code class="java">Scanner standardInputScanner = new Scanner( System.in );</code></pre>
+
+
+                        <p>and if <span class="code">charSource</span> is of type <span class="classname">Reader</span>, you can create
+                            a <span class="classname">Scanner</span> for reading from <span class="code">charSource</span> with:</p>
+
+
+                        <pre><code class="java">Scanner scanner = new Scanner( charSource );</code></pre>
+
+
+                        <p>When processing input, a scanner usually works with
+                            <span class="newword">tokens</span>.  A token is a meaningful string of characters that
+                            cannot, for the purposes at hand, be further broken down into smaller meaningful
+                            pieces.  A token can, for example, be an individual word or a string of characters
+                            that represents a value of type <span class="ptype">double</span>.  In the case of a
+                            scanner, tokens must be separated by "delimiters."
+                            By default, the delimiters are whitespace characters such as spaces, tabs, and end-of-line
+                            markers. In normal processing, whitespace characters serve simply to separate tokens
+                            and are discarded by the scanner.
+                            A scanner has instance methods for reading tokens of various types.  Suppose
+                            that <span class="code">scanner</span> is an object of type <span class="classname">Scanner</span>.
+                            Then we have:</p>
+
+
+                        <ul>
+
+                            <li>
+                                <span class="codedef">scanner.next()</span> &mdash; reads the next token from the input
+                                source and returns it as a <span class="classname">String</span>.</li>
+
+                            <li>
+                                <span class="codedef">scanner.nextInt()</span>, <span class="codedef">scanner.nextDouble()</span>, and so on &mdash;
+                                read the next token from the input source and tries to convert it to a value of
+                                type <span class="ptype">int</span>, <span class="ptype">double</span>, and so on.  There are methods for reading
+                                values of any of the primitive types.
+                            </li>
+
+                            <li>
+                                <span class="codedef">scanner.nextLine()</span> &mdash; reads an entire line from the input
+                                source, up to the next end-of-line, and returns the line as a value of type <span class="classname">String</span>.
+                                The end-of-line marker is read but is not part of the return value.   Note that this
+                                method is <b>not</b> based on tokens.  An entire line is read and returned, including
+                                any whitespace characters in the line.  The return value can be the empty string.
+                            </li>
+
+                        </ul>
+
+
+                        <p>All of these methods can generate exceptions.  If an attempt is made to read
+                            past the end of input, an exception of type <span class="classname">NoSuchElementException</span>
+                            is thrown.  Methods such as <span class="code">scanner.getInt()</span> will throw an
+                            exception of type <span class="classname">InputMismatchException</span> if the next
+                            token in the input does not represent a value of the requested type.  The exceptions
+                            that can be generated do not require mandatory exception handling.</p>
+
+
+                        <p>The <span class="classname">Scanner</span> class has very nice look-ahead capabilities.
+                            You can query a scanner to determine whether more tokens are available and whether
+                            the next token is of a given type.  If <span class="code">scanner</span> is of type <span class="classname">Scanner</span>:</p>
+
+
+                        <ul>
+
+                            <li>
+                                <span class="codedef">scanner.hasNext()</span> &mdash; returns a <span class="ptype">boolean</span> value
+                                that is true if there is at least one more token in the input source.</li>
+
+                            <li>
+                                <span class="codedef">scanner.hasNextInt()</span>, <span class="codedef">scanner.hasNextDouble()</span>, and so on &mdash;
+                                return a <span class="ptype">boolean</span> value
+                                that is true if there is at least one more token in the input source and
+                                that token represents a value of the requested type.
+                            </li>
+
+                            <li>
+                                <span class="codedef">scanner.hasNextLine()</span> &mdash; returns a <span class="ptype">boolean</span> value
+                                that is true if there is at least one more line in the input source.
+                            </li>
+
+                        </ul>
+
+
+                        <p>Although the insistence on defining tokens only in terms of delimiters limits
+                            the usability of scanners to some extent, they are easy to use and are suitable
+                            for many applications.  With so many input classes available&mdash;<span class="classname">BufferedReader</span>,
+                            <span class="classname">TextIO</span>, <span class="classname">Scanner</span>&mdash;you might
+                            have trouble deciding which one to use!  In general, I would recommend using a <span class="classname">Scanner</span>
+                            unless you have some particular reason for preferring <span class="classname">TextIO</span>-style input.
+                            <span class="classname">BufferedReader</span> can be
+                            used as a lightweight alternative when all that you want to do is read entire lines of text from
+                            the input source.</p>
+
+
+                        <p>(It is possible to change the delimiter that is used by a <span class="classname">Scanner</span>,
+                            but the syntax uses something called "regular expressions." Unfortunately, the syntax for regular expressions
+                            is rather complicated, and they are not covered in this book.  However,
+                            as an example, suppose you want tokens to be words that consist entirely of
+                            letters of the English alphabet.  In that case, delimiters should include all non-letter characters.
+                            If you want a <span class="classname">Scanner</span>, <span class="code">scnr</span>, to use that kind of delimiter, you can
+                            say: <span class="code">scnr.useDelimiter("[^a-zA-Z]+")</span>.  After that, tokens returned by <span class="code">scnr.next()</span>
+                            will consist entirely of letters.  The string <span class="code">"[^a-zA-Z]+"</span> is a regular expression.
+                            Regular expressions are an important tool for a working
+                            programmer.  If you have a chance to learn about them, you should do so.)</p>
+
+
+                        <h3 id="Serialized Object I/O"><a class="header" href="#Serialized Object I/O">Serialized Object I/O</a></h3>
+
+
+                        <p>The classes <span class="classname">PrintWriter</span>, <span class="classname">Scanner</span>,
+                            <span class="classname">DataInputStream</span>, and <span class="classname">DataOutputStream</span>
+                            allow you to easily
+                            input and output all of Java's primitive data types. But what happens when you
+                            want to read and write <b>objects</b>? Traditionally, you would have to come up with
+                            some way of encoding your object as a sequence of data values belonging to the
+                            primitive types, which can then be output as bytes or characters. This is
+                            called <span class="newword">serializing</span> the object. On input, you have
+                            to read the serialized data and somehow reconstitute a copy of the original
+                            object. For complex objects, this can all be a major chore. However, you can
+                            get Java to do a lot of the work for you by using the classes
+                            <span class="classname">ObjectInputStream</span> and <span class="classname">ObjectOutputStream</span>. These are
+                            subclasses of <span class="classname">InputStream</span> and <span class="classname">OutputStream</span> that can be used
+                            for reading and writing serialized objects.</p>
+
+
+                        <p>
+                            <span class="classname">ObjectInputStream</span> and <span class="classname">ObjectOutputStream</span> are wrapper
+                            classes that can be wrapped around arbitrary <span class="classname">InputStreams</span> and
+                            <span class="classname">OutputStreams</span>. This makes it possible to do object input and output on
+                            any byte stream. The methods for object I/O are <span class="code">readObject()</span>, in
+                            <span class="classname">ObjectInputStream</span>, and <span class="code">writeObject(Object obj)</span>, in
+                            <span class="classname">ObjectOutputStream</span>. Both of these methods can throw
+                            <span class="classname">IOExceptions</span>. Note that <span class="code">readObject()</span> returns a value of type
+                            <span class="classname">Object</span>, which generally has to be type-cast to the actual type of the
+                            object that was read.</p>
+
+
+                        <p>
+                            <span class="classname">ObjectOutputStream</span> also has methods <span class="code">writeInt()</span>,
+                            <span class="code">writeDouble()</span>, and so on, for outputting primitive type values to the stream,
+                            and <span class="classname">ObjectInputStream</span> has corresponding methods for reading
+                            primitive type values.  These primitive type values can be interspersed with objects
+                            in the data.  In the file, the primitive types will be represented in their internal
+                            binary format.</p>
+
+
+                        <p>Object streams are byte streams.  The objects are represented in binary, machine-readable
+                            form.  This is good for efficiency, but it does suffer from the fragility that is often
+                            seen in binary data.  They suffer from the additional problem that the binary format of
+                            Java objects is very specific to Java, so the data in object streams is not easily
+                            available to programs written in other programming languages.
+                            For these reasons, object streams are appropriate mostly for short-term storage of objects
+                            and for transmitting objects over a network connection from one Java program to another.
+                            For long-term storage and for communication with non-Java programs, other approaches
+                            to object serialization are usually better.  (See <a href="ch11-05-XML.html">Section&nbsp;11.5</a> for a
+                            character-based approach.  See <a href="ch12-05-NetworkProgrammingExample.html">Subsection&nbsp;12.5.1</a> for an example that uses
+                            object streams for network communication.)</p>
+
+
+                        <p>
+                            <span class="classname">ObjectInputStream</span> and <span class="classname">ObjectOutputStream</span>
+                            only work with
+                            objects that implement an interface named <span class="classname">Serializable</span>. Furthermore,
+                            all of the instance variables in the object must be serializable. However,
+                            there is little work involved in making an object serializable, since the
+                            <span class="classname">Serializable</span> interface does not declare any methods. It exists only as
+                            a marker for the compiler, to tell it that the object is meant to be writable
+                            and readable. You only need to add the words "<span class="code">implements&nbsp;Serializable</span>"
+                            to your class definitions. Many of Java's standard classes are already declared
+                            to be serializable.</p>
+
+
+                        <p>One warning about using <span class="classname">ObjectOutputStreams</span>: These streams are optimized to avoid writing
+                            the same object more than once.  When an object is encountered for a second time, only a reference to the first
+                            occurrence is written.  Unfortunately, if the object has been modified in the meantime, the new data will
+                            not be written.  That is, the modified value will not be written correctly to the stream.
+                            Because of this, <span class="classname">ObjectOutputStreams</span> are meant mainly for use
+                            with "immutable" objects that can't be changed after they are created.  (<span class="classname">Strings</span>
+                            are an example of this.)  However, if you do need to write mutable objects to an
+                            <span class="classname">ObjectOutputStream</span>, and if it is possible that you will write the
+                            same object more than once, you can ensure that the full, correct version of the
+                            object will be written by calling the stream's <span class="code">reset()</span> method before writing the object
+                            to the stream.</p>
 
                     </main>
 
