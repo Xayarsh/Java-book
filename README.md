@@ -10,6 +10,6 @@ Email: eck@hws.edu
 **The html, css and js are directly implemented from the following** 
 
 The Rust Programming Language
-by Steve Klabnik and Carol Nichols, with contributions from the Rust Community**
+by Steve Klabnik and Carol Nichols, with contributions from the Rust Community
 
 **This is an attempt to prettify the book.**
