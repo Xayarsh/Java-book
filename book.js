@@ -27,7 +27,7 @@ function playground_text(playground, hidden = true) {
 
     var playgrounds = Array.from(document.querySelectorAll(".playground"));
     if (playgrounds.length > 0) {
-        fetch_with_timeout("https://play.Java-lang.org/meta/crates", {
+        fetch_with_timeout("", {
             headers: {
                 'Content-Type': "application/json",
             },
@@ -68,7 +68,7 @@ function playground_text(playground, hidden = true) {
     }
 
     // updates the visibility of play button based on `no_run` class and
-    // used crates vs ones available on http://play.Java-lang.org
+    // used crates vs ones available on http://
     function update_play_button(pre_block, playground_crates) {
         var play_button = pre_block.querySelector(".play-button");
 
@@ -87,7 +87,7 @@ function playground_text(playground, hidden = true) {
             snippet_crates.push(item[1]);
         }
 
-        // check if all used crates are available on play.Java-lang.org
+        // check if all used crates are available on
         var all_available = snippet_crates.every(function (elem) {
             return playground_crates.indexOf(elem) > -1;
         });
@@ -129,7 +129,7 @@ function playground_text(playground, hidden = true) {
 
         result_block.innerText = "Running...";
 
-        fetch_with_timeout("https://play.Java-lang.org/evaluate.json", {
+        fetch_with_timeout("https:///evaluate.json", {
             headers: {
                 'Content-Type': "application/json",
             },
